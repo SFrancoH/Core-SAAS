@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 import Link from "next/link";
 
 import DashboardHeader from "@/components/dashboard-header";
@@ -18,18 +17,27 @@ export const maxDuration = 60;
 const allowedLimits = [10, 25, 50, 100];
 const allowedSorts = new Set(["nombre", "ciudad", "numero_documento", "estado"]);
 
-function getPets(owner) {
-  return (owner.propietarios_mascotas || []).map((relation) => relation.mascotas).filter(Boolean);
+type ListPet = { id: string; nombre: string; numero_carnet?: string | null };
+type OwnerListRow = { id: string; nombre: string; tipo_documento?: string | null;
+ numero_documento?: string | null; ciudad?: string | null; telefono?: string | null;
+ whatsapp?: string | null; email?: string | null; fuente?: string | null; estado?: string | null;
+ propietarios_mascotas?: Array<{ mascotas: ListPet | null }> };
+type Params = { page?: string; limit?: string; q?: string; sort?: string; dir?: string;
+  ok?: string; importados?: string; agrupados?: string; asociados?: string;
+  sin_mascota?: string; error?: string };
+type CompanyChoice = { id: string; nombre: string };
+function getPets(owner: OwnerListRow): ListPet[] {
+  return (owner.propietarios_mascotas || []).map((relation) => relation.mascotas).filter((pet): pet is ListPet => pet !== null);
 }
 
-export default async function OwnersPage({ searchParams }) {
+export default async function OwnersPage({ searchParams }: { searchParams: Promise<Params> }) {
   const profile = await requireOperationalProfile();
   const params = await searchParams;
   const page = Math.max(1, Number.parseInt(params?.page || "1", 10) || 1);
   const requestedLimit = Number.parseInt(params?.limit || "10", 10);
   const limit = allowedLimits.includes(requestedLimit) ? requestedLimit : 10;
   const q = sanitizeSearch(params?.q);
-  const sort = allowedSorts.has(params?.sort) ? params.sort : "nombre";
+  const sort = params?.sort && allowedSorts.has(params.sort) ? params.sort : "nombre";
   const dir = params?.dir === "desc" ? "desc" : "asc";
   const offset = (page - 1) * limit;
   const admin = getSupabaseAdmin();
@@ -47,13 +55,15 @@ export default async function OwnersPage({ searchParams }) {
     query = query.or(`nombre.ilike.%${q}%,numero_documento.ilike.%${q}%,telefono.ilike.%${q}%,whatsapp.ilike.%${q}%,email.ilike.%${q}%`);
   }
 
-  const { data: owners = [], count = 0, error: ownersError } = await query
+  const { data: ownersRaw, count = 0, error: ownersError } = await query
     .order(sort, { ascending: dir === "asc", nullsFirst: false })
     .range(offset, offset + limit - 1);
+  const owners = (ownersRaw ?? []) as OwnerListRow[];
   if (ownersError) console.error("Error al leer propietarios", { code: ownersError.code, message: ownersError.message });
   const companies = profile.rol === "super_admin"
     ? (await admin.from("empresas").select("id, nombre").eq("activa", true).order("nombre")).data || []
     : [];
+  const companyOptions = companies as CompanyChoice[];
   const totalPages = Math.max(1, Math.ceil((count || 0) / limit));
 
   return (
@@ -75,7 +85,7 @@ export default async function OwnersPage({ searchParams }) {
                   <label>Empresa
                     <select name="empresa_id" required defaultValue="">
                       <option value="" disabled>Selecciona una empresa</option>
-                      {companies.map((company) => <option key={company.id} value={company.id}>{company.nombre}</option>)}
+                      {companyOptions.map((company) => <option key={company.id} value={company.id}>{company.nombre}</option>)}
                     </select>
                   </label>
                   <label>Archivo .xlsx o .csv<input name="archivo" type="file" accept=".xlsx,.csv,text/csv" required /></label>
