@@ -110,3 +110,8 @@ Jamás cambiar la contraseña del usuario, reemplazar su token Auth, firmar un J
 
 ## Defensa en profundidad del soporte (C12)
 La ruta `/super-admin/soporte` es **diagnóstico de permisos y verticales**, no autenticación con las credenciales del usuario observado. Mientras existe su cookie `httpOnly`, el proxy bloquea rutas operativas y `lib/core/support-guard.ts` rechaza las Server Actions de escritura aunque se intenten despachar mediante una URL permitida. La acción de cerrar soporte y logout permanecen disponibles. Es una barrera de la aplicación; el propietario real conserva sus privilegios originales fuera de la vista y no hay suplantación operativa en producción.
+
+## Empresa ≠ sede: UNI-001
+El contexto de plataforma contempla **usuario → varias empresas → varias sedes por empresa**, sin repetir cuenta Auth. Empresa es frontera de privacidad/tenant; sede es subdivisión operativa. `core.memberships` define pertenencia a empresa; el diseño `core.sedes` y grants por sede determinará dónde puede operar cada usuario, mientras su licencia y permisos de vertical siguen siendo los de la empresa.
+Un empleado con PETS de alcance empresa puede buscar el mismo registro de mascota en sedes A y B, con su historial clínico integrado. Un empleado con permisos de sede restringida no puede ejecutar operaciones locales en sedes fuera de su alcance, aunque cambie URL, body o filtros. Los datos maestros son únicos por empresa y no por sede; no hay «dos cuentas» para dos ubicaciones.
+**Estado:** las tablas/grants de sede son diseño pendiente; no añadir autorizaciones ficticias sobre `fuente`. Ver `docs/UNIFICACION_MULTISEDE.md`.

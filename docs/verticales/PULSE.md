@@ -25,3 +25,8 @@ Premio mayor obligatorio, anticipados configurables anteriores a la fecha mayor 
 
 ## Permisos y calidad
 Administrar proyecto, vendedores, pagos, eliminación requieren permisos específicos. Eliminar un proyecto exige confirmación y borrado transaccional solo de sus dependencias, nunca usuarios ni empresa. Pruebas obligatorias: empresa A/B, mismo número en distintos proyectos, concurrencia, valor acumulado, liberación, webhook mixto, fallo externo y datos públicos saneados.
+
+## Regla UNI-001: proyecto/boleta únicos para una empresa con varias sedes
+Un organizador con dos oficinas o puntos de venta **usa el mismo PULSE y el mismo proyecto**. La boleta se identifica por empresa + proyecto + número (dentro de su modelo de unicidad), nunca se crea otra boleta por sede. Sedes, oficinas, vendedores y asignaciones pueden registrar ubicación/punto de atención para permisos y analítica, pero no duplicar premios, reservas, pagos o proyectos.
+El vendedor autorizado puede trabajar en una o varias sedes conforme a grants; las consultas/ventas operativas validan empresa/proyecto/sede cuando corresponda. La búsqueda y reportes pueden consolidar todas las sedes sin duplicar ventas ni números; los pagos y reservas mantienen transacciones e idempotencia.
+La futura vertical PULSE utiliza `core.sedes` central, no un catálogo independiente PULSE. **Diseño, no funcionalidad implementada.** Referencia: `docs/UNIFICACION_MULTISEDE.md`.

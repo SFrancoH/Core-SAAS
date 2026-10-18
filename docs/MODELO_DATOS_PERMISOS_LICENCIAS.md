@@ -78,3 +78,16 @@ Solo cuatro roles de Core: `super_admin` (único propietario), `super_user` (per
 `core.accounts` referencia `auth.users`. `core.memberships` permite múltiples empresas; `core.membership_permissions` tiene permiso concreto y creador; `core.entitlements` decide verticales con licencia. El RPC `public.core_autorizar_operacion` se actualizará al aplicar 011, **solo desde service_role en servidor**. Las tablas Core están cerradas a `anon/authenticated` y sus métodos son RPC expresamente autorizadas.
 
 La compatibilidad con `public.usuarios.empresa_id` y las políticas RLS PETS actuales es temporal. Prohibido habilitar la selección de una segunda empresa para operaciones PETS hasta que todas las consultas, acciones y RLS respeten la membresía activa. La DB real sigue sin comprobarse; no se ejecutó 011. Consulta `docs/IDENTIDAD_ACCESO_MULTIEMPRESA.md`.
+
+## 9. UNI-001 — Multisede integrada (diseño, NO DDL aplicado)
+`public.empresas` continúa como **único tenant** de todas las verticales. Cada empresa tendrá un catálogo central único de sedes, propuesto como `core.sedes(id uuid,empresa_id uuid,codigo,nombre,activa,...)`, con UNIQUE por `(empresa_id,codigo)` normalizado y restricción compuesta `(empresa_id,id)`. Los nombres no son valores codificados en la aplicación; cada empresa puede tener 1, 2 o N sedes.
+
+Permisos por empresa no equivalen a permisos por sede: `core.memberships` define acceso a empresa, `core.membership_sedes`/grants equivalentes definen sedes autorizadas (una selección o todas). El permiso de lectura de datos maestros puede otorgarse para toda la empresa; una operación local requiere `sede_id` autorizado y RLS/validación de pertenencia empresarial. Nunca confiar en un selector como autorización.
+
+**Identidad y unicidad:** maestros compartidos (mascota, propietario, SKU, proyecto) tienen identidad UUID y constraints por empresa, no por sede. En PETS ya existen UNIQUE de carnet y documento en ámbito `empresa_id`; conservarlos. No insertar otra mascota al visitar otra sede; las consultas guardan la sede donde ocurrieron. Los datos históricos de `fuente` exigen mapping por empresa y conciliación antes de pasar a identificadores de sede; no convertirlos con un simple rename.
+
+**Operación:** citas, consultas, cajas, inventarios físicos y stock se atribuyen a sede cuando aplique; inventario usa movimientos/transferencias balanceadas entre sedes, no duplicación del catálogo. PULSE conserva unicidad de boleta por proyecto y empresa; asignar oficina/punto de venta no duplica proyecto ni boleta. Reportes ofrecen A, B y consolidado sin doble conteo de maestros.
+
+**Licencias:** una empresa con varias sedes opera en **la misma plataforma y con el mismo contrato de producto**; cuotas por sede, si existieran, son límites comerciales del mismo entitlement, no instalaciones aisladas. **Privacidad:** empresas distintas jamás comparten o fusionan registros maestros por coincidencia de nombres, documentos, carnets o teléfonos.
+
+**Estado:** estas entidades y reglas son requisitos de diseño, no tablas ejecutadas. Requisitos, casos de uso y pruebas completas: `docs/UNIFICACION_MULTISEDE.md`.

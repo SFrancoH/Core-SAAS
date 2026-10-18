@@ -107,3 +107,12 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **Compatibilidad:** PETS legacy y PULSE intactos. No hay segunda empresa habilitada para escrituras, exportaciones ni consultas clínicas antiguas.
 - **Pruebas:** pruebas unitarias y de contratos CI del PR. Pendientes tests A/B con JWT/RLS de Supabase en staging, E2E y pruebas de regresión antes de aplicar SQL.
 - **Fases siguientes:** C14 lecturas legacy y C15/C16 escrituras, claves foráneas y eliminación de empresa_id singular como fuente de autorización.
+
+## 2026-10-18 — UNI-001: regla transversal de unificación y multisede
+- **Estado:** DEFINIDO / DOCUMENTADO, NO IMPLEMENTADO en base de datos ni interfaz. Cambios exclusivamente de documentación y prueba de contrato; sin SQL ejecutado ni cambios de producción.
+- **Motivo de producto:** una empresa con varias sedes debe usar un solo Core SaaS, una cuenta, mismas verticales y módulos; registros maestros únicos por empresa y operaciones/historiales con sede propia. El usuario autorizado puede consultar A, B o todas sin pasar entre plataformas.
+- **Decisión:** empresa es tenant y frontera de privacidad; sede es ubicación subordinada; no crear otra empresa, licencia, usuario, mascota, propietario, SKU, proyecto ni boleta por cada sede. `core.sedes` y grants de sede están propuestos, no desplegados.
+- **Integridad:** identidades maestras únicas por empresa, concurrencia e idempotencia, filtros de sede sobre operaciones, RLS y validación en servidor. Saldos físicos y agenda locales, reportes consolidados sin doble conteo. No deduplicar entre empresas distintas.
+- **Hallazgo PETS:** SQL 005 registra `fuente text` en mascotas y propietarios; el catálogo de sedes actual es `SEDE NORTE`/`SEDE SUR`, validado además en SQL 006 y 009. Ese texto NO constituye un catálogo normalizado ni da permisos. Requiere mapeo por empresa y compatibilidad antes de reemplazarlo.
+- **Archivos normativos:** `docs/UNIFICACION_MULTISEDE.md`, `AGENTS.md`, arquitectura, modelo, guía de funciones, docs de PETS/PULSE, módulos, frontend, identidad, plan y README.
+- **Siguientes pasos reales:** preflight del esquema Supabase, migración versionada de sedes/grants, permisos por sede, renovación de formularios, buscador único y operaciones localizadas; E2E contra staging. No tocar PETS/PULSE productivos prematuramente.

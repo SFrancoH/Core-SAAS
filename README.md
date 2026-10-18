@@ -89,3 +89,10 @@ Super-Admin crea Super-User, Admin y User en `/super-admin/usuarios`; Admin crea
 
 ## PETS multiempresa (C13: piloto read-only)
 El contexto y las primeras rutas de mascotas y propietarios por empresa están documentados en docs/MIGRACION_PETS_MULTIEMPRESA.md. La migración supabase/migrations/012_pets_multitenant_rls.sql está versionada, pero NO aplicada. Para habilitar las nuevas rutas se requiere preflight real de Supabase 010/011/012, pruebas de JWT/RLS y la bandera CORE_PETS_MULTI_TENANT_READ_ENABLED=true; por defecto está apagada. Los flujos clínicos antiguos continúan sin soporte para una segunda empresa.
+
+## Unificación multisede — Regla de producto UNI-001
+**Una empresa con varias sedes no compra, administra ni utiliza varias instalaciones de software.** Core SaaS ofrece un login, las mismas verticales/complementos activados, **datos maestros únicos por empresa** y operaciones localizadas por sede cuando se necesite.
+
+Ejemplo PETS: el veterinario autorizado encuentra la misma mascota y su historial desde Sede Norte o Sede Sur; puede filtrar las visitas por sede o verlas consolidadas sin crear duplicados. Agenda e inventario mantienen localización física y permisos específicos. PULSE, facturación, reportes y demás complementos obedecerán el mismo principio. El filtro por sede es una ayuda operativa, **no** una autorización.
+
+Requisito formal de arquitectura: [UNI-001 — Unificación y multisede](docs/UNIFICACION_MULTISEDE.md). **Estado:** regla documentada, modelo dinámico `core.sedes` y sus grants pendientes de implementación y validación en Supabase; PETS tiene por ahora la columna histórica `fuente` y sedes codificadas.

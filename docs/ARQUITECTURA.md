@@ -46,3 +46,12 @@ Toda la aplicación usa TypeScript; `tsconfig.json` activa `strict: true`, `allo
 - `core.accounts` + `core.memberships` + `core.entitlements` + `core.membership_permissions`: identidad N:M y aislamiento por empresa y vertical (SQL 010/011 **no ejecutados**).
 - `/super-admin/soporte`: vista como usuario temporal **solo lectura**; el proxy bloquea rutas operativas durante una sesión soporte; ninguna API clínica asume la identidad del sujeto.
 - Falta convertir rutas PETS y RLS históricos para usar una empresa activa seleccionada; hasta entonces el selector no permite operaciones PETS multiempresa. Ver `docs/IDENTIDAD_ACCESO_MULTIEMPRESA.md`.
+
+## UNI-001 — Una empresa, múltiples sedes y una sola plataforma
+**Regla global para Core, PETS, PULSE y TODOS los módulos:** `docs/UNIFICACION_MULTISEDE.md`.
+
+La jerarquía será `auth.users → core.memberships → public.empresas → core.sedes` (0..N) y permisos efectivos por empresa/vertical + sede cuando aplique. `empresa_id` es el límite de aislamiento; `sede_id` es la unidad operativa, NO otro tenant. La empresa comparte datos maestros: mascota, propietario, cliente, SKU, proyecto, etc. Las consultas, agendas, stock físico, caja y otros eventos mantienen sede de operación y actor; una ficha no se duplica porque se atienda en A y B.
+
+El usuario con permisos de lectura de toda la empresa puede buscar en todas sus sedes; el filtro por sede es un criterio de consulta, no otra autenticación. Operar en una sede requiere permiso específico y valida empresa, sede y recurso en servidor + RLS. «Todas» es una opción de lectura/consolidación; no se permiten escrituras sin sede concreta cuando la operación depende de una ubicación. Las verticales consumen el mismo catálogo de sedes Core, sin tablas redundantes por producto.
+
+**Estado:** diseño, no despliegue. PETS utiliza hoy `fuente text` y listas `SEDE NORTE/SUR`; `core.sedes`, grants y políticas multisede todavía necesitan preflight y migraciones versionadas. Las rutas C13 están orientadas a multiempresa, no resuelven por sí solas los permisos de sede.
