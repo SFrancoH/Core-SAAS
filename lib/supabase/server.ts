@@ -1,4 +1,3 @@
-// @ts-nocheck — compatibilidad PETS pendiente de tipado completo.
 import "server-only";
 
 import { createServerClient } from "@supabase/ssr";

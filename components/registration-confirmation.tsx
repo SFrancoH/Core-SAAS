@@ -1,12 +1,14 @@
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 "use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function RegistrationConfirmation({ registrationId, formUrl, initialStatus }) {
+type RegistrationStatus = "completado" | "pendiente" | "error" | string;
+type Props = { registrationId: string; formUrl: string; initialStatus: RegistrationStatus };
+
+export default function RegistrationConfirmation({ registrationId, formUrl, initialStatus }: Props) {
   const [status, setStatus] = useState(initialStatus);
-  const [petId, setPetId] = useState(null);
+  const [petId, setPetId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "completado") return undefined;
@@ -15,9 +17,11 @@ export default function RegistrationConfirmation({ registrationId, formUrl, init
       try {
         const response = await fetch(`/api/registros/${registrationId}/estado`, { cache: "no-store" });
         if (!response.ok) return;
-        const data = await response.json();
-        setStatus(data.estado);
-        setPetId(data.mascota_id || null);
+        const data: unknown = await response.json();
+        if (!data || typeof data !== "object") return;
+        const value = data as Record<string, unknown>;
+        if (typeof value.estado === "string") setStatus(value.estado);
+        setPetId(typeof value.mascota_id === "string" ? value.mascota_id : null);
       } catch {
         // El siguiente intento de consulta volverá a comprobar el estado.
       }

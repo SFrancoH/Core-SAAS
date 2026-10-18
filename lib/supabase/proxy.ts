@@ -1,10 +1,9 @@
-// @ts-nocheck — compatibilidad PETS pendiente de tipado completo.
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { getAuthCookieOptions } from "@/lib/supabase/cookie-options";
 
-export async function refreshSupabaseSession(request) {
+export async function refreshSupabaseSession(request: NextRequest): Promise<NextResponse> {
   let response = NextResponse.next({ request });
   const url = process.env.SUPABASE_URL;
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;

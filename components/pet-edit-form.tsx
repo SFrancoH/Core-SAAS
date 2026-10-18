@@ -1,10 +1,22 @@
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 import {
   sedes, especies, razas, temperamentos, estadosReproductivos, tamanos, estadosMascota
 } from "@/lib/verticals/pets/pet-catalogs";
 import { updatePetProfile } from "@/app/mascotas/[id]/profile-actions";
 
-function Choice({ label, name, current, values, required = false }) {
+type ChoiceProps = {
+  label: string; name: string; current?: string | null;
+  values: readonly string[]; required?: boolean;
+};
+type PetFormRecord = {
+  id: string; nombre?: string | null; numero_carnet?: string | null;
+  fuente?: string | null; estado?: string | null; especie?: string | null;
+  raza?: string | null; temperamento?: string | null;
+  estado_reproductivo?: string | null; tamano?: string | null; sexo?: string | null;
+  fecha_nacimiento?: string | null; color?: string | null; peso_kg?: number | null;
+  numero_partos?: number | null; fecha_fallecimiento?: string | null;
+  motivo_fallecimiento?: string | null; comentarios_fallecimiento?: string | null;
+};
+function Choice({ label, name, current, values, required = false }: ChoiceProps) {
   const options = current && !values.includes(current) ? [current, ...values] : values;
   return (
     <label>{label}
@@ -17,7 +29,7 @@ function Choice({ label, name, current, values, required = false }) {
   );
 }
 
-export default function PetEditForm({ pet, editing = false, error = false, success = false }) {
+export default function PetEditForm({ pet, editing = false, error = false, success = false }: { pet: PetFormRecord; editing?: boolean; error?: boolean; success?: boolean }) {
   const save = updatePetProfile.bind(null, pet.id);
   return (
     <section className="recordSection">
@@ -42,8 +54,8 @@ export default function PetEditForm({ pet, editing = false, error = false, succe
             <label>Peso (kg)<input type="number" min="0" step="0.01" name="peso_kg" defaultValue={pet.peso_kg ?? ""} /></label>
             <label>Número de partos<input type="number" min="0" step="1" name="numero_partos" defaultValue={pet.numero_partos ?? ""} /></label>
             <label>Fecha de fallecimiento<input type="date" name="fecha_fallecimiento" defaultValue={pet.fecha_fallecimiento || ""} /></label>
-            <label className="fullField">Motivo del fallecimiento<textarea name="motivo_fallecimiento" defaultValue={pet.motivo_fallecimiento || ""} rows="3" /></label>
-            <label className="fullField">Comentarios del fallecimiento<textarea name="comentarios_fallecimiento" defaultValue={pet.comentarios_fallecimiento || ""} rows="3" /></label>
+            <label className="fullField">Motivo del fallecimiento<textarea name="motivo_fallecimiento" defaultValue={pet.motivo_fallecimiento || ""} rows={3} /></label>
+            <label className="fullField">Comentarios del fallecimiento<textarea name="comentarios_fallecimiento" defaultValue={pet.comentarios_fallecimiento || ""} rows={3} /></label>
           </div>
           <div className="registrationActions"><button type="submit">Actualizar datos</button></div>
         </form>

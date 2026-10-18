@@ -1,4 +1,3 @@
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 import { sedes } from "@/lib/verticals/pets/pet-catalogs";
 
 const documentTypes = [
@@ -14,7 +13,7 @@ const documentTypes = [
 
 // Bloque compartido por Nuevo registro y Agregar otro propietario.
 // No incluye información de mascotas: el formulario que lo usa decide el destino.
-export default function OwnerRegistrationFields({ initialSede = "", step = "1" }) {
+export default function OwnerRegistrationFields({ initialSede = "", step = "1" }: { initialSede?: string; step?: string }) {
   const sedeDefault = sedes.includes(initialSede) ? initialSede : "";
   return (
     <section className="registrationSection">
