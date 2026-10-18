@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -7,7 +6,7 @@ import { redirect } from "next/navigation";
 import { requireProfile } from "@/lib/core/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
-export async function createCompany(formData) {
+export async function createCompany(formData: FormData) {
   const profile = await requireProfile(["super_admin"]);
   const nombre = String(formData.get("nombre") || "").trim();
 

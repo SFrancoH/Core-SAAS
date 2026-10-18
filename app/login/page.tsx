@@ -1,22 +1,21 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 import { redirect } from "next/navigation";
 
 import PasswordField from "@/components/password-field";
 import { getCurrentProfile } from "@/lib/core/auth";
 import { login } from "./actions";
 
-const messages = {
+const messages: Record<string, string> = {
   campos: "Escribe tu correo y contraseña.",
   credenciales: "El correo o la contraseña no son correctos.",
   sin_acceso: "Tu usuario no tiene acceso activo. Comunícate con el administrador."
 };
 
-export default async function LoginPage({ searchParams }) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const profile = await getCurrentProfile();
   if (profile) redirect("/panel");
 
   const params = await searchParams;
-  const message = messages[params?.error];
+  const message = params?.error ? messages[params.error] : undefined;
 
   return (
     <main className="authShell">

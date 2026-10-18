@@ -1,4 +1,3 @@
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 "use client";
 
 import { useFormStatus } from "react-dom";
@@ -6,7 +5,7 @@ import { useFormStatus } from "react-dom";
 export default function ImportSubmitButton({
   idleLabel = "Importar archivo",
   pendingLabel = "Importando..."
-}) {
+}: { idleLabel?: string; pendingLabel?: string }) {
   const { pending } = useFormStatus();
 
   return (

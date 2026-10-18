@@ -1,11 +1,10 @@
-// @ts-nocheck — compatibilidad PETS pendiente de tipado completo.
 import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
 
-let adminClient;
+let adminClient: ReturnType<typeof createClient> | undefined;
 
-function getRequiredEnvironmentVariable(name) {
+function getRequiredEnvironmentVariable(name: string): string {
   const value = process.env[name];
 
   if (!value) {

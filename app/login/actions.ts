@@ -1,11 +1,10 @@
-// @ts-nocheck — compatibilidad PETS: tipado estricto de este archivo pendiente.
 "use server";
 
 import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export async function login(formData) {
+export async function login(formData: FormData) {
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const password = String(formData.get("password") || "");
 
@@ -24,6 +23,7 @@ export async function login(formData) {
     data: { user }
   } = await supabase.auth.getUser();
 
+  if (!user) redirect("/login?error=credenciales");
   const { data: profile } = await supabase
     .from("usuarios")
     .select("activo")

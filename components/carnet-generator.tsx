@@ -1,7 +1,6 @@
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 "use client";
 
-function bogotaCarnet() {
+function bogotaCarnet(): string {
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: "America/Bogota",
     day: "2-digit",
@@ -17,10 +16,10 @@ function bogotaCarnet() {
   return `${values.day}${values.month}${values.year}${values.hour}${values.minute}${values.second}`;
 }
 
-export default function CarnetGenerator({ inputId = "numero_carnet" }) {
+export default function CarnetGenerator({ inputId = "numero_carnet" }: { inputId?: string }) {
   function generate() {
     const input = document.getElementById(inputId);
-    if (!input) return;
+    if (!(input instanceof HTMLInputElement)) return;
     input.value = bogotaCarnet();
     input.dispatchEvent(new Event("input", { bubbles: true }));
     input.focus();

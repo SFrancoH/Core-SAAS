@@ -1,9 +1,10 @@
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 import Link from "next/link";
 
 import { logout } from "@/app/actions";
+import type { CoreProfile } from "@/lib/core/auth";
 
-export default function DashboardHeader({ profile, context, active }) {
+type Props = { profile: Pick<CoreProfile, "nombre" | "rol">; context: string; active?: string };
+export default function DashboardHeader({ profile, context, active }: Props) {
   const isSuperAdmin = profile.rol === "super_admin";
 
   return (

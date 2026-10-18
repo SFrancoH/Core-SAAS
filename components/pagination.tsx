@@ -1,7 +1,9 @@
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 import Link from "next/link";
 
-function buildHref(basePath, page, query) {
+type Query = { q?: string; limit?: string | number; sort?: string; dir?: string };
+type Props = { basePath: string; page: number; totalPages: number; query: Query };
+
+function buildHref(basePath: string, page: number, query: Query): string {
   const params = new URLSearchParams();
   params.set("page", String(page));
   if (query.q) params.set("q", query.q);
@@ -11,7 +13,7 @@ function buildHref(basePath, page, query) {
   return `${basePath}?${params.toString()}`;
 }
 
-export default function Pagination({ basePath, page, totalPages, query }) {
+export default function Pagination({ basePath, page, totalPages, query }: Props) {
   if (totalPages <= 1) return null;
 
   return (
