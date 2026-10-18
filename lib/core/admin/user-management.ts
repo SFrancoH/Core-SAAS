@@ -44,10 +44,10 @@ export async function getCompanyUserAdminData(
   ]);
   if (company.error || !company.data?.activa) throw new CoreAccessError("COMPANY_NOT_FOUND");
   const dbReady = !catalogue.error && !members.error;
-  const permissions = dbReady && Array.isArray(catalogue.data)
-    ? catalogue.data.filter(isPermission) : [];
-  const rows = dbReady && Array.isArray(members.data)
-    ? members.data.filter(isMember) : [];
+  const permissions: PermissionOption[] = dbReady && Array.isArray(catalogue.data)
+    ? (catalogue.data as unknown[]).filter(isPermission) : [];
+  const rows: MemberRow[] = dbReady && Array.isArray(members.data)
+    ? (members.data as unknown[]).filter(isMember) : [];
   // El RPC deniega a usuarios sin autorización; un catálogo vacío no concede derecho.
   if (dbReady && !permissions.some(x=>x.code==="core.members.manage")) {
     throw new CoreAccessError("FORBIDDEN");
