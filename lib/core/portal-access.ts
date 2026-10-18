@@ -66,7 +66,7 @@ export async function resolvePortalContext(): Promise<PortalContext | null> {
     .from("empresas").select("id,nombre,activa").eq("id", profile.empresa_id).maybeSingle();
   if (companyError) throw new Error("No fue posible consultar la empresa.");
   const workspaces: PortalWorkspace[] = company?.activa ? [{
-    companyId: company.id, companyName: company.nombre, role,
+    companyId: company.id, companyName: company.nombre, role: role === "admin" ? "admin" : "user",
     products: ["PETS"], canOpenPets: true
   }] : [];
   return { role, workspaces, mode: "legacy_pets" };
