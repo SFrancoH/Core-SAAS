@@ -1,11 +1,17 @@
 /**
- * Reglas puras de Core SaaS para determinar alcance del usuario.
- * No autoriza por sí solo escrituras usando service_role: cada endpoint
- * también valida permiso, licencia y pertenencia del recurso.
+ * Validaciones puras de contexto empresarial.
+ * No reemplazan permisos/licencias ni las políticas de PostgreSQL.
  */
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+export type CompanyScopeProfile = {
+  activo: boolean;
+  rol: string;
+  empresa_id: string | null;
+};
+
 export class CoreAccessError extends Error {
+  readonly code: string;
   constructor(code = "FORBIDDEN") {
     super(code);
     this.name = "CoreAccessError";
@@ -13,7 +19,10 @@ export class CoreAccessError extends Error {
   }
 }
 
-export function requireCompanyScope(profile, requestedCompanyId) {
+export function requireCompanyScope(
+  profile: CompanyScopeProfile | null | undefined,
+  requestedCompanyId?: string | null
+): string {
   if (!profile?.activo) throw new CoreAccessError("UNAUTHENTICATED");
   const companyId = String(requestedCompanyId || profile.empresa_id || "");
   if (!UUID_RE.test(companyId)) throw new CoreAccessError("INVALID_COMPANY");
@@ -23,7 +32,10 @@ export function requireCompanyScope(profile, requestedCompanyId) {
   return companyId;
 }
 
-export function assertResourceCompany(companyId, resourceCompanyId) {
+export function assertResourceCompany(
+  companyId: string,
+  resourceCompanyId: string | null
+): true {
   if (!UUID_RE.test(String(companyId || "")) || resourceCompanyId !== companyId) {
     throw new CoreAccessError("RESOURCE_NOT_FOUND");
   }

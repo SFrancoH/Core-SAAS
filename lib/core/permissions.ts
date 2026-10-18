@@ -1,5 +1,5 @@
-// Catálogo de permisos Core. El catálogo real se normaliza en SQL 010.
-export const PERMISSIONS = Object.freeze({
+// Catálogo tipado. La fuente de autorización real será SQL 010, aún no aplicado.
+export const PERMISSIONS = {
   COMPANY_READ: "core.company.read",
   COMPANY_MANAGE: "core.company.manage",
   MEMBERS_MANAGE: "core.members.manage",
@@ -14,8 +14,11 @@ export const PERMISSIONS = Object.freeze({
   PULSE_TICKET_PAY: "pulse.ticket.pay",
   PULSE_TICKET_ASSIGN: "pulse.ticket.assign",
   PULSE_PROJECT_DELETE: "pulse.project.delete"
-});
-export const PRODUCTS = Object.freeze({
+} as const;
+
+export type PermissionCode = typeof PERMISSIONS[keyof typeof PERMISSIONS];
+
+export const PRODUCTS = {
   PETS: "PETS",
   PULSE: "PULSE",
   AURA: "AURA",
@@ -23,4 +26,6 @@ export const PRODUCTS = Object.freeze({
   DRIVE: "DRIVE",
   NEURO: "NEURO",
   LENS: "LENS"
-});
+} as const;
+
+export type ProductCode = typeof PRODUCTS[keyof typeof PRODUCTS];

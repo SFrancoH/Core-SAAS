@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { pickGhlField, normalizeGhlFields } from "@/lib/integrations/ghl-payload.mjs";
+import { pickGhlField, normalizeGhlFields } from "@/lib/integrations/ghl-payload";
 
 export const dynamic = "force-dynamic";
 

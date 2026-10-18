@@ -15,13 +15,14 @@ El producto se desarrolla sobre la aplicación Next.js que ya existe en este rep
 - [PETS](docs/verticales/PETS.md) y [PULSE](docs/verticales/PULSE.md).
 
 ## Stack y ejecución
-Next.js 16, React 19, Supabase Auth, PostgreSQL y ExcelJS. El código actual usa JavaScript; priorizar TypeScript para **módulos nuevos** sin convertir toda la base innecesariamente.
+Next.js 16, React 19, Supabase Auth, PostgreSQL y ExcelJS. **TypeScript es el lenguaje obligatorio para todo desarrollo nuevo**. Core y los módulos PETS ya organizados utilizan archivos `.ts`; los archivos `.js` existentes de PETS se mantienen por compatibilidad mientras se convierten por etapas. `tsconfig.json` habilita `strict` y `allowJs` para este tránsito, sin permitir nuevo código JavaScript.
 
 ```bash
 npm install
 npm run dev
+npm test       # Node.js 22, pruebas TypeScript
+npm run typecheck
 npm run build
-npm test
 ```
 
 Configurar en `.env.local` o en el servidor, **nunca en Git**:
@@ -36,3 +37,35 @@ El directorio `supabase/migrations` contiene PETS 001–009 y el **diseño aún 
 
 ## Primera entrega de Core
 Conservar PETS operativo, inventariar la base de datos actual, construir permisos/licencias centrales y agregar la primera función «Crear proyecto PULSE» siguiendo el contrato Core. No copiar todo PULSE de golpe ni escribir en una base de datos ajena a este proyecto.
+
+## Estructura confirmada
+
+```text
+Core-SAAS/
+├── AGENTS.md
+├── PLAN_DESARROLLO.md
+├── BITACORA.md
+├── README.md
+├── app/                     # Rutas PETS actuales
+├── components/              # Componentes existentes
+├── lib/
+│   ├── core/                # Autenticación, autorización y permisos TypeScript
+│   ├── verticals/
+│   │   ├── pets/            # Dominio PETS TypeScript
+│   │   └── pulse/           # Dominio previsto, aún sin casos de uso
+│   ├── modules/             # Complementos transversales
+│   └── integrations/        # Parser compartido GHL TypeScript
+├── docs/
+│   ├── ARQUITECTURA.md
+│   ├── MODELO_DATOS_PERMISOS_LICENCIAS.md
+│   ├── CONTRATOS_INTEGRACIONES.md
+│   ├── COMO_AGREGAR_FUNCIONALIDAD.md
+│   └── verticales/
+│       ├── PETS.md
+│       └── PULSE.md
+└── supabase/
+    ├── migrations/          # PETS 001–009 + Core 010 sin aplicar
+    └── design/              # Documentos y consultas de revisión
+```
+
+Esta estructura describe carpetas reales del repositorio; no significa que PULSE, licencias en DB o módulos compartidos ya estén habilitados.

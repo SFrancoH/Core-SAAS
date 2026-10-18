@@ -2,6 +2,14 @@
 
 **Estas reglas son obligatorias para cualquier IA o desarrollador.** Core SaaS es el producto; PETS, PULSE y las demás son verticales integradas. No describir este repositorio como una migración.
 
+## Norma obligatoria de lenguaje — TypeScript
+- **Todo código nuevo de aplicación, servidor, Core, verticales, módulos, integraciones y pruebas automatizadas se escribe en TypeScript**: `.ts` y `.tsx`. No crear nuevos archivos `.js`, `.jsx` ni `.mjs` para funcionalidades.
+- El proyecto usa `tsconfig.json` con `strict: true`, `allowJs: true`, `checkJs: false` y `noEmit: true`. `allowJs` se mantiene **solo para ejecutar el código heredado PETS**, no es permiso para escribir código nuevo en JavaScript.
+- Antes de finalizar un cambio: `npm ci`, `npm test`, `npm run typecheck` y `npm run build`. La CI usa Node.js 22 para ejecutar pruebas TypeScript; si el cambio requiere un runtime distinto, documentarlo.
+- Al modificar código JavaScript heredado de PETS, preservar su comportamiento. Convertir el archivo a TypeScript cuando sea seguro y se disponga de pruebas; no forzar conversiones masivas.
+- Los adapters `.js` existentes son compatibilidad temporal. La lógica real de `lib/core` y `lib/verticals/pets` se desarrolla en TypeScript. Contratos entre módulos deben tener tipos explícitos y validar entradas externas en runtime.
+- Excepciones: SQL `.sql`, documentación `.md`, JSON y archivos de configuración exigidos por herramientas; no se consideran código de funcionalidad.
+
 ## Lectura antes de modificar código
 1. Leer `README.md`, `PLAN_DESARROLLO.md`, `BITACORA.md`, `docs/ARQUITECTURA.md`, `docs/MODELO_DATOS_PERMISOS_LICENCIAS.md` y `docs/CONTRATOS_INTEGRACIONES.md`.
 2. Si se trabaja en una vertical, leer también `docs/verticales/PETS.md` o `docs/verticales/PULSE.md`. Para crear otra, documentarla primero.

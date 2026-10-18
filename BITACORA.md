@@ -42,3 +42,12 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **Pruebas:** `node --test` de 7 escenarios puros de scopes/parsing reproducidos localmente; todavía falta `npm ci`, `npm run build`, pruebas de DB y E2E sobre el repositorio.
 - **Operación:** ninguna conexión a Supabase, ningún cambio de variables, deployment ni despliegue afirmado.
 - **Pendiente:** ejecutar preflight en Supabase Core, ensayar SQL 010 en entorno de prueba y completar autorización de nuevas rutas; luego PULSE crear proyecto.
+
+## 2026-10-18 — Estandarización TypeScript de Core SaaS
+- **Estado:** IMPLEMENTADO EN CÓDIGO al confirmar commit; no cambia base de datos.
+- **Decisión TS-001:** todo desarrollo nuevo utiliza TypeScript `.ts/.tsx`; `tsconfig.json` estricto con `allowJs` temporal únicamente para el JavaScript PETS ya existente.
+- **Estructura:** carpetas de Core, verticales PETS/PULSE, módulos, integraciones, documentación y SQL confirmadas. PULSE y complementos siguen sin implementar funcionalidad.
+- **Archivos:** `lib/core/{auth,access,permissions,authorization}.ts`, `lib/verticals/pets/*.ts`, `lib/integrations/ghl-payload.ts`, `tests/core-contracts.test.ts`, `tsconfig.json`, `package.json`, `package-lock.json`, reglas/CI.
+- **Compatibilidad:** se conservan rutas `.js` PETS y adaptadores de importación; se reemplaza el `jsconfig.json` por `tsconfig.json` sin cambiar la ruta pública ni el contrato de base de datos.
+- **SQL:** sin ejecutar; `010_core_access.sql` pendiente de verificación/instalación controlada.
+- **Pruebas:** resultados documentados en el PR/CI correspondiente; pruebas con Supabase real y E2E pendientes.
