@@ -1,5 +1,7 @@
 "use server";
 
+import { assertNoSupportMode } from "@/lib/core/support-guard";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -7,6 +9,7 @@ import { requireProfile } from "@/lib/core/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function createCompany(formData: FormData) {
+  await assertNoSupportMode();
   const profile = await requireProfile(["super_admin"]);
   const nombre = String(formData.get("nombre") || "").trim();
 

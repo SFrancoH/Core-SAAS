@@ -1,5 +1,7 @@
 "use server";
 
+import { assertNoSupportMode } from "@/lib/core/support-guard";
+
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getCurrentProfile } from "@/lib/core/auth";
@@ -49,6 +51,7 @@ function validateInputs(form: FormData) {
  * Si falla cualquier RPC, borra la identidad creada: no dejar login huérfano.
  * El servidor jamás concede roles con base solo en el formulario. */
 export async function createCoreUser(form: FormData): Promise<void> {
+  await assertNoSupportMode();
   const input = validateInputs(form);
   const origin = String(form.get("origen")||"");
   const isStaff = input.role === "super_user";
@@ -121,6 +124,7 @@ export async function createCoreUser(form: FormData): Promise<void> {
 /** Solo Super-Admin puede asignar a otra empresa una cuenta ya existente.
  * No se fuerza a otros usuarios a una empresa desde un Admin local. */
 export async function assignExistingCoreUser(form: FormData): Promise<void> {
+  await assertNoSupportMode();
   const actor = await getCurrentProfile();
   if (!actor || normalizeCoreRole(actor.rol)!=="super_admin") redirect("/panel");
   const companyId = String(form.get("empresa_id") ?? "");

@@ -1,5 +1,7 @@
 "use server";
 
+import { assertNoSupportMode } from "@/lib/core/support-guard";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -18,6 +20,7 @@ function fail(petId: string, code: string): never {
 }
 
 export async function addOwnerToPet(petId: string, formData: FormData) {
+  await assertNoSupportMode();
   const profile = await requireOperationalProfile();
   if (!validUuid.test(petId || "")) redirect("/mascotas");
 
