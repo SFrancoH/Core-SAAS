@@ -8,3 +8,6 @@ Inventario, agenda, facturación, caja, reportes e integraciones reutilizan `pub
 - **Lectura consolidada** con filtros de sede y permisos; **escritura local** requiere sede concreta autorizada; traslados de stock requieren movimientos auditables y balanceados.
 - Probar dos sedes de una empresa, permisos por sede, concurrencia/deduplicación y no acceso entre empresas.
 Regla completa en `docs/UNIFICACION_MULTISEDE.md`. **Diseño; los complementos de negocio aún no están implementados.**
+
+## Inventario futuro
+Plan completo: `docs/modules/INVENTORY_PLAN.md`. El código y esquema funcional de Inventario **no se han implementado**; no crear los módulos de inventario automáticamente al instalar Core 010–013. Core sólo aporta identidad, sedes, permisos, licencia y auditoría. Fases I0–I9 definen el alcance y pruebas para desarrollo posterior.

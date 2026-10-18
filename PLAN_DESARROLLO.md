@@ -141,3 +141,15 @@ Leer reglas → identificar vertical/entidad → definir contrato, permisos/lice
 - [ ] IMPLEMENTACIÓN VERTICALES: PETS y PULSE consumen `core.sedes` sin clonar empresas, usuarios, proyectos/boletas o productos por sede; permiso y licencia siempre por empresa.
 - [ ] VERIFICACIÓN: pruebas simultáneas A/B de sedes en una empresa, control de usuarios A-only/B-only/A+B, deduplicación y concurrencia, aislamiento entre dos empresas, negativos API/RLS, regresión antes de producción.
 **Prioridad:** incorporar a fases C14-C16 sin romper PETS ni confundir esquema de sede con aislamiento multiempresa. Estado actual: diseño/documentación, NO migración aplicada.
+
+## C19 — Paquete Core multisede + alcance módulo INVENTORY
+- [x] Diseñar SQL `013_core_sedes.sql` con `core.sedes`, grants de sede, mapeo conservador de `fuente`, FK compuestas y autorización server-side (no aplicado).
+- [x] Preparar `supabase/deploy/CORE_UNA_EJECUCION_STAGING.sql`: una transacción para 010–013; preflight estructural y postcheck, bloquea Core parcialmente instalado. NO ejecutado/validado en PostgreSQL.
+- [x] Crear rutas nuevas de catálogo/alta de sedes, historial PETS filtrable por sede y exportaciones Excel por empresa autorizada; flag OFF por defecto.
+- [x] Planear INVENTORY en `docs/modules/INVENTORY_PLAN.md`: arquitectura, esquema lógico, FEFO/FIFO/JIT, caducidad sin huecos, concurrencia, contratos y fases I0–I9.
+- [ ] VALIDAR/INSTALAR 010–013 en Supabase de staging con respaldo y pruebas JWT/RLS empresa A/B, sede A/B.
+- [ ] C14: migrar las pantallas y rutas GET/export antiguas a contexto de empresa validado.
+- [ ] C15: migrar todas las escrituras PETS, consultas y formularios, control de sede, FKs/autoría y pruebas.
+- [ ] C16: retirar dependencia única `public.usuarios.empresa_id` en auth/queries/RPC legacy; estabilizar roles Core multiempresa.
+- [ ] INVENTORY I0: acordar semaforización, unidades, proveedores, stock negativo y requisitos regulatorios; el módulo NO se desarrolla aún.
+- [ ] Activar producción solo tras E2E y verificación de regresiones. El bundle único STAGING NO equivale al cierre C14/C15/C16.

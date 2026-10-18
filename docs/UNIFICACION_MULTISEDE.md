@@ -83,3 +83,6 @@ auth.users (identidad global)
 - No se han creado tablas `core.sedes` ni grants de sede; no se ha ejecutado SQL sobre Supabase.
 - No se modificaron registros, restricciones, lógica de consulta, rutas, facturación ni inventarios existentes. Son requisitos para próximos PR y migraciones reales.
 - No se define en este documento una tarifa por sede, restricciones legales por país ni una estrategia de fusión automática entre empresas.
+
+## Avance C19: sedes centrales preparadas (no aplicadas)
+`supabase/migrations/013_core_sedes.sql` define catálogo Core, grants por membresía, mapeo conservador de `fuente`, control de sede y auditoría; **no se ha ejecutado en Supabase**. Los usuarios autorizados podrán consultar historial por sede y exportar maestros desde rutas Core aisladas tras el feature flag, pero las operaciones clínicas legacy seguirán sujetas a C15/C16. No se duplica ninguna entidad maestra. El plan de Inventario como complemento UNI-001 está en `docs/modules/INVENTORY_PLAN.md`.

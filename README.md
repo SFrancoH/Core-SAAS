@@ -96,3 +96,8 @@ El contexto y las primeras rutas de mascotas y propietarios por empresa están d
 Ejemplo PETS: el veterinario autorizado encuentra la misma mascota y su historial desde Sede Norte o Sede Sur; puede filtrar las visitas por sede o verlas consolidadas sin crear duplicados. Agenda e inventario mantienen localización física y permisos específicos. PULSE, facturación, reportes y demás complementos obedecerán el mismo principio. El filtro por sede es una ayuda operativa, **no** una autorización.
 
 Requisito formal de arquitectura: [UNI-001 — Unificación y multisede](docs/UNIFICACION_MULTISEDE.md). **Estado:** regla documentada, modelo dinámico `core.sedes` y sus grants pendientes de implementación y validación en Supabase; PETS tiene por ahora la columna histórica `fuente` y sedes codificadas.
+
+## Paquete de despliegue inicial Core y futuro módulo Inventory
+El plan funcional de Inventory está en [`docs/modules/INVENTORY_PLAN.md`](docs/modules/INVENTORY_PLAN.md), incluyendo bodegas/altillaje, proveedores N:M, lotes, FEFO/FIFO, JIT, caducidad, ledger y fases I0–I9. **No hay Inventario funcional en este commit.**
+
+La migración combinada Core 010–013 para **staging sin Core previo** está en `supabase/deploy/CORE_UNA_EJECUCION_STAGING.sql` (una transacción, no aplicada). Instrucciones y advertencias: [`docs/DESPLIEGUE_UNICO_CORE_STAGING.md`](docs/DESPLIEGUE_UNICO_CORE_STAGING.md). PETS estricto multiempresa/multisede debe seguir con flag OFF hasta validar RLS real y migrar las escrituras legacy.
