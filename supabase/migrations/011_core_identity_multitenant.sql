@@ -390,7 +390,7 @@ grant execute on function public.core_support_status(uuid,uuid) to service_role;
 -- Directorio visible únicamente al propietario autenticado en servidor.
 create or replace function public.core_support_directory(p_actor_id uuid)
 returns jsonb language plpgsql stable security definer set search_path=''
-as $
+as $$
 declare result jsonb;
 begin
  if not exists(
@@ -407,14 +407,14 @@ begin
  where m.status='active' and m.user_id<>p_actor_id;
  return result;
 end;
-$;
+$$;
 revoke all on function public.core_support_directory(uuid) from public,anon,authenticated;
 grant execute on function public.core_support_directory(uuid) to service_role;
 
 -- Vista efectiva del target (sin acceso a filas clínicas ni JWT del target).
 create or replace function public.core_support_snapshot(p_actor_id uuid,p_session_id uuid)
 returns jsonb language sql stable security definer set search_path=''
-as $
+as $$
  select jsonb_build_object(
   'subject_id',s.subject_id,'subject_name',a.nombre,'company_id',m.empresa_id,
   'company_name',e.nombre,'company_role',m.company_role,
@@ -446,7 +446,7 @@ as $
  join public.empresas e on e.id=m.empresa_id and e.activa
  where s.id=p_session_id and s.actor_id=p_actor_id
  and s.revoked_at is null and s.expires_at>now() and s.read_only
-$;
+$$;
 revoke all on function public.core_support_snapshot(uuid,uuid) from public,anon,authenticated;
 grant execute on function public.core_support_snapshot(uuid,uuid) to service_role;
 
@@ -456,7 +456,7 @@ grant execute on function public.core_support_snapshot(uuid,uuid) to service_rol
 create or replace function public.core_register_account(
  p_actor_id uuid, p_user_id uuid, p_nombre text, p_email text
 ) returns boolean language plpgsql security definer set search_path=''
-as $
+as $$
 declare can_manage boolean;
 begin
  if p_actor_id is null or p_user_id is null
@@ -487,7 +487,7 @@ begin
  end if;
  return true;
 end;
-$;
+$$;
 revoke all on function public.core_register_account(uuid,uuid,text,text)
  from public,anon,authenticated;
 grant execute on function public.core_register_account(uuid,uuid,text,text) to service_role;
@@ -496,7 +496,7 @@ grant execute on function public.core_register_account(uuid,uuid,text,text) to s
 create or replace function public.core_assign_staff(
  p_actor_id uuid,p_subject_id uuid,p_role text
 ) returns boolean language plpgsql security definer set search_path=''
-as $
+as $$
 begin
  if p_role<>'super_user' or p_actor_id=p_subject_id
    or not exists(
@@ -514,7 +514,7 @@ begin
   jsonb_build_object('role','super_user'));
  return true;
 end;
-$;
+$$;
 revoke all on function public.core_assign_staff(uuid,uuid,text) from public,anon,authenticated;
 grant execute on function public.core_assign_staff(uuid,uuid,text) to service_role;
 
@@ -523,7 +523,7 @@ grant execute on function public.core_assign_staff(uuid,uuid,text) to service_ro
 create or replace function public.core_assign_multiple_memberships(
  p_actor_id uuid,p_subject_id uuid,p_assignments jsonb
 ) returns integer language plpgsql security definer set search_path=''
-as $
+as $$
 declare item jsonb; n integer:=0; company_id uuid;
 declare role_code text; perms text[];
 begin
@@ -545,7 +545,7 @@ begin
  end loop;
  return n;
 end;
-$;
+$$;
 revoke all on function public.core_assign_multiple_memberships(uuid,uuid,jsonb)
  from public,anon,authenticated;
 grant execute on function public.core_assign_multiple_memberships(uuid,uuid,jsonb)
@@ -556,7 +556,7 @@ grant execute on function public.core_assign_multiple_memberships(uuid,uuid,json
 -- DESPUÉS de resolver actor.id desde Supabase Auth.
 create or replace function public.core_permission_catalog(p_actor_id uuid,p_empresa_id uuid)
 returns jsonb language plpgsql stable security definer set search_path=''
-as $
+as $$
 declare v jsonb;
 begin
  if not core.effective_permission(p_actor_id,p_empresa_id,'core.members.manage') then
@@ -579,14 +579,14 @@ begin
  and core.effective_permission(p_actor_id,p_empresa_id,p.code);
  return v;
 end;
-$;
+$$;
 revoke all on function public.core_permission_catalog(uuid,uuid)
  from public,anon,authenticated;
 grant execute on function public.core_permission_catalog(uuid,uuid) to service_role;
 
 create or replace function public.core_company_members(p_actor_id uuid,p_empresa_id uuid)
 returns jsonb language plpgsql stable security definer set search_path=''
-as $
+as $$
 declare v jsonb;
 begin
  if not core.effective_permission(p_actor_id,p_empresa_id,'core.members.manage') then
@@ -604,7 +604,7 @@ begin
  where m.empresa_id=p_empresa_id;
  return v;
 end;
-$;
+$$;
 revoke all on function public.core_company_members(uuid,uuid)
  from public,anon,authenticated;
 grant execute on function public.core_company_members(uuid,uuid) to service_role;
@@ -613,7 +613,7 @@ grant execute on function public.core_company_members(uuid,uuid) to service_role
 -- Admin local debe usar invitación aceptada, nunca enrolar silenciosamente.
 create or replace function public.core_find_account(p_actor_id uuid,p_email text)
 returns uuid language plpgsql stable security definer set search_path=''
-as $
+as $$
 begin
  if not exists(
   select 1 from core.platform_staff st join core.accounts a on a.user_id=st.user_id
@@ -622,7 +622,7 @@ begin
  return (select user_id from core.accounts
   where lower(email)=lower(btrim(p_email)) and active);
 end;
-$;
+$$;
 revoke all on function public.core_find_account(uuid,text) from public,anon,authenticated;
 grant execute on function public.core_find_account(uuid,text) to service_role;
 
