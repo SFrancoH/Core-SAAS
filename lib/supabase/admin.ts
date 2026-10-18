@@ -14,7 +14,9 @@ function getRequiredEnvironmentVariable(name: string): string {
   return value;
 }
 
-export function getSupabaseAdmin() {
+// TODO(C01): generar los tipos de la base Supabase real antes de tipar todas las consultas.
+// Compatibilidad temporal: las tablas dinámicas PETS no tienen aún tipos Database generados.
+export function getSupabaseAdmin(): any {
   if (adminClient) {
     return adminClient;
   }
