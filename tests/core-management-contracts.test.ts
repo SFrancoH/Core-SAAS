@@ -28,5 +28,5 @@ test("interfaz de administración nunca es fuente de autorización",()=>{
   assert.match(actions,/core_assign_membership/);
   assert.match(actions,/auth\.admin\.createUser/);
   assert.match(actions,/auth\.admin\.deleteUser/);
-  assert.match(portal,/Pendiente aislamiento multiempresa/);
+  assert.match(portal,/Pendiente activación del aislamiento multiempresa/);
 });

@@ -35,9 +35,11 @@ export default async function PortalPage() {
             <div className="coreProductIcon">{product.slice(0,1)}</div>
             <h3>{product}</h3>
             <p>{LABELS[product] ?? "Vertical de Core SaaS"}</p>
-            {product === "PETS" && space.canOpenPets
-              ? <Link href="/empresa">Abrir PETS →</Link>
-              : <span className="coreStatusUpcoming">{product === "PETS" ? "Pendiente aislamiento multiempresa" : "Interfaz pendiente de implementación"}</span>}
+            {product === "PETS" && process.env.CORE_PETS_MULTI_TENANT_READ_ENABLED === "true"
+              ? <Link href={"/portal/empresa/"+space.companyId+"/pets/mascotas"}>PETS · Vista por empresa (lectura) →</Link>
+              : product === "PETS" && space.canOpenPets
+                ? <Link href="/empresa">Abrir PETS actual →</Link>
+                : <span className="coreStatusUpcoming">{product === "PETS" ? "Pendiente activación del aislamiento multiempresa" : "Interfaz pendiente de implementación"}</span>}
           </article>)}
         </div>
         {space.role==="admin" ? <p><Link href={"/portal/empresa/"+space.companyId+"/usuarios"}>Administrar usuarios y permisos →</Link></p> : null}
