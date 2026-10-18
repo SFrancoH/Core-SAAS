@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -9,14 +8,16 @@ import { mostrarSede } from "@/lib/verticals/pets/sede-display";
 import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 import { addOwnerToPet } from "./actions";
 
-const errors = {
+const errors: Record<string, string> = {
   datos: "Completa los datos del propietario y selecciona una sede válida. WhatsApp debe tener al menos 7 dígitos.",
   conflicto: "El documento o el teléfono coincide con propietarios diferentes, o el teléfono pertenece a otro documento. Revisa la información antes de asociar: no se creó ningún duplicado.",
   migracion: "Falta ejecutar la migración SQL 009 en Supabase antes de asociar propietarios.",
   guardar: "No fue posible asociar el propietario. Comprueba los datos e inténtalo de nuevo."
 };
 
-export default async function NewPetOwnerPage({ params, searchParams }) {
+export default async function NewPetOwnerPage({
+  params, searchParams
+}: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   const profile = await requireOperationalProfile();
   const { id } = await params;
   const queryParams = await searchParams;

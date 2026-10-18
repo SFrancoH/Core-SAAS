@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 import Link from "next/link";
 
 import CarnetGenerator from "@/components/carnet-generator";
@@ -9,7 +8,7 @@ import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createPetRegistration } from "./actions";
 
-const errorMessages = {
+const errorMessages: Record<string, string> = {
   empresa: "Selecciona una empresa válida.",
   propietario: "Completa nombre, WhatsApp y correo electrónico del propietario.",
   mascota: "Completa nombre, especie y número de carnet de la mascota.",
@@ -21,7 +20,7 @@ const errorMessages = {
   guardar: "No fue posible guardar el registro en Supabase. Comprueba que aplicaste la migración 006."
 };
 
-export default async function NewRegistrationPage({ searchParams }) {
+export default async function NewRegistrationPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const profile = await requireOperationalProfile();
   const params = await searchParams;
   const admin = getSupabaseAdmin();

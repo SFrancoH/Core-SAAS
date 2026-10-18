@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -7,7 +6,10 @@ import RegistrationConfirmation from "@/components/registration-confirmation";
 import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
-function buildFormUrl(baseUrl, registration) {
+type ConfirmationRegistration = {
+  id: string; propietario?: Record<string, string | null> | null;
+};
+function buildFormUrl(baseUrl: string, registration: ConfirmationRegistration): string {
   const owner = registration.propietario || {};
   const url = new URL(baseUrl);
   const values = {
@@ -33,7 +35,7 @@ function buildFormUrl(baseUrl, registration) {
   return url.toString();
 }
 
-export default async function ConfirmRegistrationPage({ params }) {
+export default async function ConfirmRegistrationPage({ params }: { params: Promise<{ id: string }> }) {
   const profile = await requireOperationalProfile();
   const { id } = await params;
   const admin = getSupabaseAdmin();

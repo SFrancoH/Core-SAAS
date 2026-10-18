@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -8,7 +7,11 @@ import { mostrarSede } from "@/lib/verticals/pets/sede-display";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 
-export default async function OwnerDetailPage({ params, searchParams }) {
+type OwnerDetailsProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ editar?: string; error_perfil?: string; perfil_actualizado?: string }>;
+};
+export default async function OwnerDetailPage({ params, searchParams }: OwnerDetailsProps) {
   const urlParams = await searchParams;
   const profile = await requireOperationalProfile();
   const { id } = await params;
