@@ -25,8 +25,8 @@ function PermissionChoices({ options, inputName }: { options: PermissionOption[]
 }
 
 export function CoreCompanyUserForms({
-  companyId, permissions, owner
-}: { companyId: string; permissions: PermissionOption[]; owner: boolean }) {
+  companyId, permissions, owner, origin = ""
+}: { companyId: string; permissions: PermissionOption[]; owner: boolean; origin?: string }) {
   return <>
     <section className="managementSection">
       <p className="eyebrow">Accesos de empresa</p>
@@ -34,6 +34,7 @@ export function CoreCompanyUserForms({
       <p className="description">Una identidad para Core SaaS. Puedes añadirla a varias empresas desde Super-Admin, con permisos distintos en cada una.</p>
       <form action={createCoreUser} className="managementForm">
         <input type="hidden" name="empresa_id" value={companyId}/>
+        <input type="hidden" name="origen" value={origin}/>
         <label>Rol de empresa
           <select name="rol" defaultValue="user" required>
             <option value="user">User · Trabajador</option>

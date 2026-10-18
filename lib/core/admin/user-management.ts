@@ -33,11 +33,9 @@ export async function getCompanyUserAdminData(
   if (!profile) throw new CoreAccessError("UNAUTHENTICATED");
   const role = normalizeCoreRole(profile.rol);
   const owner = role === "super_admin";
-  const admin = role === "admin";
-  if (!owner && !admin) throw new CoreAccessError("FORBIDDEN");
-  const companyId = owner ? requestedCompanyId : profile.empresa_id;
+  // Admin es rol de MEMBRESÍA, no del perfil global; la RPC valida alcance.
+  const companyId = requestedCompanyId || profile.empresa_id;
   if (!companyId || !UUID_RE.test(companyId)) throw new CoreAccessError("INVALID_COMPANY");
-  if (!owner && companyId !== profile.empresa_id) throw new CoreAccessError("FORBIDDEN");
   const client = getSupabaseAdmin();
   const [company, catalogue, members] = await Promise.all([
     client.from("empresas").select("id,nombre,activa").eq("id",companyId).maybeSingle(),
@@ -61,6 +59,6 @@ export async function getCompanyUserAdminData(
   return {
     companyId, companyName: company.data.nombre,
     options: (companies.data ?? []) as CompanyOption[],
-    permissions, members: rows, actorRole: role!, dbReady
+    permissions, members: rows, actorRole: role ?? "user", dbReady
   };
 }
