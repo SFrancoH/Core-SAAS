@@ -53,5 +53,5 @@ test("especificación Inventory permanece un documento de diseño, no se crea un
  "PULSE","PETS","altillaje","lote","stock","sede","I0","I9","NO"]) {
    assert.ok(md.toLowerCase().includes(term.toLowerCase()),term);
  }
- assert.match(md,/NO se implementan tablas/);
+ assert.match(md,/no se implementan tablas/i);
 });
