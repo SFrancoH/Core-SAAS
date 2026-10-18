@@ -1416,7 +1416,7 @@ grant execute on function public.core_sedes_access(uuid,uuid,text) to service_ro
 create or replace function public.core_crear_sede(
  p_actor_id uuid, p_empresa_id uuid, p_codigo text, p_nombre text
 ) returns uuid language plpgsql security definer set search_path=''
-as $
+as $$
 declare v_id uuid; v_code text; v_name text; v_owner boolean;
 begin
  v_code:=upper(btrim(coalesce(p_codigo,'')));
@@ -1447,7 +1447,7 @@ begin
  jsonb_build_object('code',v_code,'name',v_name));
  return v_id;
 end;
-$;
+$$;
 revoke all on function public.core_crear_sede(uuid,uuid,text,text)
  from public,anon,authenticated;
 grant execute on function public.core_crear_sede(uuid,uuid,text,text) to service_role;
@@ -1459,7 +1459,7 @@ grant execute on function public.core_crear_sede(uuid,uuid,text,text) to service
 create or replace function public.core_contexto_sedes(
  p_actor_id uuid,p_empresa_id uuid,p_permiso text
 ) returns jsonb language sql stable security definer set search_path=''
-as $
+as $$
 select case when core.effective_permission(p_actor_id,p_empresa_id,p_permiso)
 then jsonb_build_object(
  'todas',(
@@ -1485,7 +1485,7 @@ then jsonb_build_object(
     and core.site_allowed(p_actor_id,p_empresa_id,s.id,p_permiso)
  ),'[]'::jsonb))
 else jsonb_build_object('todas',false,'sedes','[]'::jsonb) end;
-$;
+$$;
 revoke all on function public.core_contexto_sedes(uuid,uuid,text)
  from public,anon,authenticated;
 grant execute on function public.core_contexto_sedes(uuid,uuid,text) to service_role;
