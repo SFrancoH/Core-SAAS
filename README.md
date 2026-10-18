@@ -1,26 +1,21 @@
-# PETS
+# Core SaaS
 
-Aplicación administrativa para gestionar propietarios y mascotas.
+Plataforma SaaS modular y multiempresa. **PETS** es la primera vertical disponible en código; PULSE (rifas, boletas, eventos) se incorpora por funcionalidades. Verticales planeadas: AURA (estética), VISION (oftalmología), DRIVE (movilidad), NEURO (educación), LENS (ópticas).
 
-## Variables de entorno
+El producto se desarrolla sobre la aplicación Next.js que ya existe en este repositorio. **No es un plan de migración de repositorios**. El objetivo es incorporar casos de uso nuevos a una arquitectura central, sin reconstruir todas las pantallas ni desplegar módulos antes de tiempo.
 
-Configura estas variables únicamente en Vercel o en un archivo local `.env.local` que nunca se suba a GitHub:
+## Documentación del proyecto
+- [AGENTS.md](AGENTS.md): reglas obligatorias para la IA.
+- [PLAN_DESARROLLO.md](PLAN_DESARROLLO.md): secuencia de construcción.
+- [BITACORA.md](BITACORA.md): decisiones, estado y evidencias.
+- [Arquitectura](docs/ARQUITECTURA.md).
+- [Modelo de datos, permisos y licencias](docs/MODELO_DATOS_PERMISOS_LICENCIAS.md).
+- [Contratos de integración](docs/CONTRATOS_INTEGRACIONES.md).
+- [Cómo agregar una funcionalidad](docs/COMO_AGREGAR_FUNCIONALIDAD.md).
+- [PETS](docs/verticales/PETS.md) y [PULSE](docs/verticales/PULSE.md).
 
-```env
-SUPABASE_URL=https://tu-proyecto.supabase.co
-SUPABASE_SECRET_KEY=sb_secret_...
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
-```
-
-`SUPABASE_SECRET_KEY` tiene privilegios elevados y solo se utiliza en módulos del servidor. Nunca debe llevar el prefijo `NEXT_PUBLIC_` ni utilizarse desde componentes del navegador.
-
-## Base de datos
-
-Ejecuta las migraciones de `supabase/migrations` en orden numérico (001–009) en el SQL Editor de Supabase. Las migraciones 006, 007, 008 y 009 habilitan el registro nativo transaccional, el historial unificado con paginación y la auditoría de ediciones. Deben estar aplicadas **antes** de usar esas funciones en la aplicación.
-
-La documentación operativa, las decisiones, el historial de cambios y los pendientes están en [docs/BITACORA_PETS.md](docs/BITACORA_PETS.md). El antiguo documento de formulario externo se conserva exclusivamente como referencia histórica.
-
-## Comandos
+## Stack y ejecución
+Next.js 16, React 19, Supabase Auth, PostgreSQL y ExcelJS. El código actual usa JavaScript; priorizar TypeScript para **módulos nuevos** sin convertir toda la base innecesariamente.
 
 ```bash
 npm install
@@ -28,6 +23,15 @@ npm run dev
 npm run build
 ```
 
-La ruta `/api/health/supabase` valida la conexión sin devolver datos, nombres de tablas ni credenciales.
+Configurar en `.env.local` o en el servidor, **nunca en Git**:
+```env
+SUPABASE_URL=...
+SUPABASE_SECRET_KEY=...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+```
+`SUPABASE_SECRET_KEY` es exclusivamente privada y no lleva prefijo `NEXT_PUBLIC_`.
 
-Para **Agregar otro propietario** desde la ficha de una mascota, ejecutar también `supabase/migrations/009_asociar_propietario_mascota.sql`; añade una función de asociación por documento/teléfono con prevención de duplicados y no crea tablas nuevas.
+El directorio `supabase/migrations` contiene el esquema base PETS 001–009. Confirmar qué migraciones se ejecutaron realmente antes de aplicar SQL. Las carpetas nuevas documentan límites de dominio; sus README no prueban funciones implementadas.
+
+## Primera entrega de Core
+Conservar PETS operativo, inventariar la base de datos actual, construir permisos/licencias centrales y agregar la primera función «Crear proyecto PULSE» siguiendo el contrato Core. No copiar todo PULSE de golpe ni escribir en una base de datos ajena a este proyecto.
