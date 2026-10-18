@@ -129,3 +129,15 @@ Leer reglas → identificar vertical/entidad → definir contrato, permisos/lice
 - [ ] Migrar GET legacy, paginación, exportaciones y fichas de mascotas/propietarios.
 - [ ] Migrar Server Actions y API de escritura, veterinarios/usuarios y RLS de todas las tablas PETS.
 - [ ] Ejecutar E2E de aislamiento con revocación y cambio de empresa, y habilitar producción solo tras aprobarlo.
+
+## C18 — UNI-001: Propuesta de valor y arquitectura multisede unificada
+- [x] DEFINIDO: una empresa con N sedes comparte software, login, verticales/complementos, registros maestros e historial; operaciones locales con sede propia.
+- [x] DEFINIDO: modelo `core.sedes`, grants de sede por membresía, distinción de maestro vs. evento de sede, búsqueda consolidada y filtros sin duplicados. Documento normativo: `docs/UNIFICACION_MULTISEDE.md`.
+- [x] DOCUMENTADO: reglas en AGENTS, modelo de datos, arquitectura, guías de desarrollo, PETS/PULSE, módulos compartidos, frontend, README y bitácora.
+- [ ] PRE-FLIGHT: inventariar sedes reales por empresa, valores `fuente` en mascotas/propietarios, consultas asociadas, propietarios/carnets repetidos, SQL 006/009, RLS/FKs y restricciones en staging. No resolver por nombre de sede sin empresa.
+- [ ] IMPLEMENTACIÓN DB: diseñar y probar migración SQL de `core.sedes`, identificadores/constraints compuestas y grants de sede. No ejecutar sin respaldo, preflight y pruebas de aislamiento.
+- [ ] IMPLEMENTACIÓN PETS: mapear `fuente` heredada sin pérdida de procedencia, retirar SEDE NORTE/SUR rígidas, selector de sede desde Core, búsqueda y ficha unificada, eventos clínicos con sede y pruebas A/B.
+- [ ] IMPLEMENTACIÓN MÓDULOS: inventario por ubicación con transferencias auditadas, agenda por sede con choque de horarios, reportes consolidados y filtros, integraciones con origen empresa/sede.
+- [ ] IMPLEMENTACIÓN VERTICALES: PETS y PULSE consumen `core.sedes` sin clonar empresas, usuarios, proyectos/boletas o productos por sede; permiso y licencia siempre por empresa.
+- [ ] VERIFICACIÓN: pruebas simultáneas A/B de sedes en una empresa, control de usuarios A-only/B-only/A+B, deduplicación y concurrencia, aislamiento entre dos empresas, negativos API/RLS, regresión antes de producción.
+**Prioridad:** incorporar a fases C14-C16 sin romper PETS ni confundir esquema de sede con aislamiento multiempresa. Estado actual: diseño/documentación, NO migración aplicada.

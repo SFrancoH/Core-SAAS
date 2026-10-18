@@ -42,3 +42,8 @@ La ruta /super-admin/apariencia muestra una referencia visual de los tokens. No 
 
 ## Pruebas
 CI: instalación, tests, revisión de TypeScript y build. Regresión visual y funcional con datos ficticios: pendiente antes de considerar producción verificada.
+
+## Experiencia unificada multisede (UNI-001)
+Mantener el mismo shell, tokens y navegación para una empresa con muchas sedes. El selector global es **empresa (solo si tiene varias membresías)** y el selector operativo es **sede autorizada o «Todas»** cuando el módulo lo permita.
+La búsqueda de registros maestros PETS debe abarcar toda la empresa para usuarios con permiso clínico transversal; los filtros de sede se aplican a eventos/operación sin duplicar fichas. Al escribir una consulta, cita o traslado se debe mostrar y validar inequívocamente la sede elegida; no permitir guardar en «Todas las sedes».
+Los complementos y verticales no implementan encabezados divergentes o páginas duplicadas por sede: comparten patrones de filtros, breadcrumbs, estado activo y listas. Los selectores no son controles de seguridad; cada operación verifica permisos de sede y empresa en servidor.
