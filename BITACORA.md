@@ -96,3 +96,14 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **Motivo:** el bloqueo de rutas del proxy no basta para Next.js Server Actions: un POST puede intentar ejecutar un identificador de acción desde otra URL.
 - **Cambio:** `lib/core/support-guard.ts` consulta la cookie `httpOnly` del modo soporte y rechaza escrituras; todas las acciones de creación/edición/importación/usuarios/empresas y login lo invocan antes de mutar. `logout` y los controles exclusivos de inicio/cierre del soporte quedan habilitados para salir con seguridad.
 - **Validación:** prueba de cobertura de acciones y CI; no sustituye una prueba con Supabase ni pretende crear un JWT del sujeto.
+
+## 2026-10-18 — C13: inicio PETS multiempresa (contexto de lectura)
+- **Estado:** IMPLEMENTADO EN RAMA/PR #8, SQL 012 NO APLICADO. Pendiente verificación de integración PostgreSQL/RLS.
+- **Objetivo:** dejar de depender de public.usuarios.empresa_id para nuevas consultas PETS, comprobando el tenant por membresía Core, licencia y permiso.
+- **Código:** lib/verticals/pets/tenant-context.ts y tenant-policy.ts; nuevas vistas read-only /portal/empresa/[id]/pets/mascotas, /mascotas/[petId] y /propietarios.
+- **Base:** supabase/migrations/012_pets_multitenant_rls.sql incluye función RLS private.pets_tenant_allowed y RPC public.core_pets_tenant_access. No hay SQL ejecutado ni acceso real a Supabase en este trabajo.
+- **Seguridad:** service_role solo después de verificar actor/tenant con RPC, queries filtradas por empresa_id, revisión de filas devueltas; suspensión/revocación debe denegar. Feature flag CORE_PETS_MULTI_TENANT_READ_ENABLED deshabilitado por defecto.
+- **Preflight:** supabase/design/PREFLIGHT_PETS_MULTIEMPRESA.sql de solo lectura; requiere revisar migraciones 010/011, políticas, roles y backup.
+- **Compatibilidad:** PETS legacy y PULSE intactos. No hay segunda empresa habilitada para escrituras, exportaciones ni consultas clínicas antiguas.
+- **Pruebas:** pruebas unitarias y de contratos CI del PR. Pendientes tests A/B con JWT/RLS de Supabase en staging, E2E y pruebas de regresión antes de aplicar SQL.
+- **Fases siguientes:** C14 lecturas legacy y C15/C16 escrituras, claves foráneas y eliminación de empresa_id singular como fuente de autorización.

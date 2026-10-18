@@ -120,3 +120,12 @@ Leer reglas → identificar vertical/entidad → definir contrato, permisos/lice
 
 - [x] C12: bloquear Server Actions de escritura cuando la cookie de soporte está activa, no solo bloquear navegación en proxy.
 - [ ] C12: pruebas de integración de cookies, Server Actions y RPC en un entorno Next.js conectado a Supabase.
+
+## C13 — Primera fase: PETS con contexto de empresa
+- [x] Diseñar y versionar SQL 012 para RLS con membresía, permiso y entitlement PETS.
+- [x] Crear nuevas vistas PETS read-only por UUID de empresa, RPC server-side y filtros explícitos.
+- [x] Añadir feature flag desactivado por defecto y preflight SQL de lectura.
+- [ ] Verificar 010/011, respaldar y ensayar migración 012 en Supabase staging con JWT de empresas A/B.
+- [ ] Migrar GET legacy, paginación, exportaciones y fichas de mascotas/propietarios.
+- [ ] Migrar Server Actions y API de escritura, veterinarios/usuarios y RLS de todas las tablas PETS.
+- [ ] Ejecutar E2E de aislamiento con revocación y cambio de empresa, y habilitar producción solo tras aprobarlo.
