@@ -443,4 +443,105 @@ revoke all on function public.core_support_snapshot(uuid,uuid) from public,anon,
 grant execute on function public.core_support_snapshot(uuid,uuid) to service_role;
 
 
+-- Registro de cuenta previamente invitada/creada en Supabase Auth.
+-- Garantiza autoría inmutable y que correo/UUID existen realmente en Auth.
+create or replace function public.core_register_account(
+ p_actor_id uuid, p_user_id uuid, p_nombre text, p_email text
+) returns boolean language plpgsql security definer set search_path=''
+as $
+declare can_manage boolean;
+begin
+ if p_actor_id is null or p_user_id is null
+    or char_length(btrim(coalesce(p_nombre,''))) not between 2 and 120
+    or nullif(btrim(coalesce(p_email,'')),'') is null then
+   raise exception 'INVALID_ACCOUNT' using errcode='22023';
+ end if;
+ select exists(
+   select 1 from core.platform_staff st join core.accounts a on a.user_id=st.user_id
+   where st.user_id=p_actor_id and st.role='super_admin' and st.active and a.active
+ ) or exists(
+   select 1 from core.memberships m join core.accounts a on a.user_id=m.user_id
+   where m.user_id=p_actor_id and m.company_role='admin' and m.status='active'
+   and a.active and core.effective_permission(p_actor_id,m.empresa_id,'core.members.manage')
+ ) into can_manage;
+ if not can_manage then raise exception 'FORBIDDEN' using errcode='42501'; end if;
+ if not exists(
+   select 1 from auth.users au
+   where au.id=p_user_id and lower(au.email)=lower(p_email)
+ ) then raise exception 'AUTH_USER_NOT_FOUND' using errcode='42501'; end if;
+ insert into core.accounts(user_id,nombre,email,created_by)
+ values(p_user_id,btrim(p_nombre),lower(btrim(p_email)),p_actor_id)
+ on conflict(user_id) do nothing;
+ if found then
+   insert into core.audit_events(actor_id,event_type,resource_id,metadata)
+   values(p_actor_id,'core.account.created',p_user_id::text,
+    jsonb_build_object('name',btrim(p_nombre)));
+ end if;
+ return true;
+end;
+$;
+revoke all on function public.core_register_account(uuid,uuid,text,text)
+ from public,anon,authenticated;
+grant execute on function public.core_register_account(uuid,uuid,text,text) to service_role;
+
+-- El propietario puede crear Super-Users, jamás un segundo Super-Admin.
+create or replace function public.core_assign_staff(
+ p_actor_id uuid,p_subject_id uuid,p_role text
+) returns boolean language plpgsql security definer set search_path=''
+as $
+begin
+ if p_role<>'super_user' or p_actor_id=p_subject_id
+   or not exists(
+     select 1 from core.platform_staff st join core.accounts a on a.user_id=st.user_id
+     where st.user_id=p_actor_id and st.role='super_admin' and st.active and a.active
+   ) or not exists(select 1 from core.accounts a where a.user_id=p_subject_id and a.active)
+ then raise exception 'FORBIDDEN' using errcode='42501'; end if;
+ if exists(select 1 from core.platform_staff where user_id=p_subject_id and role='super_admin')
+ then raise exception 'CANNOT_CHANGE_OWNER' using errcode='42501'; end if;
+ insert into core.platform_staff(user_id,role,created_by)
+ values(p_subject_id,'super_user',p_actor_id)
+ on conflict(user_id) do update set role='super_user',active=true;
+ insert into core.audit_events(actor_id,event_type,resource_id,metadata)
+ values(p_actor_id,'core.staff.assigned',p_subject_id::text,
+  jsonb_build_object('role','super_user'));
+ return true;
+end;
+$;
+revoke all on function public.core_assign_staff(uuid,uuid,text) from public,anon,authenticated;
+grant execute on function public.core_assign_staff(uuid,uuid,text) to service_role;
+
+-- Asociación a varias empresas en una sola transacción.
+-- Cada item: { company_id, role: admin|user, permissions:[...] }.
+create or replace function public.core_assign_multiple_memberships(
+ p_actor_id uuid,p_subject_id uuid,p_assignments jsonb
+) returns integer language plpgsql security definer set search_path=''
+as $
+declare item jsonb; n integer:=0; company_id uuid;
+declare role_code text; perms text[];
+begin
+ if p_actor_id is null or p_subject_id is null
+   or jsonb_typeof(p_assignments)<>'array'
+   or jsonb_array_length(p_assignments) not between 1 and 20
+ then raise exception 'INVALID_ASSIGNMENTS' using errcode='22023'; end if;
+ for item in select value from jsonb_array_elements(p_assignments) loop
+   if jsonb_typeof(item)<>'object' or jsonb_typeof(item->'permissions')<>'array'
+   then raise exception 'INVALID_ASSIGNMENT' using errcode='22023'; end if;
+   company_id:=(item->>'company_id')::uuid;
+   role_code:=item->>'role';
+   select coalesce(array_agg(value),array[]::text[])
+      into perms from jsonb_array_elements_text(item->'permissions') as v(value);
+   perform public.core_assign_membership(
+     p_actor_id,p_subject_id,company_id,role_code,perms
+   );
+   n:=n+1;
+ end loop;
+ return n;
+end;
+$;
+revoke all on function public.core_assign_multiple_memberships(uuid,uuid,jsonb)
+ from public,anon,authenticated;
+grant execute on function public.core_assign_multiple_memberships(uuid,uuid,jsonb)
+ to service_role;
+
+
 commit;
