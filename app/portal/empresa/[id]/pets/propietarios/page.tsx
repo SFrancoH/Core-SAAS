@@ -18,7 +18,7 @@ export default async function TenantOwnersPage({params,searchParams}:{
   let db=getSupabaseAdmin().from("propietarios")
     .select("id,empresa_id,nombre,telefono,ciudad,email",{count:"exact"})
     .eq("empresa_id",ctx.companyId);
-  if(q)db=db.or(\`nombre.ilike.%\${q}%,telefono.ilike.%\${q}%,email.ilike.%\${q}%\`);
+  if(q)db=db.or("nombre.ilike.%"+q+"%,telefono.ilike.%"+q+"%,email.ilike.%"+q+"%");
   const {data,error,count}=await db.order("nombre").range((page-1)*limit,page*limit-1);
   if(error)throw new Error("No fue posible consultar propietarios del contexto");
   const owners=ensureTenantRows((data??[]) as OwnerRow[],ctx.companyId);

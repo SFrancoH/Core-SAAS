@@ -1,4 +1,4 @@
-import { UUID_RE } from "@/lib/core/access";
+import { UUID_RE } from "../../core/access.ts";
 
 export type PetTenantPermission =
   | "pets.pet.read"

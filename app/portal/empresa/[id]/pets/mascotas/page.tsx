@@ -19,7 +19,7 @@ export default async function TenantPetsPage({params,searchParams}:{
   let db=getSupabaseAdmin().from("mascotas").select(
     "id,empresa_id,nombre,numero_carnet,especie,raza,estado",{count:"exact"}
   ).eq("empresa_id",context.companyId);
-  if(q)db=db.or(\`nombre.ilike.%\${q}%,numero_carnet.ilike.%\${q}%,especie.ilike.%\${q}%\`);
+  if(q)db=db.or("nombre.ilike.%"+q+"%,numero_carnet.ilike.%"+q+"%,especie.ilike.%"+q+"%");
   const {data,error,count}=await db.order("nombre")
     .range((page-1)*pageSize,page*pageSize-1);
   if(error)throw new Error("No fue posible consultar las mascotas del contexto");
