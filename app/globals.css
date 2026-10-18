@@ -1,15 +1,3 @@
-:root {
-  color-scheme: light;
-  --ink: #17211b;
-  --muted: #607066;
-  --line: #dce5de;
-  --paper: #ffffff;
-  --green: #147d4a;
-  --green-soft: #e9f7ef;
-  --red: #b42318;
-  --red-soft: #fff0ee;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -18,10 +6,9 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(circle at top left, #e7f5eb 0, transparent 34rem),
-    #f4f7f5;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+    radial-gradient(circle at top left, var(--color-page-accent) 0, transparent 34rem),
+    var(--color-page);
+  font-family: var(--font-sans);
 }
 
 button,
@@ -45,10 +32,10 @@ button {
 .card {
   width: min(720px, 100%);
   padding: clamp(28px, 6vw, 58px);
-  border: 1px solid rgba(23, 33, 27, 0.08);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 24px 70px rgba(30, 60, 42, 0.12);
+  border: 1px solid var(--color-alpha-1);
+  border-radius: var(--radius-2xl);
+  background: var(--color-alpha-2);
+  box-shadow: 0 24px 70px var(--color-alpha-3);
 }
 
 .brand {
@@ -56,8 +43,8 @@ button {
   align-items: center;
   height: 38px;
   padding: 0 14px;
-  border-radius: 12px;
-  color: white;
+  border-radius: var(--radius-md);
+  color: var(--color-white);
   background: var(--ink);
   font-size: 14px;
   font-weight: 800;
@@ -92,7 +79,7 @@ h1 {
   display: flex;
   gap: 14px;
   padding: 18px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
 }
 
 .status.success {
@@ -112,7 +99,7 @@ h1 {
   margin-top: 5px;
   border-radius: 999px;
   background: currentColor;
-  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 5px var(--color-alpha-4);
 }
 
 .status strong {
@@ -130,7 +117,7 @@ h1 {
   margin-top: 20px;
   padding: 18px;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
 }
 
 .nextStep span {
@@ -151,10 +138,10 @@ h1 {
 .loginCard {
   width: min(460px, 100%);
   padding: clamp(28px, 7vw, 48px);
-  border: 1px solid rgba(23, 33, 27, 0.08);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 24px 70px rgba(30, 60, 42, 0.12);
+  border: 1px solid var(--color-alpha-1);
+  border-radius: var(--radius-2xl);
+  background: var(--color-alpha-5);
+  box-shadow: 0 24px 70px var(--color-alpha-3);
 }
 
 .loginCard h1,
@@ -178,27 +165,27 @@ input {
   width: 100%;
   min-height: 48px;
   padding: 0 14px;
-  border: 1px solid #cbd8cf;
-  border-radius: 12px;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-md);
   color: var(--ink);
-  background: white;
+  background: var(--color-white);
   outline: none;
 }
 
 select {
   min-height: 42px;
   padding: 0 34px 0 12px;
-  border: 1px solid #cbd8cf;
+  border: 1px solid var(--color-input-border);
   border-radius: 10px;
   color: var(--ink);
-  background: white;
+  background: var(--color-white);
 }
 
 input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--green);
-  box-shadow: 0 0 0 4px rgba(20, 125, 74, 0.1);
+  box-shadow: 0 0 0 4px var(--color-alpha-6);
 }
 
 .passwordControl {
@@ -217,7 +204,7 @@ textarea:focus {
   min-height: 34px;
   padding: 0 10px;
   transform: translateY(-50%);
-  border-radius: 9px;
+  border-radius: var(--radius-xs);
   color: var(--green);
   background: var(--green-soft);
   font-size: 12px;
@@ -227,8 +214,8 @@ button {
   min-height: 46px;
   padding: 0 18px;
   border: 0;
-  border-radius: 12px;
-  color: white;
+  border-radius: var(--radius-md);
+  color: var(--color-white);
   background: var(--green);
   font-weight: 800;
 }
@@ -241,7 +228,7 @@ button:hover {
 .successAlert {
   margin-bottom: 18px;
   padding: 13px 15px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   line-height: 1.45;
 }
@@ -276,7 +263,7 @@ button:hover {
   gap: 20px;
   padding: 16px clamp(20px, 5vw, 64px);
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--color-alpha-2);
 }
 
 .operationalHeader {
@@ -337,7 +324,7 @@ button:hover {
 .buttonSecondary {
   min-height: 40px;
   color: var(--ink);
-  background: #edf2ee;
+  background: var(--color-neutral-soft);
 }
 
 .secondaryLink {
@@ -346,9 +333,9 @@ button:hover {
   justify-content: center;
   min-height: 46px;
   padding: 0 18px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: var(--ink);
-  background: #edf2ee;
+  background: var(--color-neutral-soft);
   font-weight: 800;
   text-decoration: none;
 }
@@ -365,9 +352,9 @@ button:hover {
 .registrationSection {
   padding: clamp(20px, 4vw, 32px);
   border: 1px solid var(--line);
-  border-radius: 20px;
-  background: white;
-  box-shadow: 0 12px 36px rgba(23, 33, 27, 0.06);
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+  box-shadow: 0 12px 36px var(--color-alpha-7);
 }
 
 .registrationSection > h2,
@@ -396,7 +383,7 @@ button:hover {
   height: 34px;
   place-items: center;
   border-radius: 50%;
-  color: white;
+  color: var(--color-white);
   background: var(--green);
   font-weight: 850;
 }
@@ -417,7 +404,7 @@ button:hover {
 .managementForm label {
   display: grid;
   gap: 8px;
-  color: #34443a;
+  color: var(--color-text-subtle);
   font-size: 13px;
   font-weight: 750;
 }
@@ -447,12 +434,12 @@ button:hover {
   margin: 0;
   padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .choiceField legend {
   padding: 0 6px;
-  color: #34443a;
+  color: var(--color-text-subtle);
   font-size: 13px;
   font-weight: 750;
 }
@@ -495,7 +482,7 @@ button:hover {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 13px;
-  background: white;
+  background: var(--color-white);
 }
 
 .petConfirmationSummary span,
@@ -511,7 +498,7 @@ button:hover {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: white;
+  background: var(--color-white);
 }
 
 .confirmationStatus {
@@ -519,8 +506,8 @@ button:hover {
   align-items: center;
   gap: 12px;
   padding: 14px 18px;
-  color: #135f37;
-  background: #effaf3;
+  color: var(--color-success-strong);
+  background: var(--color-success-soft);
 }
 
 .confirmationStatus > div {
@@ -529,7 +516,7 @@ button:hover {
 }
 
 .confirmationStatus small {
-  color: #3f6950;
+  color: var(--color-muted-strong);
 }
 
 .confirmationFrame {
@@ -537,7 +524,7 @@ button:hover {
   height: 980px;
   display: block;
   border: 0;
-  background: white;
+  background: var(--color-white);
 }
 
 .registrationComplete {
@@ -545,9 +532,9 @@ button:hover {
   justify-items: center;
   gap: 12px;
   padding: 52px 24px;
-  border: 1px solid #b8dec6;
-  border-radius: 20px;
-  background: #effaf3;
+  border: 1px solid var(--color-success-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-success-soft);
   text-align: center;
 }
 
@@ -562,7 +549,7 @@ button:hover {
   height: 54px;
   place-items: center;
   border-radius: 50%;
-  color: white;
+  color: var(--color-white);
   background: var(--green);
   font-size: 28px;
   font-weight: 900;
@@ -594,12 +581,12 @@ button:hover {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 13px;
-  background: #f7f9f7;
+  background: var(--color-surface-muted);
 }
 
 .webhookBox code {
   overflow-wrap: anywhere;
-  color: #155d86;
+  color: var(--color-info-strong);
   font-size: 12px;
 }
 
@@ -647,8 +634,8 @@ button:hover {
   justify-content: center;
   min-height: 42px;
   padding: 0 15px;
-  border-radius: 11px;
-  color: white;
+  border-radius: var(--radius-sm);
+  color: var(--color-white);
   background: var(--green);
   font-size: 14px;
   font-weight: 800;
@@ -678,9 +665,9 @@ button:hover {
   gap: 13px;
   padding: 20px;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  background: white;
-  box-shadow: 0 22px 60px rgba(23, 33, 27, 0.18);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: 0 22px 60px var(--color-alpha-8);
 }
 
 .uploadForm label {
@@ -726,10 +713,10 @@ button:hover {
   align-items: flex-start;
   gap: 11px;
   padding: 12px;
-  border: 1px solid #b8dec6;
-  border-radius: 11px;
-  color: #135f37;
-  background: #effaf3;
+  border: 1px solid var(--color-success-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-success-strong);
+  background: var(--color-success-soft);
   font-size: 13px;
   line-height: 1.4;
 }
@@ -782,8 +769,8 @@ button:hover {
 .dataTableWrap {
   overflow-x: auto;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  background: white;
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
 }
 
 .dataTable {
@@ -806,18 +793,18 @@ button:hover {
   top: 0;
   z-index: 1;
   color: var(--ink);
-  background: #f7f9f7;
+  background: var(--color-surface-muted);
   font-size: 12px;
   font-weight: 850;
   white-space: nowrap;
 }
 
 .dataTable tbody tr:hover {
-  background: #f9fcfa;
+  background: var(--color-hover);
 }
 
 .dataTable td a:not(.tableAction) {
-  color: #0969da;
+  color: var(--color-link);
   font-weight: 700;
   text-decoration: none;
 }
@@ -853,9 +840,9 @@ button:hover {
   width: max-content;
   padding: 9px 13px;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: var(--radius-xs);
   color: var(--green);
-  background: white;
+  background: var(--color-white);
   font-weight: 800;
   text-decoration: none;
 }
@@ -876,7 +863,7 @@ button:hover {
   margin: 30px 0;
   padding: 12px;
   border-radius: 14px;
-  background: #e9edf1;
+  background: var(--color-neutral-panel);
   overflow-x: auto;
 }
 
@@ -884,14 +871,14 @@ button:hover {
   min-height: 40px;
   border-radius: 14px;
   color: var(--ink);
-  background: #f4f5f6;
+  background: var(--color-neutral-soft);
   font-size: 12px;
   white-space: nowrap;
 }
 
 .clinicalModules button.active {
-  color: white;
-  background: #0875f5;
+  color: var(--color-white);
+  background: var(--color-info);
 }
 
 .clinicalModules button:disabled {
@@ -902,10 +889,10 @@ button:hover {
 .consultationWorkspace {
   margin: -8px 0 30px;
   padding: clamp(20px, 4vw, 34px);
-  border: 1px solid #c9dce9;
-  border-radius: 20px;
-  background: white;
-  box-shadow: 0 18px 46px rgba(24, 66, 94, 0.08);
+  border: 1px solid var(--color-info-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+  box-shadow: 0 18px 46px var(--color-alpha-9);
 }
 
 .consultationToolbar,
@@ -952,9 +939,9 @@ button:hover {
 
 .clinicalBlock {
   overflow: hidden;
-  border: 1px solid #cfe0e9;
+  border: 1px solid var(--color-info-border);
   border-radius: 14px;
-  background: #fbfdfe;
+  background: var(--color-info-subtle);
 }
 
 .clinicalBlock > summary {
@@ -962,8 +949,8 @@ button:hover {
   padding: 14px 48px 14px 18px;
   cursor: pointer;
   list-style: none;
-  color: #155d86;
-  background: #dff2fb;
+  color: var(--color-info-strong);
+  background: var(--color-info-soft);
   font-size: 15px;
   font-weight: 850;
 }
@@ -1001,7 +988,7 @@ button:hover {
 .stackedField {
   display: grid;
   gap: 7px;
-  color: #34443a;
+  color: var(--color-text-subtle);
   font-size: 13px;
   font-weight: 750;
 }
@@ -1010,10 +997,10 @@ button:hover {
 .clinicalForm select,
 .clinicalForm textarea {
   width: 100%;
-  border: 1px solid #cbd8d1;
-  border-radius: 11px;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-sm);
   color: var(--ink);
-  background: white;
+  background: var(--color-white);
   outline: none;
 }
 
@@ -1030,8 +1017,8 @@ button:hover {
 }
 
 .clinicalForm input[readonly] {
-  color: #4f5d55;
-  background: #f0f2f1;
+  color: var(--color-muted);
+  background: var(--color-neutral-soft);
 }
 
 .fullField {
@@ -1055,13 +1042,13 @@ button:hover {
   margin: 0;
   padding: 15px;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: white;
+  border-radius: var(--radius-md);
+  background: var(--color-white);
 }
 
 .systemAssessment.isAbnormal {
-  border-color: #e3a49d;
-  background: #fff8f7;
+  border-color: var(--color-danger-border);
+  background: var(--color-danger-soft);
 }
 
 .systemAssessment legend,
@@ -1111,8 +1098,8 @@ button:hover {
   margin: 0;
   padding: 16px;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: white;
+  border-radius: var(--radius-md);
+  background: var(--color-white);
 }
 
 .procedureToggle legend,
@@ -1153,9 +1140,9 @@ button:hover {
 
 .prescriptionCard {
   overflow: hidden;
-  border: 1px solid #b9d8eb;
-  border-radius: 16px;
-  background: white;
+  border: 1px solid var(--color-info-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
 }
 
 .prescriptionHeading {
@@ -1164,18 +1151,18 @@ button:hover {
   justify-content: space-between;
   gap: 20px;
   padding: 16px 20px;
-  color: white;
-  background: #0875f5;
+  color: var(--color-white);
+  background: var(--color-info);
 }
 
 .prescriptionHeading .eyebrow {
   margin: 0 0 3px;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--color-alpha-10);
 }
 
 .prescriptionHeading h3 {
   margin: 0;
-  color: white;
+  color: var(--color-white);
   font-size: 23px;
 }
 
@@ -1203,9 +1190,9 @@ button:hover {
 
 .medicationRow {
   padding: 16px;
-  border: 1px solid #d9e3dd;
+  border: 1px solid var(--color-border);
   border-radius: 13px;
-  background: #f8faf9;
+  background: var(--color-surface-muted);
 }
 
 .medicationRowHeading {
@@ -1235,8 +1222,8 @@ button:hover {
 }
 
 .removeMedicationButton {
-  color: #a52d26;
-  background: #fff0ef;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 
 .addMedicationButton {
@@ -1249,9 +1236,9 @@ button:hover {
   gap: 14px;
   margin-top: 16px;
   padding: 18px;
-  border: 1px solid #cfe0e9;
+  border: 1px solid var(--color-info-border);
   border-radius: 13px;
-  background: #f8fcfe;
+  background: var(--color-info-subtle);
 }
 
 .procedureHistory h3,
@@ -1281,8 +1268,8 @@ button:hover {
   gap: 5px;
   padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 11px;
-  background: white;
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
   font-size: 13px;
 }
 
@@ -1298,10 +1285,10 @@ button:hover {
 .responsibilityNotice {
   margin-top: 16px;
   padding: 17px;
-  border-left: 4px solid #d28a19;
+  border-left: 4px solid var(--color-warning);
   border-radius: 10px;
-  color: #62440e;
-  background: #fff8e8;
+  color: var(--color-warning-ink);
+  background: var(--color-warning-soft);
   font-size: 14px;
   line-height: 1.65;
 }
@@ -1328,7 +1315,7 @@ button:hover {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: #fbfcfb;
+  background: var(--color-surface-muted);
 }
 
 .consultationCard > summary {
@@ -1369,7 +1356,7 @@ button:hover {
 .consultationCardContent {
   padding: 20px;
   border-top: 1px solid var(--line);
-  background: white;
+  background: var(--color-white);
 }
 
 .historyDetailGrid,
@@ -1385,7 +1372,7 @@ button:hover {
   min-width: 0;
   padding: 13px;
   border-radius: 10px;
-  background: #f6f8f6;
+  background: var(--color-surface-alt);
 }
 
 .historyNarratives {
@@ -1414,10 +1401,10 @@ button:hover {
   gap: 8px;
   margin-top: 16px;
   padding: 16px;
-  border: 1px solid #ecc7c2;
-  border-radius: 12px;
-  color: #7b2820;
-  background: #fff7f6;
+  border: 1px solid var(--color-danger-border);
+  border-radius: var(--radius-md);
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 
 .abnormalSummary h3 {
@@ -1440,9 +1427,9 @@ button:hover {
   margin-top: 24px;
   padding: clamp(22px, 4vw, 34px);
   border: 1px solid var(--line);
-  border-radius: 20px;
-  background: white;
-  box-shadow: 0 12px 36px rgba(30, 60, 42, 0.05);
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+  box-shadow: 0 12px 36px var(--color-alpha-11);
 }
 
 .recordSection h2 {
@@ -1464,7 +1451,7 @@ button:hover {
 .detailGrid > div {
   padding: 16px;
   border-radius: 13px;
-  background: #f6f8f6;
+  background: var(--color-surface-alt);
 }
 
 .detailGrid dt {
@@ -1493,12 +1480,12 @@ button:hover {
   border: 1px solid var(--line);
   border-radius: 14px;
   color: var(--ink);
-  background: #fbfcfb;
+  background: var(--color-surface-muted);
   text-decoration: none;
 }
 
 .associationCard:hover {
-  border-color: #94c4a8;
+  border-color: var(--color-primary-border);
   background: var(--green-soft);
 }
 
@@ -1543,7 +1530,7 @@ button:hover {
   border: 1px solid var(--line);
   border-radius: 18px;
   background: var(--paper);
-  box-shadow: 0 12px 36px rgba(30, 60, 42, 0.06);
+  box-shadow: 0 12px 36px var(--color-alpha-12);
 }
 
 .companyCard {
@@ -1561,7 +1548,7 @@ button:hover {
 
 .companyCardLink:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 42px rgba(30, 60, 42, 0.12);
+  box-shadow: 0 18px 42px var(--color-alpha-3);
 }
 
 .cardArrow {
@@ -1584,7 +1571,7 @@ button:hover {
   place-items: center;
   flex: 0 0 auto;
   border-radius: 15px;
-  color: white;
+  color: var(--color-white);
   background: var(--green);
   font-size: 20px;
   font-weight: 850;
@@ -1653,8 +1640,8 @@ button:hover {
   padding: clamp(22px, 4vw, 34px);
   border: 1px solid var(--line);
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 12px 36px rgba(30, 60, 42, 0.06);
+  background: var(--color-alpha-2);
+  box-shadow: 0 12px 36px var(--color-alpha-12);
 }
 
 .managementSection h2 {
@@ -1696,8 +1683,8 @@ button:hover {
   gap: 24px;
   padding: 18px;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  background: #fbfcfb;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
 }
 
 .userIdentity {
@@ -1904,13 +1891,13 @@ button:hover {
 
 /* PETS: ficha editable, consulta en modo lectura e historial escalable */
 .profileEditPanel { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-.profileEditPanel > summary { padding: 16px 20px; font-weight: 800; cursor: pointer; background: #ecf7f2; color: #215e41; }
+.profileEditPanel > summary { padding: 16px 20px; font-weight: 800; cursor: pointer; background: var(--color-primary-soft); color: var(--color-primary-dark); }
 .profileEditPanel > .formAlert, .profileEditPanel > form { margin: 18px; }
 .profileEditPanel .registrationGrid { padding: 4px 0; }
 .clinicalReadonlyFields { display: grid; gap: 14px; margin: 0; padding: 0; min-width: 0; border: 0; }
 .clinicalReadOnly :is(input, textarea, select):disabled {
-  opacity: 1; color: #33423a; -webkit-text-fill-color: #33423a;
-  background: #f5f8f7; cursor: default; border-color: #d7e1dc;
+  opacity: 1; color: var(--color-text-subtle); -webkit-text-fill-color: var(--color-text-subtle);
+  background: var(--color-surface-muted); cursor: default; border-color: var(--color-border);
 }
 .clinicalReadOnly :is(input[type="radio"], input[type="checkbox"]):disabled { opacity: 1; }
 .clinicalReadOnly .clinicalFormHeading h2 { font-size: 22px; }
@@ -1918,10 +1905,10 @@ button:hover {
 .consultationRecordActions > span { color: var(--muted); font-size: 13px; }
 .clinicalRecordContent { padding: clamp(12px, 3vw, 24px); }
 .moduleOverviewGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 22px; }
-.moduleOverviewCard { display: grid; gap: 12px; border: 1px solid #dbe4df; border-radius: 12px; padding: 16px; background: #fafcfb; min-height: 124px; }
+.moduleOverviewCard { display: grid; gap: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; background: var(--color-surface-muted); min-height: 124px; }
 .moduleOverviewCard strong { font-size: 14px; }
 .moduleOverviewCard > div { display: grid; gap: 6px; }
-.moduleOverviewCard span { color: #376148; font-size: 13px; }
+.moduleOverviewCard span { color: var(--color-success-strong); font-size: 13px; }
 .moduleOverviewCard small, .moduleOverviewCard .muted { color: var(--muted); font-size: 12px; }
 .historyMoreAction { margin-top: 24px; }
 .fullClinicalTimeline { border-top: 1px solid var(--line); margin-top: 22px; padding-top: 20px; }

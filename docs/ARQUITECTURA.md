@@ -32,3 +32,10 @@ Desde la primera organización de código, `lib/core/auth.ts` mantiene la lógic
 
 ## Estandarización de lenguaje
 El núcleo compartido, los catálogos y utilidades PETS y el parser GHL son TypeScript. `tsconfig.json` activa `strict: true`, `allowJs: true`, `checkJs: false` y verificación CI `tsc --noEmit`. La existencia de archivos `.js` en `app/` y `components/` significa únicamente compatibilidad con PETS heredado; las nuevas rutas son `.ts/.tsx`. La conversión del código histórico se hace funcionalidad por funcionalidad y con pruebas. No cambiar a monorepo de paquetes ni crear microservicios por este requisito.
+
+## Estructura frontend implementada
+- app/super-admin: Core Admin global; roles super_admin y casos de uso de lib/core/admin.
+- app/mascotas, app/propietarios, app/registros, app/empresa: portal PETS.
+- components/layouts: shells por contexto (global/vertical); components/ui: controles comunes.
+- styles/tokens.css: fuente única de identidad visual; app/globals.css: estilos de PETS y generales; styles/shell.css: shell y vistas Core Admin.
+- Las URLs existentes se conservan. Toda nueva funcionalidad en TypeScript. Archivos convertidos con @ts-nocheck deben recibir tipado progresivo.

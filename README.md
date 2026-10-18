@@ -69,3 +69,8 @@ Core-SAAS/
 ```
 
 Esta estructura describe carpetas reales del repositorio; no significa que PULSE, licencias en DB o módulos compartidos ya estén habilitados.
+
+## Frontend y estilos centralizados
+Core Admin (superadministrador) vive en /super-admin, con diseño global en /super-admin/apariencia. La operación de empresas permanece diferenciada de PETS. Ver docs/CORE_ADMIN.md y docs/FRONTEND_DESIGN_SYSTEM.md.
+El color primario inicial es #147d4a. Para cambiar la estética global, editar styles/tokens.css y desplegar el cambio; nunca reescribir cada vertical.
+Todos los archivos PETS se llevan a extensiones TypeScript .ts/.tsx. Los que conservan @ts-nocheck siguen pendientes de tipado interno y pruebas E2E; no deben considerarse completamente comprobados por TypeScript.

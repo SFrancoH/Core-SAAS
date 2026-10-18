@@ -37,3 +37,15 @@ Nunca copiar archivos completos sin auditar. Seguir `docs/COMO_AGREGAR_FUNCIONAL
 
 ## Entrega y evidencia
 Actualizar `PLAN_DESARROLLO.md` y `BITACORA.md` en el mismo PR. Estados: DEFINIDO, IMPLEMENTADO, BD APLICADA, PROBADO LOCAL, DESPLEGADO, VERIFICADO EN PRODUCCIÓN. Informar qué se verificó, qué quedó pendiente y a qué entorno afectó. No asumir que un commit equivalga a producción.
+
+## Frontend, Core Admin y estilos compartidos
+- La plataforma tiene dos contextos: Core Admin global (ruta /super-admin, rol super_admin) y portales operativos por vertical, empezando por PETS.
+- La estética de todas las verticales viene exclusivamente de styles/tokens.css. No usar nuevos colores HEX o rgba fuera de ese archivo.
+- Los componentes compartidos viven en components/ui y los layouts en components/layouts. Usar accesibilidad, responsive y mensajes de error/carga.
+- /super-admin/apariencia es una página informativa del diseño. No persiste cambios ni ofrece temas dinámicos por empresa.
+- Está prohibido presentar como operativas licencias, auditoría o facturación Core sin tener API, DB y autorización verificadas.
+
+## Conversión real de PETS a TypeScript
+- Las rutas, acciones, componentes y utilidades de PETS se renombraron a .ts/.tsx conservando URLs y lógica.
+- Algunos archivos heredados requieren todavía tipos explícitos y contienen @ts-nocheck. NO equivalen a tipado estricto completo; retirarlo de manera progresiva con tests. Prohibido introducir @ts-nocheck en funcionalidades nuevas.
+- No crear archivos JavaScript dentro de app, components o lib. El núcleo nuevo permanece en TypeScript estricto.
