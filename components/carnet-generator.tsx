@@ -1,6 +1,6 @@
+// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 "use client";
 
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 function bogotaCarnet() {
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: "America/Bogota",

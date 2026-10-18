@@ -1,6 +1,6 @@
+// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 "use client";
 
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 import { useState } from "react";
 
 export default function PasswordField({

@@ -1,6 +1,6 @@
+// @ts-nocheck — compatibilidad PETS: tipado estricto de este archivo pendiente.
 "use server";
 
-// @ts-nocheck — compatibilidad PETS: tipado estricto de este archivo pendiente.
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 

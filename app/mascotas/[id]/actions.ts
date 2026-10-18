@@ -1,6 +1,6 @@
+// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 

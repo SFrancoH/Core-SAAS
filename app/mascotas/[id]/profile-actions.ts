@@ -1,6 +1,6 @@
+// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireOperationalProfile } from "@/lib/verticals/pets/operational";

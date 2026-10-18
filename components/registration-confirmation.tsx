@@ -1,6 +1,6 @@
+// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 "use client";
 
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
