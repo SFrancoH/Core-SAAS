@@ -4,7 +4,7 @@ import { createCoreUser, assignExistingCoreUser } from "@/app/core-users/actions
 export type PermissionOption = { code: string; name: string; product: string | null; module: string | null };
 export type MemberInfo = {
   user_id: string; name: string; email: string; role: "admin" | "user";
-  active: boolean; created_by: string | null; permissions: string[];
+  active: boolean; created_by: string | null; creator_name?: string | null; permissions: string[];
 };
 
 function PermissionChoices({ options, inputName }: { options: PermissionOption[]; inputName: string }) {
@@ -94,6 +94,7 @@ export function CompanyMembershipTable({ members }: { members: MemberInfo[] }) {
           <strong>{member.name}</strong><span>{member.email}</span>
           <small>{member.role === "admin" ? "Admin" : "User"} · {member.permissions.length} permisos</small>
           <small>{member.permissions.join(", ") || "Sin permisos"}</small>
+          {member.creator_name ? <small>Creado por: {member.creator_name}</small> : null}
         </div>
         <div className="userActions">
           <span className={member.active?"badgeActive":"badgeInactive"}>{member.active?"Activo":"Inactivo"}</span>

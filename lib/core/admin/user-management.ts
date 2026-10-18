@@ -7,7 +7,7 @@ import { normalizeCoreRole } from "@/lib/core/roles";
 type PermissionOption = { code: string; name: string; product: string | null; module: string | null };
 type MemberRow = {
   user_id: string; name: string; email: string; role: "admin" | "user";
-  active: boolean; created_by: string | null; permissions: string[];
+  active: boolean; created_by: string | null; creator_name?: string | null; permissions: string[];
 };
 type CompanyOption = { id: string; nombre: string };
 const record = (v: unknown): v is Record<string, unknown> =>

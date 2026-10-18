@@ -594,13 +594,15 @@ begin
  end if;
  select coalesce(jsonb_agg(jsonb_build_object(
   'user_id',m.user_id,'name',a.nombre,'email',a.email,
-  'role',m.company_role,'active',m.status='active','created_by',m.created_by,
+  'role',m.company_role,'active',m.status='active',
+  'created_by',m.created_by,'creator_name',creator.nombre,
   'permissions',coalesce((
    select jsonb_agg(mp.permission_code order by mp.permission_code)
    from core.membership_permissions mp where mp.membership_id=m.id
   ),'[]'::jsonb)
  ) order by a.nombre),'[]'::jsonb) into v
  from core.memberships m join core.accounts a on a.user_id=m.user_id
+ left join core.accounts creator on creator.user_id=m.created_by
  where m.empresa_id=p_empresa_id;
  return v;
 end;
