@@ -31,9 +31,7 @@ export async function GET(_request: NextRequest, {params}: {params:Promise<{id:s
   });
 
   ensureTenantRows(owners,tenant.companyId);
-  const includeCompany = false;
   const columns = [
-    ...(includeCompany ? [{ header: "Empresa", key: "empresa", width: 24 }] : []),
     { header: "Nombre propietario", key: "nombre", width: 28 },
     { header: "Ciudad", key: "ciudad", width: 18 },
     { header: "Dirección", key: "direccion", width: 28 },
@@ -52,7 +50,6 @@ export async function GET(_request: NextRequest, {params}: {params:Promise<{id:s
   const rows = owners.map((owner) => {
     const pets = (owner.propietarios_mascotas || []).map((relation) => relation.mascotas).filter((pet): pet is OwnerExportPet => Boolean(pet));
     return {
-      ...(includeCompany ? { empresa: owner.empresas?.nombre || "" } : {}),
       nombre: owner.nombre,
       ciudad: owner.ciudad || "",
       direccion: owner.direccion || "",
