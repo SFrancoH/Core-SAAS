@@ -285,6 +285,14 @@ begin
       and e.module_code=p.module_code and e.status='active'
       and e.valid_from<=now() and (e.valid_until is null or e.valid_until>now())
    ))
+   -- Ningún rol de empresa recibe control de licencias, personal Core,
+   -- auditoría global u otros permisos de plataforma, ni por petición maliciosa.
+   and (p.code not like 'core.%' or p.code in (
+     'core.company.read','core.company.manage','core.members.manage'
+   ))
+   and (p_role='admin' or p.code not in (
+     'core.company.manage','core.members.manage'
+   ))
    and (is_owner or core.effective_permission(p_actor_id,p_empresa_id,p.code));
  if granted <> coalesce(array_length(array(select distinct unnest(p_permissions)),1),0) then
    raise exception 'INVALID_PERMISSION_SET' using errcode='42501';
