@@ -28,6 +28,7 @@ export default async function TenantOwnersPage({params,searchParams}:{
     <Link href={root+"/mascotas"}>← Mascotas</Link>
     <p className="eyebrow">PETS · {ctx.companyName} · Solo lectura</p>
     <h1>Propietarios</h1>
+    <p><a href={"/api/core/empresas/"+ctx.companyId+"/pets/export/propietarios"}>Exportar propietarios de esta empresa (Excel)</a></p>
     <p className="description">Directorio filtrado exclusivamente por la empresa autorizada.</p>
     <form method="get" className="inlineForm">
       <input type="search" name="q" defaultValue={q} placeholder="Nombre, teléfono o correo"/>

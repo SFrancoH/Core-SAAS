@@ -34,6 +34,7 @@ export default async function TenantPetDetail({params}:{
       <p><strong>Fecha de nacimiento:</strong> {pet.fecha_nacimiento??"—"}</p>
       <p><strong>Estado:</strong> {pet.estado??"—"}</p>
     </div>
-    <p className="coreDesignNote">La edición y el historial clínico multiempresa aún no están habilitados. Se migrarán junto con la autorización de escritura y los vínculos de datos.</p>
+    <p><Link href={"/portal/empresa/"+ctx.companyId+"/pets/mascotas/"+petId+"/historial"}>Ver historial clínico por sedes →</Link></p>
+    <p className="coreDesignNote">La edición clínica multiempresa aún no está habilitada. El historial es únicamente de lectura.</p>
   </section></main>;
 }

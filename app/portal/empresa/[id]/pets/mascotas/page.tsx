@@ -31,7 +31,10 @@ export default async function TenantPetsPage({params,searchParams}:{
     <p className="eyebrow">PETS · {context.companyName} · Solo lectura</p>
     <h1>Mascotas</h1>
     <p className="description">Todas las consultas están limitadas a la empresa seleccionada y autorizada. Las operaciones clínicas de edición siguen disponibles únicamente en el sistema legacy hasta migrarlas.</p>
-    <div className="listActions"><Link className="actionLink" href={root+"/propietarios"}>Propietarios</Link></div>
+    <div className="listActions">
+      <Link className="actionLink" href={root+"/propietarios"}>Propietarios</Link>
+      <a className="actionLink" href={"/api/core/empresas/"+context.companyId+"/pets/export/mascotas"}>Exportar Excel</a>
+    </div>
     <form method="get" className="inlineForm">
       <input type="search" name="q" defaultValue={q} placeholder="Buscar mascota, carnet o especie"/>
       <button type="submit">Buscar</button>
