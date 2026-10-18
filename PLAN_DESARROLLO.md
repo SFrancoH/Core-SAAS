@@ -17,10 +17,14 @@ Core aporta empresas, cuentas, membresías, permisos, licencias, integraciones y
 
 ## 3. Fases ejecutables
 
-### C00 — Documentación y estructura
+### C00 — Documentación, estructura y estándar TypeScript
+- [x] Estructura `app`, `components`, `lib/core`, `lib/verticals/pets`, `lib/verticals/pulse`, `lib/modules`, `lib/integrations`, `docs` y `supabase` integrada al repositorio.
+- [x] Norma de TypeScript obligatorio para código nuevo, `tsconfig.json` estricto y compatibilidad temporal con JavaScript PETS.
+- [x] Servicios Core (autenticación, alcance, permisos, autorización), utilidades PETS y parser GHL reorganizados a `.ts`.
+- [ ] Conversión gradual de las rutas/componentes JS de PETS a `.ts/.tsx`, solo con tests funcionales.
 - [x] Documentación maestra, modelo de datos, contratos, reglas PETS/PULSE.
 - [x] Carpetas previstas sin alterar código de aplicación.
-- [~] Tests unitarios de scoping/webhook disponibles. Pendiente build/regresión PETS con dependencias y tests E2E.
+- [~] Pruebas TypeScript de scoping/webhook disponibles; CI debe validar `npm test`, `npm run typecheck` y build. PETS E2E pendiente.
 **Criterio:** sin cambios en base de datos ni dependencias; estructura consistente.
 
 ### C01 — Inventario de la base Core

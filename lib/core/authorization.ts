@@ -1,21 +1,23 @@
 import "server-only";
-
 import { getCurrentProfile } from "@/lib/core/auth";
-import { UUID_RE, CoreAccessError } from "@/lib/core/access.mjs";
+import { UUID_RE, CoreAccessError } from "@/lib/core/access";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
+export interface CoreAuthorizationOptions {
+  companyId?: string;
+  entitlement?: string | null;
+}
+
 /**
- * Puerta de autorización de cualquier nuevo caso de uso Core o vertical.
- * 1. La identidad del actor procede de Supabase Auth (nunca del body).
- * 2. El UUID pedido es solo el contexto, NO concede acceso.
- * 3. La RPC valida empresa activa, membresía/rol, permiso y licencia.
- * 4. Un error o ausencia de RPC significa acceso DENEGADO.
- *
- * PETS mantiene sus rutas actuales hasta implantar SQL 010 y probarlas.
- * @param {string} permission Ej. pulse.project.create
- * @param {{companyId?:string, entitlement?:string|null}} options
+ * Autorización para nuevos casos de uso.
+ * La identidad viene de la sesión real, nunca del cuerpo HTTP.
+ * La RPC valida empresa, permisos y licencia; ante ausencia o error DENIEGA.
+ * Las rutas PETS existentes conservan temporalmente su autorización anterior.
  */
-export async function requireCorePermission(permission, { companyId, entitlement = null } = {}) {
+export async function requireCorePermission(
+  permission: string,
+  { companyId, entitlement = null }: CoreAuthorizationOptions = {}
+): Promise<{ actor: NonNullable<Awaited<ReturnType<typeof getCurrentProfile>>>; companyId: string }> {
   const actor = await getCurrentProfile();
   if (!actor) throw new CoreAccessError("UNAUTHENTICATED");
   const requestedCompanyId = String(companyId || actor.empresa_id || "");
@@ -23,6 +25,7 @@ export async function requireCorePermission(permission, { companyId, entitlement
   if (!permission || typeof permission !== "string") {
     throw new CoreAccessError("INVALID_PERMISSION");
   }
+
   const admin = getSupabaseAdmin();
   const { data, error } = await admin.rpc("core_autorizar_operacion", {
     p_actor_id: actor.id,

@@ -1,2 +1,2 @@
-# Complementos transversales
-Inventario, facturación, agenda y otros módulos se implementan aquí cuando exista caso real, sin importar tablas internas de verticales. No hay módulos implementados por crear este archivo.
+# Módulos compartidos
+Inventario, facturación, agenda y complementos futuros vivirán aquí como interfaces y casos de uso TypeScript. Son transversales y no importan detalles internos de PETS/PULSE. No hay módulos de negocio implementados aún.
