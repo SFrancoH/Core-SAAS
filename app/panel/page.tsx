@@ -9,5 +9,5 @@ export default async function PanelPage() {
     redirect("/super-admin");
   }
 
-  redirect("/empresa");
+  redirect("/portal");
 }
