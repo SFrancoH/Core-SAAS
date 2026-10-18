@@ -117,3 +117,6 @@ Leer reglas → identificar vertical/entidad → definir contrato, permisos/lice
 - [ ] Aplicación 010/011 en Supabase de pruebas y prueba de aislamiento real; ninguna migración fue ejecutada desde GitHub.
 - [ ] Reescritura de los permisos en cada API/PETS y RLS para segunda empresa; prohibido habilitarlo prematuramente.
 - [ ] En modo soporte, lectura de datos por vista contextual requiere otro diseño auditado. Actualmente solo lectura de metadatos de permiso.
+
+- [x] C12: bloquear Server Actions de escritura cuando la cookie de soporte está activa, no solo bloquear navegación en proxy.
+- [ ] C12: pruebas de integración de cookies, Server Actions y RPC en un entorno Next.js conectado a Supabase.

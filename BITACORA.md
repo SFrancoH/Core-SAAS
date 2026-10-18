@@ -90,3 +90,9 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **Aislamiento:** Admin solo Admin/User de su empresa y no concede permisos ajenos; Super-User no hereda autoridad de propietario. Una cuenta puede pertenecer a varias empresas con role/perms distintos, pero PETS sigue usando `public.usuarios.empresa_id` y por tanto **NO se habilita una segunda empresa en sus pantallas**.
 - **Superadmin como usuario:** vista diagnóstica en `super-admin/soporte` solo permite ver identidad, licencias y permisos, con actor real, motivo, expiración y auditoría; NO sustituye la identidad Auth, no permite operar la app como el usuario.
 - **Pendientes críticos:** generar tipos de BD, validar migraciones 010 y 011 con `PREFLIGHT_CORE.sql`, E2E A/B/usuarios, migración de RLS PETS a membresías y empresa seleccionada, aceptación de invitación para Admin si correo ya existe. Sin deploy a Supabase ni intervención en PULSE.
+
+### 2026-10-18 — Defensa adicional del modo soporte
+- **Estado:** Implementado en código del PR #7, bajo pruebas CI.
+- **Motivo:** el bloqueo de rutas del proxy no basta para Next.js Server Actions: un POST puede intentar ejecutar un identificador de acción desde otra URL.
+- **Cambio:** `lib/core/support-guard.ts` consulta la cookie `httpOnly` del modo soporte y rechaza escrituras; todas las acciones de creación/edición/importación/usuarios/empresas y login lo invocan antes de mutar. `logout` y los controles exclusivos de inicio/cierre del soporte quedan habilitados para salir con seguridad.
+- **Validación:** prueba de cobertura de acciones y CI; no sustituye una prueba con Supabase ni pretende crear un JWT del sujeto.
