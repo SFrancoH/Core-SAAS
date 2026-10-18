@@ -8,13 +8,15 @@ export type MemberInfo = {
 };
 
 function PermissionChoices({ options, inputName }: { options: PermissionOption[]; inputName: string }) {
-  const categories = [...new Set(options.map(item=>item.product ?? item.module ?? "CORE"))];
+  // La jerarquía Core se deriva del rol; el selector controla solo permisos de vertical/módulo.
+  const verticalPermissions = options.filter(item=>Boolean(item.product || item.module));
+  const categories = [...new Set(verticalPermissions.map(item=>item.product ?? item.module ?? "CORE"))];
   return <fieldset className="corePermissionSelector">
     <legend>Permisos por vertical</legend>
     <p className="description">Solo se pueden delegar permisos autorizados y correspondientes a licencias activas. El backend comprueba nuevamente cada selección.</p>
     {categories.map(group=><div className="corePermissionGroup" key={group}>
       <h3>{group}</h3>
-      {options.filter(p=>(p.product ?? p.module ?? "CORE")===group).map(p=>
+      {verticalPermissions.filter(p=>(p.product ?? p.module ?? "CORE")===group).map(p=>
         <label className="checkLabel" key={p.code}>
           <input type="checkbox" name={inputName} value={p.code} />
           <span>{p.name} <small>({p.code})</small></span>
