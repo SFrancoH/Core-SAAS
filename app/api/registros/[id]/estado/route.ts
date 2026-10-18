@@ -1,12 +1,11 @@
-// @ts-nocheck — compatibilidad PETS: tipado estricto de este archivo pendiente.
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { getCurrentProfile } from "@/lib/core/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_request, { params }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const profile = await getCurrentProfile();
   if (!profile) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 

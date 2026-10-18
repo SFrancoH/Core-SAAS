@@ -1,5 +1,4 @@
-// @ts-nocheck — compatibilidad PETS: tipado estricto de este archivo pendiente.
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { pickGhlField, normalizeGhlFields } from "@/lib/integrations/ghl-payload";
@@ -9,24 +8,24 @@ export const dynamic = "force-dynamic";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 // Parseo único Core: mantiene alias y fuentes ya aceptadas por PETS.
-function pick(body, ...keys) {
+function pick(body: unknown, ...keys: string[]): string {
   return pickGhlField(body, ...keys);
 }
 
-async function readBody(request) {
+async function readBody(request: NextRequest): Promise<unknown> {
   const contentType = request.headers.get("content-type") || "";
   if (contentType.includes("application/json")) return request.json();
   const form = await request.formData();
   return Object.fromEntries(form.entries());
 }
 
-export async function POST(request, { params }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   if (!uuidPattern.test(token || "")) {
     return NextResponse.json({ ok: false, error: "Ruta no válida" }, { status: 404 });
   }
 
-  let body;
+  let body: unknown;
   try {
     body = await readBody(request);
   } catch {
