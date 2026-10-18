@@ -42,7 +42,11 @@ export default async function PortalPage() {
                 : <span className="coreStatusUpcoming">{product === "PETS" ? "Pendiente activación del aislamiento multiempresa" : "Interfaz pendiente de implementación"}</span>}
           </article>)}
         </div>
-        {space.role==="admin" ? <p><Link href={"/portal/empresa/"+space.companyId+"/usuarios"}>Administrar usuarios y permisos →</Link></p> : null}
+        {space.role==="admin" ? <p>
+          <Link href={"/portal/empresa/"+space.companyId+"/usuarios"}>Administrar usuarios y permisos →</Link>
+          {" · "}
+          {process.env.CORE_PETS_MULTI_TENANT_READ_ENABLED==="true" ? <Link href={"/portal/empresa/"+space.companyId+"/sedes"}>Administrar sedes →</Link> : null}
+        </p> : null}
       </section>)}
       <p className="coreDesignNote">El listado no sustituye las validaciones de empresa, licencia y permisos realizadas por el servidor.</p>
     </section>

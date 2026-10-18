@@ -36,3 +36,5 @@ Agrega RPC service_role public.core_pets_tenant_access para nuevas rutas, y una 
 - Políticas RLS PostgreSQL permisivas se combinan con OR. No agregar permisos nuevos sin eliminar las políticas históricas de alcance inseguro.
 - Un build de TypeScript y pruebas puras no demuestran autorización real en PostgreSQL.
 - Las cuentas Core nuevas no tienen necesariamente perfil public.usuarios, y algunas FKs clínicas todavía lo requieren.
+## Actualización C19
+La migración 013 añade sedes Core, mapeo conservador PETS y RPC de acceso por sede. `supabase/deploy/CORE_UNA_EJECUCION_STAGING.sql` agrupa 010–013 en una transacción **para una instalación inicial en staging** y falla si hay Core previo/parcial. No se ejecutó ni verificó en DB real; ver `docs/DESPLIEGUE_UNICO_CORE_STAGING.md`. Se añadieron vistas de historial por sede y exportación por tenant; C14 legacy y escrituras C15/C16 permanecen pendientes, sin bandera activada.
