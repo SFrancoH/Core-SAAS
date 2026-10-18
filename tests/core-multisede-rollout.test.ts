@@ -16,11 +16,15 @@ test("bundle Supabase integra cuatro migraciones en UNA transacción y deniega C
  assert.match(sql,/PETS_001_009_INCOMPLETO/);
  assert.match(sql,/POSTCHECK_MEMBERSHIPS/);
  assert.match(sql,/core\.migration_bundle_runs/);
+ assert.doesNotMatch(sql,/^as \$/gm);
+ assert.doesNotMatch(sql,/^\$;$/gm);
  assert.doesNotMatch(sql,/create table\s+(?:inventory|inventario)\./i);
 });
 test("PETS históricos preservan sede de origen sin inventar sede clínica",()=>{
  const sql=read("supabase/migrations/013_core_sedes.sql");
  assert.match(sql,/create table if not exists core\.sedes/);
+ assert.doesNotMatch(sql,/^as \$/gm);
+ assert.doesNotMatch(sql,/^\$;$/gm);
  assert.match(sql,/create table if not exists core\.membership_sedes/);
  assert.match(sql,/create or replace function core\.site_allowed/);
  assert.match(sql,/create or replace function public\.core_contexto_sedes/);
