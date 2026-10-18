@@ -86,3 +86,6 @@ La ruta `/super-admin/soporte` ofrece una **vista como usuario de solo lectura**
 
 ## Usuarios Core y permisos por vertical
 Super-Admin crea Super-User, Admin y User en `/super-admin/usuarios`; Admin crea solo Admin/User para sus empresas desde `/empresa/usuarios` (PETS) o `/portal/empresa/[id]/usuarios` (Core). Una cuenta puede asociarse a varias empresas con permisos distintos; el selector exige empresa + licencia + permiso, también en backend, y cada asignación registra al actor. SQL 010 y 011 **deben revisarse e instalarse en entorno de pruebas** antes de habilitar estas funciones. La apariencia del selector no sustituye RLS.
+
+## PETS multiempresa (C13: piloto read-only)
+El contexto y las primeras rutas de mascotas y propietarios por empresa están documentados en docs/MIGRACION_PETS_MULTIEMPRESA.md. La migración supabase/migrations/012_pets_multitenant_rls.sql está versionada, pero NO aplicada. Para habilitar las nuevas rutas se requiere preflight real de Supabase 010/011/012, pruebas de JWT/RLS y la bandera CORE_PETS_MULTI_TENANT_READ_ENABLED=true; por defecto está apagada. Los flujos clínicos antiguos continúan sin soporte para una segunda empresa.

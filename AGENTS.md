@@ -57,3 +57,11 @@ Actualizar `PLAN_DESARROLLO.md` y `BITACORA.md` en el mismo PR. Estados: DEFINID
 - Ningún botón, selector de empresa, pathname, URL, sesión Auth metadata ni parámetro del body concede acceso. En servidor validar usuario activo + membresía activa + empresa activa + permiso + entitlement vigente + recurso del tenant. RLS y FKs compuestas protegen la base; service_role jamás se expone a cliente.
 - `/super-admin/soporte` es vista diagnóstica auditada, **solo lectura**, con actor real y plazo máximo 15 min; prohíbe navegar o escribir en rutas operativas mientras esté activa. NO es autenticación real del sujeto ni una función «operar como» completa.
 - Migración 011 requiere 010 y preflight real de Supabase; no afirmar que hay membresías/permisos seguros o suplantación operativa hasta integrar RLS y ejecutar E2E.
+
+## PETS C13: migración multiempresa sin fuga de datos
+- Ninguna ruta PETS nueva usa public.usuarios.empresa_id como única autorización; el contexto es un UUID empresa validado con sesión real, licencia y permiso mediante public.core_pets_tenant_access.
+- Ninguna consulta PETS con getSupabaseAdmin()/service_role omite el filtro empresarial .eq('empresa_id',ctx.companyId). En comprobaciones de lectura se validan los resultados con ensureTenantRows. Filtrar un botón o un menú NO es autorización.
+- Las rutas C13 bajo /portal/empresa/[id]/pets/* son SOLO LECTURA y requieren la bandera CORE_PETS_MULTI_TENANT_READ_ENABLED=true tras instalar y validar 010/011/012 con RLS A/B.
+- Mantener el flag apagado por defecto. NO habilitar segundo tenant, writes, exports ni consultas antiguas hasta completar C14/C15/C16 y la prueba de regresión PostgreSQL.
+- Revisar cualquier política nueva junto con las políticas permisivas existentes: PostgreSQL puede unirlas por OR. El despliegue de 012 debe fallar si identifica políticas de terceros desconocidas.
+- Fuente del plan, preflight y casos E2E: docs/MIGRACION_PETS_MULTIEMPRESA.md.
