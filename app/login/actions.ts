@@ -1,11 +1,14 @@
 "use server";
 
+import { assertNoSupportMode } from "@/lib/core/support-guard";
+
 import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/core/auth";
 
 export async function login(formData: FormData) {
+  await assertNoSupportMode();
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const password = String(formData.get("password") || "");
 

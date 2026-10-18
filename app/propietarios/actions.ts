@@ -1,5 +1,7 @@
 "use server";
 
+import { assertNoSupportMode } from "@/lib/core/support-guard";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -63,6 +65,7 @@ function mergeMissing(target: ImportedOwner, source: ImportedOwner): void {
 }
 
 export async function importOwners(formData: FormData) {
+  await assertNoSupportMode();
   const actor = await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const file = formData.get("archivo");

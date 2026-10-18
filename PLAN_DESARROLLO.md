@@ -103,7 +103,20 @@ Leer reglas → identificar vertical/entidad → definir contrato, permisos/lice
 - [x] Vista de soporte de solo lectura con creación/auditoría/cierre por RPC, cookie httpOnly temporal y bloqueo de rutas operativas; **dependiente de SQL 011**.
 - [x] Pruebas de roles y permisos negativos por empresa/licencia y bloqueo de soporte.
 - [ ] C01 preflight y copia; aplicar 010 y 011 solo tras ensayos en entorno de pruebas.
-- [ ] Crear/invitar personal desde UI, seleccionar múltiples empresas y permisos por vertical; transacciones y auditoría E2E.
+- [x] Crear usuarios Core y asociar cuentas a varias empresas desde UI, con selector de permisos por vertical, validación SQL y creación auditada (código en PR #7).
+- [ ] Desplegar tras preflight 010/011 y pruebas transaccionales/negativas A/B en Supabase; invitaciones aceptadas para correos preexistentes creadas por Admin quedan pendientes.
 - [ ] Sustituir filtro PETS basado en `public.usuarios.empresa_id` por membresía elegida validada en todas las APIs y RLS PETS. Hasta entonces NO abrir PETS desde segunda empresa.
 - [ ] Activar PULSE frontend y tablas en Core; no presentar PULSE operativo solo por mostrar licencia.
 - [ ] Pruebas de aislamiento real: usuario A/B, rol, recurso, URL, API, revocación y soporte. Solo después permitir soporte de lectura real de datos y acciones delegadas aprobadas.
+
+## C12 — Gestión Core de usuarios, roles y permisos (2026-10-18)
+- [x] Formularios de Super-Admin, Admin legacy y Admin multiempresa Core, selector de permisos por vertical, listado de membresías.
+- [x] Acciones de creación con Supabase Auth, RPC con actor verificado y rollback ante errores; Super-User global y asociación exclusiva de propietario.
+- [x] SQL 011: normalizar delimitadores `$$` de funciones y añadir catálogo de permisos/listado de miembros/búsqueda de cuenta existente restringida a propietario.
+- [ ] Generación de invitaciones y confirmación de consentimiento para la asociación de cuentas existentes por Admin.
+- [ ] Aplicación 010/011 en Supabase de pruebas y prueba de aislamiento real; ninguna migración fue ejecutada desde GitHub.
+- [ ] Reescritura de los permisos en cada API/PETS y RLS para segunda empresa; prohibido habilitarlo prematuramente.
+- [ ] En modo soporte, lectura de datos por vista contextual requiere otro diseño auditado. Actualmente solo lectura de metadatos de permiso.
+
+- [x] C12: bloquear Server Actions de escritura cuando la cookie de soporte está activa, no solo bloquear navegación en proxy.
+- [ ] C12: pruebas de integración de cookies, Server Actions y RPC en un entorno Next.js conectado a Supabase.

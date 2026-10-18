@@ -1,5 +1,7 @@
 "use server";
 
+import { assertNoSupportMode } from "@/lib/core/support-guard";
+
 import { redirect } from "next/navigation";
 
 import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
@@ -22,6 +24,7 @@ function fail(code: string): never {
 }
 
 export async function createPetRegistration(formData: FormData) {
+  await assertNoSupportMode();
   const profile = await requireOperationalProfile();
   const requestedCompanyId = text(formData, "empresa_id", 40);
   const companyId = profile.rol === "super_admin" ? requestedCompanyId : profile.empresa_id;

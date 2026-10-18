@@ -80,3 +80,19 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **Compatibilidad preservada:** `public.usuarios.rol` (enum PETS) y `empresa_id` legacy permanecen sin cambios; el acceso a PETS por empresa adicional se bloquea hasta adaptar todos los filtros y RLS. PULSE sigue sin frontend productivo en Core.
 - **Seguridad:** sin licencias inventadas desde frontend; fail-closed cuando falta 011 para nuevas funciones. Sin leer datos de Supabase real ni desplegar SQL; pruebas de aislamiento real/E2E pendientes.
 - **Pendientes:** preflight C01, ensayo de SQL 010/011, API/UI de invitación de usuarios y selector de permisos, adaptación completa de PETS multiempresa, pruebas de soporte y auditoría contra BD real.
+
+## 2026-10-18 — C12: gestión de usuarios y permisos por empresa
+- **Estado:** IMPLEMENTADO EN CÓDIGO del PR #7, NO ACTIVADO EN BD; requerirá CI y pruebas E2E.
+- **Objetivo:** aplicar los cuatro roles en gestión real: Super-Admin (único), Super-User (empleado interno sin acceso implícito), Admin (empresa), User (empresa), con un login Core, membresía N:M y permisos por vertical.
+- **Frontend:** `app/super-admin/usuarios`, `app/empresa/usuarios`, `app/portal/empresa/[id]/usuarios`, `components/core/user-forms.tsx`; el catálogo muestra solo permisos delegables de verticales licenciadas.
+- **Backend:** `app/core-users/actions.ts` valida identidad desde `getCurrentProfile`, empresa por RPC `core_autorizar_operacion`, permisos delegables, longitud de contraseña, y crea cuenta con Supabase Auth + RPC. En errores intenta borrar la identidad Auth; se audita creador y asignaciones en SQL.
+- **SQL versionado:** `011_core_identity_multitenant.sql` recibió corrección de delimitadores de funciones y RPCs `core_permission_catalog`, `core_company_members` y `core_find_account`. Depende de 010, NO se ejecutó en ninguna instancia real.
+- **Aislamiento:** Admin solo Admin/User de su empresa y no concede permisos ajenos; Super-User no hereda autoridad de propietario. Una cuenta puede pertenecer a varias empresas con role/perms distintos, pero PETS sigue usando `public.usuarios.empresa_id` y por tanto **NO se habilita una segunda empresa en sus pantallas**.
+- **Superadmin como usuario:** vista diagnóstica en `super-admin/soporte` solo permite ver identidad, licencias y permisos, con actor real, motivo, expiración y auditoría; NO sustituye la identidad Auth, no permite operar la app como el usuario.
+- **Pendientes críticos:** generar tipos de BD, validar migraciones 010 y 011 con `PREFLIGHT_CORE.sql`, E2E A/B/usuarios, migración de RLS PETS a membresías y empresa seleccionada, aceptación de invitación para Admin si correo ya existe. Sin deploy a Supabase ni intervención en PULSE.
+
+### 2026-10-18 — Defensa adicional del modo soporte
+- **Estado:** Implementado en código del PR #7, bajo pruebas CI.
+- **Motivo:** el bloqueo de rutas del proxy no basta para Next.js Server Actions: un POST puede intentar ejecutar un identificador de acción desde otra URL.
+- **Cambio:** `lib/core/support-guard.ts` consulta la cookie `httpOnly` del modo soporte y rechaza escrituras; todas las acciones de creación/edición/importación/usuarios/empresas y login lo invocan antes de mutar. `logout` y los controles exclusivos de inicio/cierre del soporte quedan habilitados para salir con seguridad.
+- **Validación:** prueba de cobertura de acciones y CI; no sustituye una prueba con Supabase ni pretende crear un JWT del sujeto.

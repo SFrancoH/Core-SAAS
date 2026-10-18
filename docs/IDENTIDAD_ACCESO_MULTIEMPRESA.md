@@ -91,9 +91,22 @@ Jamás cambiar la contraseña del usuario, reemplazar su token Auth, firmar un J
 | Roles tipados y validación de alcance pura | Implementado en código con tests |
 | SQL 011 de cuentas/membresías/roles/auditoría/soporte | Redactado, **NO aplicado** |
 | Vista soporte (permisos, sin operar como usuario) | Implementada en código; bloqueada sin SQL 011 |
-| Selector editable y creación/invitación desde UI | Pendiente |
+| UI crear Admin/User/Super-User y asociar cuenta multiempresa | Implementada en código; bloqueada sin SQL 010/011 |
+| Invitaciones aceptadas por terceros (cuentas preexistentes) | Pendiente: Admin no puede asociar terceros silenciosamente |
 | Adaptación PETS a empresa activa multiempresa en cada ruta/RLS | Pendiente |
 | Pruebas E2E de 2 empresas, 2 verticales, permisos y sesión soporte | Pendiente |
 | PULSE en Core SaaS | Carpeta preparada; frontend operativo pendiente |
 
 **Despliegue seguro:** C01 preflight real → copia/ensayo → SQL 010 en prueba → SQL 011 en prueba → regresiones PETS + RLS A/B → aprobación y rollout controlado. No ejecutar SQL 011 aislada ni inferir que se aplicó a Supabase por estar en Git.
+
+## Gestión de usuarios Core (PR #7)
+- Super-Admin: `app/super-admin/usuarios` permite elegir empresa, crear Admin/User, crear Super-User y asociar una cuenta Core existente a varias empresas por correo. Una cuenta usa una sola identidad `auth.users`; la asociación se registra en `core.memberships` con `created_by` y en `core.audit_events`.
+- Admin de empresa: `app/empresa/usuarios` (compatibilidad PETS) y `app/portal/empresa/[id]/usuarios` (membresías Core) solo habilitan operaciones tras una RPC que valida pertenencia y `core.members.manage` en la empresa. No se confía en el ID en la URL ni en el formulario.
+- Formulario: permisos por vertical; el rol Admin incluye `core.members.manage` sin que el cliente elija privilegios globales. El backend rechaza permisos no delegables o sin licencia, y niega cualquier intento de crear personal global por parte de Admin.
+- Super-User: cuenta global creada solo por Super-Admin. No hereda acceso a ninguna empresa. El propietario puede asociarla expresamente como Admin/User a cada empresa, con permisos específicos, y queda auditado.
+- Crear usuario: servidor verifica el actor y el catálogo delegable antes de `auth.admin.createUser`; luego RPC registra la cuenta/actor y asigna membresía. Si algo falla se intenta eliminar la nueva identidad Auth. Se debe monitorear errores de cleanup para resolver posibles cuentas huérfanas.
+- Las cuentas Core nuevas **NO reciben automáticamente un perfil PETS legacy**. Por ello la interfaz PETS de una nueva cuenta queda bloqueada hasta completar los filtros y RLS. No afirmar que el selector actual da acceso productivo a PETS de múltiples empresas.
+- El login como otro usuario de `/super-admin/soporte` sigue siendo **vista de permisos en modo soporte**: no sustituye la sesión del sujeto ni opera su negocio. La modalidad operativa sólo podrá habilitarse con autorización por contexto efectivo, doble actor en auditoría, protección por base de datos y pruebas E2E.
+
+## Defensa en profundidad del soporte (C12)
+La ruta `/super-admin/soporte` es **diagnóstico de permisos y verticales**, no autenticación con las credenciales del usuario observado. Mientras existe su cookie `httpOnly`, el proxy bloquea rutas operativas y `lib/core/support-guard.ts` rechaza las Server Actions de escritura aunque se intenten despachar mediante una URL permitida. La acción de cerrar soporte y logout permanecen disponibles. Es una barrera de la aplicación; el propietario real conserva sus privilegios originales fuera de la vista y no hay suplantación operativa en producción.

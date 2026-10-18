@@ -1,5 +1,7 @@
 "use server";
 
+import { assertNoSupportMode } from "@/lib/core/support-guard";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -110,10 +112,12 @@ function parseMedicationRows(value: unknown): MedicationRow[] | null {
 }
 
 export async function createConsultation(petId: string, formData: FormData) {
+  await assertNoSupportMode();
   return saveConsultation(petId, null, formData);
 }
 
 export async function updateConsultation(petId: string, consultationId: string, formData: FormData) {
+  await assertNoSupportMode();
   if (!uuidPattern.test(consultationId || "")) redirect("/mascotas");
   return saveConsultation(petId, consultationId, formData);
 }

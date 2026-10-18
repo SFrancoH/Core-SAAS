@@ -1,5 +1,7 @@
 "use server";
 
+import { assertNoSupportMode } from "@/lib/core/support-guard";
+
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
@@ -10,6 +12,7 @@ const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12
 const value = (data: FormData, key: string, max = 500): string => String(data.get(key) || "").trim().slice(0, max);
 
 export async function updateOwnerProfile(ownerId: string, formData: FormData) {
+  await assertNoSupportMode();
   const actor = await requireOperationalProfile();
   if (!uuidPattern.test(ownerId)) redirect("/propietarios");
   const admin = getSupabaseAdmin();

@@ -1,5 +1,7 @@
 "use server";
 
+import { assertNoSupportMode } from "@/lib/core/support-guard";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -13,6 +15,7 @@ function companyPath(companyId: string, query = ""): string {
 }
 
 export async function createCompanyAdmin(formData: FormData) {
+  await assertNoSupportMode();
   const actor = await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const nombre = String(formData.get("nombre") || "").trim();
@@ -64,6 +67,7 @@ export async function createCompanyAdmin(formData: FormData) {
 }
 
 export async function resetCompanyUserPassword(formData: FormData) {
+  await assertNoSupportMode();
   await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const userId = String(formData.get("usuario_id") || "");
@@ -91,6 +95,7 @@ export async function resetCompanyUserPassword(formData: FormData) {
 }
 
 export async function setCompanyUserStatus(formData: FormData) {
+  await assertNoSupportMode();
   await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const userId = String(formData.get("usuario_id") || "");
@@ -116,6 +121,7 @@ export async function setCompanyUserStatus(formData: FormData) {
 }
 
 export async function saveContactIntegration(formData: FormData) {
+  await assertNoSupportMode();
   const actor = await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const formUrl = String(formData.get("formulario_url") || "").trim();

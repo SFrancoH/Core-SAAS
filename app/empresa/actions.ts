@@ -1,5 +1,7 @@
 "use server";
 
+import { assertNoSupportMode } from "@/lib/core/support-guard";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -9,6 +11,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export async function createVeterinarian(formData: FormData) {
+  await assertNoSupportMode();
   const actor = await requireProfile(["empresa_admin"]);
   const nombre = String(formData.get("nombre") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
@@ -61,6 +64,7 @@ async function getManagedVeterinarian(actor: CoreProfile, userId: string) {
 }
 
 export async function resetVeterinarianPassword(formData: FormData) {
+  await assertNoSupportMode();
   const actor = await requireProfile(["empresa_admin"]);
   const userId = String(formData.get("usuario_id") || "");
   const password = String(formData.get("password") || "");
@@ -77,6 +81,7 @@ export async function resetVeterinarianPassword(formData: FormData) {
 }
 
 export async function setVeterinarianStatus(formData: FormData) {
+  await assertNoSupportMode();
   const actor = await requireProfile(["empresa_admin"]);
   const userId = String(formData.get("usuario_id") || "");
   const activo = String(formData.get("activo")) === "true";
