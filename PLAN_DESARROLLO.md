@@ -78,3 +78,12 @@ Core aporta empresas, cuentas, membresías, permisos, licencias, integraciones y
 Leer reglas → identificar vertical/entidad → definir contrato, permisos/licencia y SQL → hacer prueba → implementar una función → validar → registrar archivos/migración/entorno/resultado/commit en bitácora.
 
 **Siguiente trabajo: C01.** No aplicar SQL de PULSE antes de examinar el Supabase de Core SaaS.
+
+## C09 — Frontend global, Core Admin y código PETS TypeScript
+- [x] Rutas, acciones, componentes y utilidades PETS pasados de extensión .js a .ts/.tsx.
+- [x] Core Admin separado de la operación PETS con panel global y catálogo visual de verticales.
+- [x] Identidad visual única: styles/tokens.css y estilos consumidores.
+- [x] Componentes compartidos iniciales tipados y cabecera Core Admin.
+- [ ] Eliminar @ts-nocheck de código histórico PETS, incorporando tipado estricto función por función.
+- [ ] Pruebas de la aplicación PETS conectada al Supabase real, permisos, formularios y responsive.
+- [ ] Licencias, planes, auditoría y módulos Core reales: requieren SQL 010 aplicado y pruebas.

@@ -51,3 +51,11 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **Compatibilidad:** se conservan rutas `.js` PETS y adaptadores de importación; se reemplaza el `jsconfig.json` por `tsconfig.json` sin cambiar la ruta pública ni el contrato de base de datos.
 - **SQL:** sin ejecutar; `010_core_access.sql` pendiente de verificación/instalación controlada.
 - **Pruebas:** resultados documentados en el PR/CI correspondiente; pruebas con Supabase real y E2E pendientes.
+
+## 2026-10-18 — TypeScript PETS, frontend global y Core Admin
+- Estado: IMPLEMENTADO EN CÓDIGO, sujeto a CI, sin modificación de base de datos.
+- Rutas, acciones, componentes, importadores y utilidades PETS renombrados .ts/.tsx sin cambiar URLs ni APIs.
+- Core Admin: lib/core/admin/overview.ts, components/layouts/core-admin-header.tsx, components/ui/stat-card.tsx y páginas /super-admin y /super-admin/apariencia.
+- Sistema visual: styles/tokens.css contiene paleta, transparencias, radios y tipografía; app/globals.css consume variables en lugar de valores HEX; styles/shell.css organiza administración.
+- Estado de tipado: algunos archivos heredados todavía llevan @ts-nocheck; deben tiparse realmente por fases. No introducir nuevos JS.
+- SQL 010 no aplicado; Supabase y PULSE productivo sin cambios. Pruebas de integración clínica y visuales pendientes.

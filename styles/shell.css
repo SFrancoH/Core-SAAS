@@ -1,0 +1,56 @@
+
+/* Core Admin: usa exclusivamente variables de styles/tokens.css. */
+.visuallyHidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.coreAdminShell{background:var(--color-page)}
+.coreAdminHeader{min-height:78px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;padding:14px var(--space-page);background:var(--color-surface);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:40}
+.coreHeaderIdentity{flex-shrink:0}
+.coreLogo{display:flex;align-items:center;gap:11px;color:var(--color-text);text-decoration:none;font-weight:900;font-size:16px;letter-spacing:.025em}
+.coreLogoMark{width:42px;height:42px;display:grid;place-items:center;background:var(--color-primary);color:var(--color-white);border-radius:var(--radius-md);font-size:22px}
+.coreLogo strong{color:var(--color-primary)}
+.coreLogo small{display:block;margin-top:2px;color:var(--color-muted);font-size:10px;font-weight:750;letter-spacing:.14em}
+.coreHeaderNav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.coreHeaderNav a{color:var(--color-muted);padding:11px 13px;border-radius:var(--radius-md);font-size:14px;font-weight:700;text-decoration:none}
+.coreHeaderNav a:hover,.coreHeaderNav .coreNavActive{color:var(--color-primary);background:var(--color-primary-soft)}
+.coreHeaderUser{display:flex;align-items:center;gap:10px}
+.coreAvatar{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--color-primary-soft);color:var(--color-primary);font-weight:850}
+.coreUserInfo{display:grid;gap:2px}
+.coreUserInfo strong{color:var(--color-text);font-size:13px}
+.coreUserInfo small{color:var(--color-muted);font-size:11px}
+.coreLogout{margin-left:8px}
+.coreAdminContent{max-width:var(--page-max-width)}
+.corePageIntro{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:25px;flex-wrap:wrap}
+.corePageIntro .eyebrow,.coreSectionHeading .eyebrow{margin-top:0}
+.corePageIntro .description{margin-bottom:0;max-width:670px}
+.coreCreateCompany{align-items:center}
+.coreCreateCompany input{width:260px}
+.coreStatsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:24px 0 32px}
+.coreStatCard{border:1px solid var(--color-border);background:var(--color-surface);border-radius:var(--radius-xl);padding:23px;display:grid;gap:10px;box-shadow:0 12px 32px var(--color-alpha-4)}
+.coreStatTop{color:var(--color-muted);font-weight:700;font-size:13px;display:flex;justify-content:space-between}
+.coreStatCard strong{font-size:36px;letter-spacing:-.04em;color:var(--color-text)}
+.coreStatCard small{color:var(--color-muted);font-size:12px}
+.coreSection{margin:32px 0}
+.coreSectionHeading{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:20px}
+.coreSectionHeading h2{margin:0;color:var(--color-text);font-size:24px}
+.coreSectionMeta{color:var(--color-muted);font-size:13px}
+.coreProductGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px}
+.coreProductCard{border:1px solid var(--color-border);border-radius:var(--radius-lg);background:var(--color-surface);padding:20px;min-height:212px;display:flex;flex-direction:column;align-items:flex-start}
+.coreProductIcon{display:grid;place-items:center;width:38px;height:38px;margin-bottom:12px;border-radius:var(--radius-md);color:var(--color-primary);background:var(--color-primary-soft);font-weight:900}
+.coreProductInactive{color:var(--color-muted);background:var(--color-neutral-soft)}
+.coreProductCard h3{font-size:16px;color:var(--color-text);margin:0 0 6px}
+.coreProductCard p{color:var(--color-muted);font-size:13px;line-height:1.5;margin:0 0 18px}
+.coreProductCard a{color:var(--color-primary);font-weight:800;font-size:13px;text-decoration:none;margin-top:auto}
+.coreStatusUpcoming{margin-top:auto;color:var(--color-muted);font-size:12px}
+.coreSwatchGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px}
+.coreSwatch{border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;background:var(--color-surface);display:grid;gap:6px;padding-bottom:13px}
+.coreSwatchColor{height:78px;border-bottom:1px solid var(--color-border)}
+.coreSwatch strong,.coreSwatch small{padding:0 14px}
+.coreSwatch small{color:var(--color-muted);font-size:11px}
+.corePreviewSurface{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:28px;display:grid;gap:14px}
+.corePreviewSurface h2{font-size:27px;margin:0}
+.corePreviewSurface .description{font-size:14px;margin:10px 0}
+.corePreviewActions{display:flex;flex-wrap:wrap;gap:12px}
+.corePreviewField{display:grid;gap:7px;font-size:13px;font-weight:700;max-width:350px}
+.coreDesignNote{color:var(--color-muted);font-size:14px}
+:focus-visible{outline:2px solid var(--color-primary);outline-offset:3px}
+@media(max-width:900px){.coreHeaderNav{order:3;flex-basis:100%}.coreAdminHeader{gap:13px}.coreStatsGrid{grid-template-columns:1fr}.coreUserInfo{display:none}}
+@media(max-width:520px){.coreCreateCompany input{width:100%}.coreCreateCompany{width:100%;display:grid;gap:10px}.corePageIntro{align-items:stretch}}
