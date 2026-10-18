@@ -71,3 +71,10 @@ auth.users -> core.memberships -> public.empresas
                 -> membership_roles -> roles -> permissions
 public.empresas -> core.integrations -> core.webhook_events / outbox_events
 ```
+
+## 8. Canon de roles y multiempresa (C11)
+Solo cuatro roles de Core: `super_admin` (único propietario), `super_user` (personal interno con grants explícitos), `admin` y `user` (por membresía). Los cargos veterinario/vendedor no crean nuevos roles globales: son conjuntos de permisos sobre PETS/PULSE.
+
+`core.accounts` referencia `auth.users`. `core.memberships` permite múltiples empresas; `core.membership_permissions` tiene permiso concreto y creador; `core.entitlements` decide verticales con licencia. El RPC `public.core_autorizar_operacion` se actualizará al aplicar 011, **solo desde service_role en servidor**. Las tablas Core están cerradas a `anon/authenticated` y sus métodos son RPC expresamente autorizadas.
+
+La compatibilidad con `public.usuarios.empresa_id` y las políticas RLS PETS actuales es temporal. Prohibido habilitar la selección de una segunda empresa para operaciones PETS hasta que todas las consultas, acciones y RLS respeten la membresía activa. La DB real sigue sin comprobarse; no se ejecutó 011. Consulta `docs/IDENTIDAD_ACCESO_MULTIEMPRESA.md`.

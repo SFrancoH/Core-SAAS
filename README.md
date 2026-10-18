@@ -78,3 +78,8 @@ Todos los archivos PETS se llevan a extensiones TypeScript .ts/.tsx. Los que con
 ## Tipado TypeScript estricto
 Todas las rutas, componentes y servicios del proyecto se mantienen en TS/TSX; `tsconfig.json` usa `strict` y `allowJs: false`. Las verificaciones en CI prohíben archivos JavaScript y directivas de supresión de tipado.
 **Límite explícito:** el adaptador `lib/supabase/admin.ts` sigue teniendo un tipo dinámico para las tablas/RPC hasta generar `Database` a partir del esquema real de Supabase (fase C01). Las pruebas funcionales contra BD aún son independientes de los tests TypeScript.
+
+## Identidad y acceso multiempresa
+`/login` es el único acceso CORE SAAS; `/portal` selecciona empresas y verticales con licencia. Los cuatro roles canónicos son **Super-Admin, Super-User, Admin y User**. El rol de empresa y los permisos se asignan por membresía; veterinario o vendedor son perfiles funcionales de cada producto. Ver [Identidad y aislamiento](docs/IDENTIDAD_ACCESO_MULTIEMPRESA.md).
+
+La ruta `/super-admin/soporte` ofrece una **vista como usuario de solo lectura**, auditada y temporal: no inicia sesión en nombre del sujeto y bloquea operaciones del propietario mientras esté activa. Requiere SQL 011. La migración 011 está versionada, no aplicada. Las rutas PETS históricas aún necesitan adaptar RLS/contexto de usuario multiempresa antes de activarlo completamente.

@@ -95,3 +95,15 @@ Leer reglas → identificar vertical/entidad → definir contrato, permisos/lice
 - [x] Desactivar `allowJs` en `tsconfig.json` para nuevas funcionalidades.
 - [ ] Generar tipos Database directamente del Supabase de Core y eliminar la excepción temporal en `lib/supabase/admin.ts` después del preflight C01.
 - [ ] Ejecutar pruebas E2E clínicas, registros, permisos de empresa y webhooks contra un entorno Supabase de pruebas autorizado.
+
+## C11 — Login Core, perfiles globales y seguridad multiempresa (2026-10-18)
+- [x] Login marcado CORE SAAS y punto de entrada unificado `/portal` para perfiles no globales; PETS histórico sigue abriendo su panel.
+- [x] Contratos tipados Super-Admin, Super-User, Admin, User; una persona puede tener múltiples membresías en el modelo SQL.
+- [x] RPC portal licencias/membresías, provisión y asignación auditada multiempresa diseñadas en `011_core_identity_multitenant.sql`. SQL **NO ejecutado**.
+- [x] Vista de soporte de solo lectura con creación/auditoría/cierre por RPC, cookie httpOnly temporal y bloqueo de rutas operativas; **dependiente de SQL 011**.
+- [x] Pruebas de roles y permisos negativos por empresa/licencia y bloqueo de soporte.
+- [ ] C01 preflight y copia; aplicar 010 y 011 solo tras ensayos en entorno de pruebas.
+- [ ] Crear/invitar personal desde UI, seleccionar múltiples empresas y permisos por vertical; transacciones y auditoría E2E.
+- [ ] Sustituir filtro PETS basado en `public.usuarios.empresa_id` por membresía elegida validada en todas las APIs y RLS PETS. Hasta entonces NO abrir PETS desde segunda empresa.
+- [ ] Activar PULSE frontend y tablas en Core; no presentar PULSE operativo solo por mostrar licencia.
+- [ ] Pruebas de aislamiento real: usuario A/B, rol, recurso, URL, API, revocación y soporte. Solo después permitir soporte de lectura real de datos y acciones delegadas aprobadas.

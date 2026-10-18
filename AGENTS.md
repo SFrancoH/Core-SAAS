@@ -49,3 +49,11 @@ Actualizar `PLAN_DESARROLLO.md` y `BITACORA.md` en el mismo PR. Estados: DEFINID
 - Las rutas, acciones, componentes y utilidades de PETS se renombraron a .ts/.tsx conservando URLs y lógica.
 - Los archivos PETS se verifican con `strict: true`, **sin `@ts-nocheck` ni `@ts-ignore`**. La prueba automática bloquea regresiones. Un único límite pendiente es la definición tipada de tablas/RPC de Supabase real (requiere C01); no extender `any` del adaptador administrativo a nuevas funciones.
 - No crear archivos JavaScript dentro de app, components o lib. El núcleo nuevo permanece en TypeScript estricto.
+
+## Identidad, cuatro roles y aislamiento (IDENT-001)
+- Fuente normativa: `docs/IDENTIDAD_ACCESO_MULTIEMPRESA.md`. Un login global; membresía N:M usuario-empresa; licencias por empresa; permisos por membresía **y vertical**.
+- Los roles canónicos son `super_admin` (único propietario), `super_user` (personal Core sin privilegios heredados), `admin` y `user`. «Veterinario» y «vendedor» se expresan como permisos de vertical. Las etiquetas legacy del enum PETS solo se conservan por compatibilidad; no crear más super_admin.
+- Super-Admin puede asignar Super-User/Admin/User y empresas; Admin **solo** Admin/User en su empresa, sin delegar privilegios ausentes. Cada creación/edición guarda `created_by` y evento en `core.audit_events`.
+- Ningún botón, selector de empresa, pathname, URL, sesión Auth metadata ni parámetro del body concede acceso. En servidor validar usuario activo + membresía activa + empresa activa + permiso + entitlement vigente + recurso del tenant. RLS y FKs compuestas protegen la base; service_role jamás se expone a cliente.
+- `/super-admin/soporte` es vista diagnóstica auditada, **solo lectura**, con actor real y plazo máximo 15 min; prohíbe navegar o escribir en rutas operativas mientras esté activa. NO es autenticación real del sujeto ni una función «operar como» completa.
+- Migración 011 requiere 010 y preflight real de Supabase; no afirmar que hay membresías/permisos seguros o suplantación operativa hasta integrar RLS y ejecutar E2E.

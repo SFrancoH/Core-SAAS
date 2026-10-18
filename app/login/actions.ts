@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/core/auth";
 
 export async function login(formData: FormData) {
   const email = String(formData.get("email") || "").trim().toLowerCase();
@@ -24,12 +25,7 @@ export async function login(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login?error=credenciales");
-  const { data: profile } = await supabase
-    .from("usuarios")
-    .select("activo")
-    .eq("id", user.id)
-    .maybeSingle();
-
+  const profile = await getCurrentProfile();
   if (!profile?.activo) {
     await supabase.auth.signOut();
     redirect("/login?error=sin_acceso");

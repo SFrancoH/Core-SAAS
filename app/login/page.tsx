@@ -20,11 +20,11 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <main className="authShell">
       <section className="loginCard">
-        <div className="brand">PETS</div>
+        <div className="brand">CORE SAAS</div>
         <p className="eyebrow">Acceso privado</p>
         <h1>Ingresa a tu cuenta</h1>
         <p className="description">
-          Utiliza las credenciales asignadas por el administrador de tu empresa.
+          Una sola cuenta para acceder a las empresas y verticales que tengas habilitadas.
         </p>
 
         {message ? <div className="formAlert">{message}</div> : null}

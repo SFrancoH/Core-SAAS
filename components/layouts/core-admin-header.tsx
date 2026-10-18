@@ -16,6 +16,7 @@ export default function CoreAdminHeader({ profile, active = "empresas" }: Props)
       <nav className="coreHeaderNav" aria-label="Módulos de la plataforma">
         <Link className={active === "empresas" ? "coreNavActive" : ""} href="/super-admin">Empresas</Link>
         <Link className={active === "apariencia" ? "coreNavActive" : ""} href="/super-admin/apariencia">Diseño global</Link>
+        <Link href="/super-admin/soporte">Ver como usuario</Link>
         <Link href="/mascotas">Abrir PETS ↗</Link>
       </nav>
       <div className="coreHeaderUser">
