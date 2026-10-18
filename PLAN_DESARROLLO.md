@@ -21,7 +21,7 @@ Core aporta empresas, cuentas, membresías, permisos, licencias, integraciones y
 - [x] Estructura `app`, `components`, `lib/core`, `lib/verticals/pets`, `lib/verticals/pulse`, `lib/modules`, `lib/integrations`, `docs` y `supabase` integrada al repositorio.
 - [x] Norma de TypeScript obligatorio para código nuevo, `tsconfig.json` estricto y compatibilidad temporal con JavaScript PETS.
 - [x] Servicios Core (autenticación, alcance, permisos, autorización), utilidades PETS y parser GHL reorganizados a `.ts`.
-- [ ] Conversión gradual de las rutas/componentes JS de PETS a `.ts/.tsx`, solo con tests funcionales.
+- [x] Conversión de todas las rutas/componentes PETS a `.ts/.tsx` y chequeo estático del código. Faltan pruebas funcionales E2E.
 - [x] Documentación maestra, modelo de datos, contratos, reglas PETS/PULSE.
 - [x] Carpetas previstas sin alterar código de aplicación.
 - [~] Pruebas TypeScript de scoping/webhook disponibles; CI debe validar `npm test`, `npm run typecheck` y build. PETS E2E pendiente.
@@ -84,6 +84,14 @@ Leer reglas → identificar vertical/entidad → definir contrato, permisos/lice
 - [x] Core Admin separado de la operación PETS con panel global y catálogo visual de verticales.
 - [x] Identidad visual única: styles/tokens.css y estilos consumidores.
 - [x] Componentes compartidos iniciales tipados y cabecera Core Admin.
-- [ ] Eliminar @ts-nocheck de código histórico PETS, incorporando tipado estricto función por función.
+- [x] Eliminar las directivas `@ts-nocheck` de los archivos PETS/Core, con contratos TypeScript y verificación CI.
 - [ ] Pruebas de la aplicación PETS conectada al Supabase real, permisos, formularios y responsive.
 - [ ] Licencias, planes, auditoría y módulos Core reales: requieren SQL 010 aplicado y pruebas.
+
+## C10 — Tipado estricto PETS (2026-10-18)
+- [x] Formulario clínico y medicamentos con tipos propios de mascota, veterinario, consulta, historial y procedimientos.
+- [x] Rutas de administración, formularios, importación/exportación Excel y API GHL con parámetros, entidades y errores validados.
+- [x] Eliminar `@ts-nocheck` de aplicación, componentes y servicios; protegerlo con prueba automática.
+- [x] Desactivar `allowJs` en `tsconfig.json` para nuevas funcionalidades.
+- [ ] Generar tipos Database directamente del Supabase de Core y eliminar la excepción temporal en `lib/supabase/admin.ts` después del preflight C01.
+- [ ] Ejecutar pruebas E2E clínicas, registros, permisos de empresa y webhooks contra un entorno Supabase de pruebas autorizado.

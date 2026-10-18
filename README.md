@@ -74,3 +74,7 @@ Esta estructura describe carpetas reales del repositorio; no significa que PULSE
 Core Admin (superadministrador) vive en /super-admin, con diseño global en /super-admin/apariencia. La operación de empresas permanece diferenciada de PETS. Ver docs/CORE_ADMIN.md y docs/FRONTEND_DESIGN_SYSTEM.md.
 El color primario inicial es #147d4a. Para cambiar la estética global, editar styles/tokens.css y desplegar el cambio; nunca reescribir cada vertical.
 Todos los archivos PETS se llevan a extensiones TypeScript .ts/.tsx. Los que conservan @ts-nocheck siguen pendientes de tipado interno y pruebas E2E; no deben considerarse completamente comprobados por TypeScript.
+
+## Tipado TypeScript estricto
+Todas las rutas, componentes y servicios del proyecto se mantienen en TS/TSX; `tsconfig.json` usa `strict` y `allowJs: false`. Las verificaciones en CI prohíben archivos JavaScript y directivas de supresión de tipado.
+**Límite explícito:** el adaptador `lib/supabase/admin.ts` sigue teniendo un tipo dinámico para las tablas/RPC hasta generar `Database` a partir del esquema real de Supabase (fase C01). Las pruebas funcionales contra BD aún son independientes de los tests TypeScript.

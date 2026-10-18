@@ -141,7 +141,10 @@ export async function importOwners(formData: FormData) {
       fetchAll<{ id: string; numero_carnet: string | null }>((from, to) => admin.from("mascotas").select("id, numero_carnet").eq("empresa_id", companyId).range(from, to))
     ]);
     const ownersByIdentity = new Map(owners.map((owner) => [ownerIdentity(owner), owner.id]));
-    const petsByCarnet = new Map(pets.map((pet) => [String(pet.numero_carnet || "").toLowerCase(), pet.id]).filter(([key]) => key));
+    const petsByCarnet = new Map<string, string>(
+      pets.filter(pet => Boolean(pet.numero_carnet))
+        .map(pet => [String(pet.numero_carnet).toLowerCase(), pet.id] as const)
+    );
     const links: Array<{ empresa_id: string; propietario_id: string; mascota_id: string; creado_por: string }> = [];
     const usedLinks = new Set<string>();
     let unmatchedAssociations = 0;

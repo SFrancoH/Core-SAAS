@@ -29,7 +29,7 @@ export default async function OwnerDetailPage({ params, searchParams }: OwnerDet
   if (!owner) notFound();
 
   type PetAssociation = { id: string; nombre: string; raza?: string | null; especie?: string | null; numero_carnet?: string | null };
-  const pets = (owner.propietarios_mascotas || [])
+  const pets: PetAssociation[] = (owner.propietarios_mascotas || [])
     .map((relation: { mascotas: PetAssociation | null }) => relation.mascotas)
     .filter((pet: PetAssociation | null): pet is PetAssociation => pet !== null);
   const details = [
