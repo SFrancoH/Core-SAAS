@@ -131,7 +131,7 @@ export async function importOwners(formData: FormData) {
     if (rows.length) await insertInChunks("propietarios", rows, admin, 500);
 
     const [owners, pets] = await Promise.all([
-      fetchAll((from, to) =>
+      fetchAll<ExistingOwner>((from, to) =>
         admin
           .from("propietarios")
           .select("id, nombre, ciudad, direccion, telefono, whatsapp, email, numero_documento")

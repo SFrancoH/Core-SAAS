@@ -649,7 +649,7 @@ function ClinicalForm({
           <div className="clinicalBlockContent">
             <label className="stackedField">
               <span>Descripción</span>
-              <textarea name={name} rows={5} defaultValue={initial[name] || ""} />
+              <textarea name={name} rows={5} defaultValue={narrativeValue(initial, name)} />
             </label>
           </div>
         </details>
@@ -806,7 +806,7 @@ function PetHistoryOverview({ pet, latestConsultation, latestModules = [], histo
     name,
     latestModules.find((event) => event.modulo === name) || (
       !eventSchemaReady && name === "Consulta y control" && latestConsultation
-        ? { fecha_registro: latestConsultation.fecha_registro, resumen: latestConsultation.tipo_servicio }
+        ? { modulo: name, fecha_registro: latestConsultation.fecha_registro, resumen: latestConsultation.tipo_servicio }
         : null
     )
   ]);

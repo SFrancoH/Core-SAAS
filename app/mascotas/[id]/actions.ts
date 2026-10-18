@@ -80,12 +80,12 @@ function parseMedicationRows(value: unknown): MedicationRow[] | null {
       const cantidad = Number(String(item?.cantidad_total || "").replace(",", "."));
 
       if (
-        !allowedMedications.has(medicamento || "")
+        !medicamento || !allowedMedications.has(medicamento)
         || (medicamento === "Otro" && !medicamentoOtro)
         || !dosis
-        || !allowedAdministrationRoutes.has(via || "")
+        || !via || !allowedAdministrationRoutes.has(via)
         || (via === "Otra" && !viaOtra)
-        || !allowedMedicationFrequencies.has(frecuencia || "")
+        || !frecuencia || !allowedMedicationFrequencies.has(frecuencia)
         || (frecuencia === "Otra" && !frecuenciaOtra)
         || !Number.isFinite(cantidad)
         || cantidad <= 0
