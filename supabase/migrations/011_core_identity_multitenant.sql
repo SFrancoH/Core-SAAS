@@ -379,4 +379,68 @@ $$;
 revoke all on function public.core_support_status(uuid,uuid) from public,anon,authenticated;
 grant execute on function public.core_support_status(uuid,uuid) to service_role;
 
+-- Directorio visible únicamente al propietario autenticado en servidor.
+create or replace function public.core_support_directory(p_actor_id uuid)
+returns jsonb language plpgsql stable security definer set search_path=''
+as $
+declare result jsonb;
+begin
+ if not exists(
+   select 1 from core.platform_staff st join core.accounts a on a.user_id=st.user_id
+   where st.user_id=p_actor_id and st.role='super_admin' and st.active and a.active
+ ) then return '[]'::jsonb; end if;
+ select coalesce(jsonb_agg(jsonb_build_object(
+   'subject_id',m.user_id,'subject_name',a.nombre,'subject_email',a.email,
+   'company_id',m.empresa_id,'company_name',e.nombre,'role',m.company_role
+ ) order by e.nombre,a.nombre),'[]'::jsonb)
+ into result
+ from core.memberships m join core.accounts a on a.user_id=m.user_id and a.active
+ join public.empresas e on e.id=m.empresa_id and e.activa
+ where m.status='active' and m.user_id<>p_actor_id;
+ return result;
+end;
+$;
+revoke all on function public.core_support_directory(uuid) from public,anon,authenticated;
+grant execute on function public.core_support_directory(uuid) to service_role;
+
+-- Vista efectiva del target (sin acceso a filas clínicas ni JWT del target).
+create or replace function public.core_support_snapshot(p_actor_id uuid,p_session_id uuid)
+returns jsonb language sql stable security definer set search_path=''
+as $
+ select jsonb_build_object(
+  'subject_id',s.subject_id,'subject_name',a.nombre,'company_id',m.empresa_id,
+  'company_name',e.nombre,'company_role',m.company_role,
+  'permissions',coalesce((
+    select jsonb_agg(mp.permission_code order by mp.permission_code)
+    from core.membership_permissions mp join core.permissions p on p.code=mp.permission_code
+    where mp.membership_id=m.id
+      and (p.product_code is null or exists (
+        select 1 from core.entitlements ent
+        where ent.empresa_id=m.empresa_id and ent.product_code=p.product_code
+          and ent.status='active' and ent.valid_from<=now()
+          and (ent.valid_until is null or ent.valid_until>now())))
+  ),'[]'::jsonb),
+  'products',coalesce((
+    select jsonb_agg(ent.product_code order by ent.product_code)
+    from core.entitlements ent
+    where ent.empresa_id=m.empresa_id and ent.product_code is not null
+      and ent.status='active' and ent.valid_from<=now()
+      and (ent.valid_until is null or ent.valid_until>now())
+      and exists (
+        select 1 from core.membership_permissions mp join core.permissions p on p.code=mp.permission_code
+        where mp.membership_id=m.id and p.product_code=ent.product_code
+      )
+  ),'[]'::jsonb)
+ )
+ from core.support_sessions s
+ join core.accounts a on a.user_id=s.subject_id and a.active
+ join core.memberships m on m.user_id=s.subject_id and m.empresa_id=s.empresa_id and m.status='active'
+ join public.empresas e on e.id=m.empresa_id and e.activa
+ where s.id=p_session_id and s.actor_id=p_actor_id
+ and s.revoked_at is null and s.expires_at>now() and s.read_only
+$;
+revoke all on function public.core_support_snapshot(uuid,uuid) from public,anon,authenticated;
+grant execute on function public.core_support_snapshot(uuid,uuid) to service_role;
+
+
 commit;
