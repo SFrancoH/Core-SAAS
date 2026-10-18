@@ -552,4 +552,78 @@ grant execute on function public.core_assign_multiple_memberships(uuid,uuid,json
  to service_role;
 
 
+-- Las siguientes RPC solo se invocan desde servidor con service_role
+-- DESPUÉS de resolver actor.id desde Supabase Auth.
+create or replace function public.core_permission_catalog(p_actor_id uuid,p_empresa_id uuid)
+returns jsonb language plpgsql stable security definer set search_path=''
+as $
+declare v jsonb;
+begin
+ if not core.effective_permission(p_actor_id,p_empresa_id,'core.members.manage') then
+   return '[]'::jsonb;
+ end if;
+ select coalesce(jsonb_agg(jsonb_build_object(
+  'code',p.code,'name',p.name,'product',p.product_code,'module',p.module_code
+ ) order by p.product_code nulls first,p.code),'[]'::jsonb)
+ into v from core.permissions p
+ where (p.product_code is null or exists(
+  select 1 from core.entitlements e where e.empresa_id=p_empresa_id
+  and e.product_code=p.product_code and e.status='active'
+  and e.valid_from<=now() and (e.valid_until is null or e.valid_until>now())
+ ))
+ and (p.module_code is null or exists(
+  select 1 from core.entitlements e where e.empresa_id=p_empresa_id
+  and e.module_code=p.module_code and e.status='active'
+  and e.valid_from<=now() and (e.valid_until is null or e.valid_until>now())
+ ))
+ and core.effective_permission(p_actor_id,p_empresa_id,p.code);
+ return v;
+end;
+$;
+revoke all on function public.core_permission_catalog(uuid,uuid)
+ from public,anon,authenticated;
+grant execute on function public.core_permission_catalog(uuid,uuid) to service_role;
+
+create or replace function public.core_company_members(p_actor_id uuid,p_empresa_id uuid)
+returns jsonb language plpgsql stable security definer set search_path=''
+as $
+declare v jsonb;
+begin
+ if not core.effective_permission(p_actor_id,p_empresa_id,'core.members.manage') then
+   return '[]'::jsonb;
+ end if;
+ select coalesce(jsonb_agg(jsonb_build_object(
+  'user_id',m.user_id,'name',a.nombre,'email',a.email,
+  'role',m.company_role,'active',m.status='active','created_by',m.created_by,
+  'permissions',coalesce((
+   select jsonb_agg(mp.permission_code order by mp.permission_code)
+   from core.membership_permissions mp where mp.membership_id=m.id
+  ),'[]'::jsonb)
+ ) order by a.nombre),'[]'::jsonb) into v
+ from core.memberships m join core.accounts a on a.user_id=m.user_id
+ where m.empresa_id=p_empresa_id;
+ return v;
+end;
+$;
+revoke all on function public.core_company_members(uuid,uuid)
+ from public,anon,authenticated;
+grant execute on function public.core_company_members(uuid,uuid) to service_role;
+
+-- Sólo el propietario puede asociar una cuenta preexistente por correo;
+-- Admin local debe usar invitación aceptada, nunca enrolar silenciosamente.
+create or replace function public.core_find_account(p_actor_id uuid,p_email text)
+returns uuid language plpgsql stable security definer set search_path=''
+as $
+begin
+ if not exists(
+  select 1 from core.platform_staff st join core.accounts a on a.user_id=st.user_id
+  where st.user_id=p_actor_id and st.role='super_admin' and st.active and a.active
+ ) then raise exception 'FORBIDDEN' using errcode='42501'; end if;
+ return (select user_id from core.accounts
+  where lower(email)=lower(btrim(p_email)) and active);
+end;
+$;
+revoke all on function public.core_find_account(uuid,text) from public,anon,authenticated;
+grant execute on function public.core_find_account(uuid,text) to service_role;
+
 commit;

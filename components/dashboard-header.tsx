@@ -19,6 +19,7 @@ export default function DashboardHeader({ profile, context, active }: Props) {
         <Link className={active === "mascotas" ? "active" : ""} href="/mascotas">Mascotas</Link>
         <Link className={active === "propietarios" ? "active" : ""} href="/propietarios">Propietarios</Link>
         <Link className={active === "registro" ? "active" : ""} href="/registros/nuevo">Nuevo registro</Link>
+        {profile.rol === "empresa_admin" ? <Link className={active === "usuarios" ? "active" : ""} href="/empresa/usuarios">Usuarios Core</Link> : null}
         {isSuperAdmin ? (
           <Link className={active === "empresas" ? "active" : ""} href="/super-admin">Empresas</Link>
         ) : null}
