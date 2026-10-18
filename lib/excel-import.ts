@@ -52,10 +52,10 @@ function detectDelimiter(text: string): string {
       continue;
     }
     if (!quoted && (character === "\n" || character === "\r")) break;
-    if (!quoted && counts.has(character)) counts.set(character, counts.get(character) + 1);
+    if (!quoted && counts.has(character)) counts.set(character, (counts.get(character) ?? 0) + 1);
   }
 
-  return candidates.reduce((best, candidate) => counts.get(candidate) > counts.get(best) ? candidate : best, ",");
+  return candidates.reduce((best, candidate) => (counts.get(candidate) ?? 0) > (counts.get(best) ?? 0) ? candidate : best, ",");
 }
 
 function parseCsv(text: string): string[][] {
@@ -116,7 +116,7 @@ function recordsFromTable(table: readonly (readonly unknown[])[]): Record<string
 
 async function readXlsx(buffer: Buffer): Promise<Record<string, unknown>[]> {
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(buffer);
+  await workbook.xlsx.load(buffer as Parameters<typeof workbook.xlsx.load>[0]);
   const worksheet = workbook.worksheets[0];
   if (!worksheet) throw new Error("EMPTY_WORKBOOK");
 
@@ -229,7 +229,7 @@ export async function fetchAll<T>(
   queryFactory: (from: number, to: number) => PromiseLike<PaginatedResult<T>>,
   pageSize = 1000
 ): Promise<T[]> {
-  const rows: Record<string, unknown>[] = [];
+  const rows: T[] = [];
   for (let offset = 0; ; offset += pageSize) {
     const { data, error } = await queryFactory(offset, offset + pageSize - 1);
     if (error) throw error;

@@ -1,20 +1,30 @@
-// @ts-nocheck — compatibilidad PETS: tipado estricto de este archivo pendiente.
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { getCurrentProfile } from "@/lib/core/auth";
 import { createExcelFile } from "@/lib/excel-export";
 import { fetchAll } from "@/lib/excel-import";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
+type OwnerExportPet = { nombre: string; numero_carnet: string | null };
+type OwnerExportRow = {
+  empresas?: { nombre: string } | null; nombre: string;
+  ciudad?: string | null; direccion?: string | null;
+  telefono?: string | null; whatsapp?: string | null; email?: string | null;
+  tipo_documento?: string | null; numero_documento?: string | null;
+  estado?: string | null; notificaciones_whatsapp?: boolean | null;
+  tags?: string[] | null; fuente?: string | null;
+  propietarios_mascotas?: Array<{ mascotas: OwnerExportPet | null }>;
+};
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET(request) {
+export async function GET(request: NextRequest) {
   const profile = await getCurrentProfile();
   if (!profile) return NextResponse.redirect(new URL("/login", request.url));
   const admin = getSupabaseAdmin();
 
-  const owners = await fetchAll((from, to) => {
+  const owners = await fetchAll<OwnerExportRow>((from, to) => {
     let query = admin.from("propietarios").select(`*, empresas(nombre), propietarios_mascotas(mascotas(nombre, numero_carnet))`);
     if (profile.rol !== "super_admin") query = query.eq("empresa_id", profile.empresa_id);
     return query.order("nombre").range(from, to);
@@ -39,7 +49,7 @@ export async function GET(request) {
     { header: "Mascotas", key: "mascotas", width: 34 }
   ];
   const rows = owners.map((owner) => {
-    const pets = (owner.propietarios_mascotas || []).map((relation) => relation.mascotas).filter(Boolean);
+    const pets = (owner.propietarios_mascotas || []).map((relation) => relation.mascotas).filter((pet): pet is OwnerExportPet => Boolean(pet));
     return {
       ...(includeCompany ? { empresa: owner.empresas?.nombre || "" } : {}),
       nombre: owner.nombre,

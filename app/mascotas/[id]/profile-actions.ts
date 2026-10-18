@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
 import { redirect } from "next/navigation";
@@ -8,21 +7,21 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { sedes, especies, razas, temperamentos, estadosReproductivos, tamanos, estadosMascota } from "@/lib/verticals/pets/pet-catalogs";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-function field(data, key, max = 500) {
+function field(data: FormData, key: string, max = 500): string {
   return String(data.get(key) || "").trim().slice(0, max);
 }
-function nullableNumber(data, key, integer = false) {
+function nullableNumber(data: FormData, key: string, integer = false): number | null {
   const value = field(data, key, 30);
   if (!value) return null;
   const number = Number(value);
   if (!Number.isFinite(number) || number < 0 || (integer && !Number.isInteger(number))) throw new Error("invalid_number");
   return number;
 }
-function allowed(value, values, previous) {
+function allowed(value: string, values: readonly string[], previous?: string | null): boolean {
   return !value || values.includes(value) || value === previous;
 }
 
-export async function updatePetProfile(petId, formData) {
+export async function updatePetProfile(petId: string, formData: FormData) {
   const actor = await requireOperationalProfile();
   if (!uuidPattern.test(petId)) redirect("/mascotas");
   const admin = getSupabaseAdmin();
@@ -73,9 +72,10 @@ export async function updatePetProfile(petId, formData) {
     if (error) throw error;
     revalidatePath(`/mascotas/${petId}`);
     revalidatePath("/mascotas");
-  } catch (error) {
-    if (error?.digest?.startsWith("NEXT_REDIRECT")) throw error;
-    console.error("No se actualizó la ficha de mascota", { code: error?.code, message: error?.message });
+  } catch (error: unknown) {
+    const info = error && typeof error === "object" ? error as { code?: string; message?: string; digest?: string } : {};
+    if (info.digest?.startsWith("NEXT_REDIRECT")) throw error;
+    console.error("No se actualizó la ficha de mascota", { code: info.code, message: info.message });
     fail();
   }
   redirect(`/mascotas/${petId}?perfil_actualizado=1`);
