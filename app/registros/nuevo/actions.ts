@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
 import { redirect } from "next/navigation";
@@ -9,20 +8,20 @@ import { especies, razas, sedes, temperamentos, estadosReproductivos, tamanos, e
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function text(formData, key, max = 240) {
+function text(formData: FormData, key: string, max = 240): string {
   return String(formData.get(key) || "").trim().slice(0, max);
 }
 
-function optionalNumber(formData, key) {
+function optionalNumber(formData: FormData, key: string): string | null {
   const value = text(formData, key, 30);
   return value === "" ? null : value;
 }
 
-function fail(code) {
+function fail(code: string): never {
   redirect(`/registros/nuevo?error=${encodeURIComponent(code)}`);
 }
 
-export async function createPetRegistration(formData) {
+export async function createPetRegistration(formData: FormData) {
   const profile = await requireOperationalProfile();
   const requestedCompanyId = text(formData, "empresa_id", 40);
   const companyId = profile.rol === "super_admin" ? requestedCompanyId : profile.empresa_id;

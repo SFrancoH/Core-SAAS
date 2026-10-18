@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -18,7 +17,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function normalizeIdentity(value) {
+function normalizeIdentity(value: unknown): string {
   return String(value || "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -27,11 +26,24 @@ function normalizeIdentity(value) {
     .replace(/\s+/g, " ");
 }
 
-function phoneIdentity(value) {
+function phoneIdentity(value: unknown): string {
   return String(value || "").replace(/\D/g, "");
 }
 
-function ownerIdentity(owner) {
+type OwnerIdentity = {
+  nombre: string; ciudad?: string | null; direccion?: string | null;
+  telefono?: string | null; whatsapp?: string | null;
+  email?: string | null; numero_documento?: string | null;
+};
+type ImportedOwner = OwnerIdentity & {
+  empresa_id: string; tipo_documento: string | null; fuente: string | null;
+  estado: string; notificaciones_whatsapp: boolean; tags: string[];
+  creado_por: string; actualizado_por: string;
+};
+type OwnerGroup = { identity: string; owner: ImportedOwner; carnets: Set<string> };
+type ExistingOwner = OwnerIdentity & { id: string };
+
+function ownerIdentity(owner: OwnerIdentity): string {
   const document = normalizeIdentity(owner.numero_documento);
   if (document) return `documento:${document}`;
   const email = normalizeIdentity(owner.email);
@@ -42,18 +54,19 @@ function ownerIdentity(owner) {
   return `nombre:${name}:${normalizeIdentity(owner.ciudad)}:${normalizeIdentity(owner.direccion)}`;
 }
 
-function mergeMissing(target, source) {
-  for (const field of ["ciudad", "direccion", "telefono", "whatsapp", "email", "tipo_documento", "numero_documento", "fuente"]) {
+function mergeMissing(target: ImportedOwner, source: ImportedOwner): void {
+  for (const field of ["ciudad", "direccion", "telefono", "whatsapp", "email", "tipo_documento", "numero_documento", "fuente"] as const) {
     if (!target[field] && source[field]) target[field] = source[field];
   }
   target.notificaciones_whatsapp ||= source.notificaciones_whatsapp;
   target.tags = [...new Set([...(target.tags || []), ...(source.tags || [])])];
 }
 
-export async function importOwners(formData) {
+export async function importOwners(formData: FormData) {
   const actor = await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const file = formData.get("archivo");
+  if (!(file instanceof File)) redirect("/propietarios?error=archivo");
   if (!uuidPattern.test(companyId)) redirect("/propietarios?error=empresa");
 
   try {
@@ -62,7 +75,7 @@ export async function importOwners(formData) {
     const { data: company } = await admin.from("empresas").select("id").eq("id", companyId).eq("activa", true).maybeSingle();
     if (!company) redirect("/propietarios?error=empresa");
 
-    const existing = await fetchAll((from, to) =>
+    const existing = await fetchAll<ExistingOwner>((from, to) =>
       admin
         .from("propietarios")
         .select("id, nombre, ciudad, direccion, telefono, whatsapp, email, numero_documento")
@@ -70,7 +83,7 @@ export async function importOwners(formData) {
         .range(from, to)
     );
     const existingByIdentity = new Map(existing.map((owner) => [ownerIdentity(owner), owner]));
-    const groups = new Map();
+    const groups = new Map<string, OwnerGroup>();
 
     for (const source of sourceRows) {
       const nombre = textValue(pick(source, ["nombre propietario", "nombre del propietario", "nombre"]));
@@ -85,7 +98,7 @@ export async function importOwners(formData) {
         "carnets"
       ]) || "")
         .split(/[,;|]/).map((value) => value.trim()).filter(Boolean);
-      const owner = {
+      const owner: ImportedOwner = {
         empresa_id: companyId,
         nombre,
         ciudad: textValue(pick(source, ["ciudad"])),
@@ -125,12 +138,12 @@ export async function importOwners(formData) {
           .eq("empresa_id", companyId)
           .range(from, to)
       ),
-      fetchAll((from, to) => admin.from("mascotas").select("id, numero_carnet").eq("empresa_id", companyId).range(from, to))
+      fetchAll<{ id: string; numero_carnet: string | null }>((from, to) => admin.from("mascotas").select("id, numero_carnet").eq("empresa_id", companyId).range(from, to))
     ]);
     const ownersByIdentity = new Map(owners.map((owner) => [ownerIdentity(owner), owner.id]));
     const petsByCarnet = new Map(pets.map((pet) => [String(pet.numero_carnet || "").toLowerCase(), pet.id]).filter(([key]) => key));
-    const links = [];
-    const usedLinks = new Set();
+    const links: Array<{ empresa_id: string; propietario_id: string; mascota_id: string; creado_por: string }> = [];
+    const usedLinks = new Set<string>();
     let unmatchedAssociations = 0;
     for (const group of groups.values()) {
       const ownerId = ownersByIdentity.get(group.identity);
@@ -162,8 +175,8 @@ export async function importOwners(formData) {
     redirect(
       `/propietarios?ok=importado&importados=${rows.length}&agrupados=${groups.size}&asociados=${links.length}&sin_mascota=${unmatchedAssociations}`
     );
-  } catch (error) {
-    if (error?.digest?.startsWith("NEXT_REDIRECT")) throw error;
+  } catch (error: unknown) {
+    if (error && typeof error === "object" && "digest" in error && typeof error.digest === "string" && error.digest.startsWith("NEXT_REDIRECT")) throw error;
     redirect("/propietarios?error=archivo");
   }
 }

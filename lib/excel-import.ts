@@ -116,7 +116,7 @@ function recordsFromTable(table: readonly (readonly unknown[])[]): Record<string
 
 async function readXlsx(buffer: Buffer): Promise<Record<string, unknown>[]> {
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(buffer as Parameters<typeof workbook.xlsx.load>[0]);
+  await workbook.xlsx.load(buffer as unknown as Parameters<typeof workbook.xlsx.load>[0]);
   const worksheet = workbook.worksheets[0];
   if (!worksheet) throw new Error("EMPTY_WORKBOOK");
 

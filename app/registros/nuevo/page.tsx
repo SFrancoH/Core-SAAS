@@ -43,7 +43,7 @@ export default async function NewRegistrationPage({ searchParams }: { searchPara
           {profile.rol === "super_admin" ? (
             <section className="registrationSection">
               <h2>Empresa</h2>
-              <label>Empresa<select name="empresa_id" required defaultValue=""><option value="" disabled>Selecciona una empresa</option>{companies.map((company) => <option key={company.id} value={company.id}>{company.nombre}</option>)}</select></label>
+              <label>Empresa<select name="empresa_id" required defaultValue=""><option value="" disabled>Selecciona una empresa</option>{companies.map((company: { id: string; nombre: string }) => <option key={company.id} value={company.id}>{company.nombre}</option>)}</select></label>
             </section>
           ) : null}
 
