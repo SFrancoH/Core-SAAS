@@ -256,4 +256,41 @@ revoke all on function public.core_crear_sede(uuid,uuid,text,text)
 grant execute on function public.core_crear_sede(uuid,uuid,text,text) to service_role;
 
 
+-- El alcance del usuario distingue 'todas las sedes de su empresa'
+-- de permisos restringidos a un subconjunto. Necesario para filtrar
+-- historias clínicas sin permitir que el valor 'Todas' salte los grants.
+create or replace function public.core_contexto_sedes(
+ p_actor_id uuid,p_empresa_id uuid,p_permiso text
+) returns jsonb language sql stable security definer set search_path=''
+as $
+select case when core.effective_permission(p_actor_id,p_empresa_id,p_permiso)
+then jsonb_build_object(
+ 'todas',(
+  exists (
+   select 1 from core.platform_staff st join core.accounts a on a.user_id=st.user_id
+   where st.user_id=p_actor_id and st.role='super_admin' and st.active and a.active
+  )
+  or exists (
+   select 1 from core.memberships m where m.user_id=p_actor_id
+    and m.empresa_id=p_empresa_id and m.status='active' and m.sede_scope='all'
+  )
+  or exists (
+   select 1 from core.platform_permission_grants gp
+   join core.platform_staff st on st.user_id=gp.staff_user_id and st.active
+   where gp.staff_user_id=p_actor_id and gp.empresa_id=p_empresa_id
+    and gp.permission_code=p_permiso and st.role='super_user'
+  )
+ ),
+ 'sedes',coalesce((
+  select jsonb_agg(jsonb_build_object('id',s.id,'nombre',s.nombre,'codigo',s.codigo)
+      order by s.nombre)
+   from core.sedes s where s.empresa_id=p_empresa_id and s.activa
+    and core.site_allowed(p_actor_id,p_empresa_id,s.id,p_permiso)
+ ),'[]'::jsonb))
+else jsonb_build_object('todas',false,'sedes','[]'::jsonb) end;
+$;
+revoke all on function public.core_contexto_sedes(uuid,uuid,text)
+ from public,anon,authenticated;
+grant execute on function public.core_contexto_sedes(uuid,uuid,text) to service_role;
+
 commit;
