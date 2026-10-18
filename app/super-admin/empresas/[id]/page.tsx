@@ -20,13 +20,16 @@ const successMessages = {
   integracion: "La conexión del formulario fue guardada."
 };
 
-export default async function CompanyDetailPage({ params, searchParams }) {
+type CompanyDetailProps = { params: Promise<{ id: string }>; searchParams: Promise<{ ok?: keyof typeof successMessages; error?: string }> };
+type CompanyUser = { id: string; nombre: string; email: string; rol: string; activo: boolean };
+
+export default async function CompanyDetailPage({ params, searchParams }: CompanyDetailProps) {
   const profile = await requireProfile(["super_admin"]);
   const { id } = await params;
   const query = await searchParams;
   const admin = getSupabaseAdmin();
 
-  const [{ data: company }, { data: users = [] }, { count: petCount }, { count: ownerCount }, { data: integration }] =
+  const [{ data: company }, { data: rawUsers = [] }, { count: petCount }, { count: ownerCount }, { data: integration }] =
     await Promise.all([
       admin.from("empresas").select("id, nombre, activa").eq("id", id).maybeSingle(),
       admin
@@ -39,6 +42,7 @@ export default async function CompanyDetailPage({ params, searchParams }) {
       admin.from("integraciones_contacto").select("formulario_url, webhook_token, activa").eq("empresa_id", id).maybeSingle()
     ]);
 
+  const users = (rawUsers ?? []) as CompanyUser[];
   if (!company) notFound();
   const requestHeaders = await headers();
   const protocol = requestHeaders.get("x-forwarded-proto") || "https";

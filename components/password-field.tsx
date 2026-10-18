@@ -1,7 +1,15 @@
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 "use client";
 
 import { useState } from "react";
+
+type PasswordFieldProps = {
+  label?: string;
+  name?: string;
+  autoComplete?: string;
+  minLength?: number;
+  placeholder?: string;
+  required?: boolean;
+};
 
 export default function PasswordField({
   label = "Contraseña",
@@ -10,7 +18,7 @@ export default function PasswordField({
   minLength = 8,
   placeholder,
   required = true
-}) {
+}: PasswordFieldProps) {
   const [visible, setVisible] = useState(false);
 
   return (
