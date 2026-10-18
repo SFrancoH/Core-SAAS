@@ -1,4 +1,3 @@
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 "use client";
 
 import { useMemo, useState } from "react";
@@ -12,6 +11,79 @@ import {
   medications as medicationCatalog,
   procedureTypes
 } from "@/lib/verticals/pets/clinical-catalogs";
+
+export type ClinicalPet = {
+  id: string; nombre: string; numero_carnet?: string | null;
+  especie?: string | null; raza?: string | null; sexo?: string | null;
+  tamano?: string | null; fecha_nacimiento_formateada?: string | null;
+  estado_reproductivo?: string | null; color?: string | null;
+  peso_kg?: number | null; propietarios?: string[];
+};
+export type ClinicalActor = { id: string; nombre: string; rol: string };
+export type ClinicalVeterinarian = { id: string; nombre: string; rol?: string; empresa_id?: string | null };
+type MedicationValues = {
+  medicamento: string; medicamento_otro: string;
+  dosis_terapeutica: string; via_administracion: string;
+  via_administracion_otra: string; frecuencia: string;
+  frecuencia_otra: string; cantidad_total: string | number;
+};
+type MedicationRow = MedicationValues & { id: number };
+export type ClinicalConsultation = {
+  id: string; fecha_registro: string; updated_at?: string | null;
+  tipo_servicio?: string | null; medico_veterinario_id?: string | null;
+  medico_veterinario_nombre?: string | null; medico_registra_nombre?: string | null;
+  motivo_cita?: string | null; anamnesis?: string | null; tipo_alimento?: string | null;
+  tipo_alimento_otro?: string | null; heces?: string | null; heces_otro?: string | null;
+  racion?: string | null; orina?: string | null;
+  frecuencia_cardiaca?: number | null; frecuencia_respiratoria?: number | null;
+  temperatura_c?: number | null; tllc_segundos?: number | null;
+  pulso?: string | null; peso_actual_kg?: number | null;
+  actitud?: string | null; condicion_corporal?: string | null;
+  revision_sistemas?: Record<string, { estado?: string | null; detalle?: string | null }> | null;
+  comentarios_observaciones?: string | null;
+  lista_problemas?: string | null; diagnostico_diferencial?: string | null;
+  diagnostico_presuntivo?: string | null; examenes_laboratorio?: string | null;
+  imagenes_diagnosticas?: string | null; diagnostico_definitivo?: string | null;
+  tratamiento?: string | null; pronostico?: string | null; notas?: string | null;
+  procedimientos_habilitados?: boolean | null; procedimientos?: string | null;
+  area_consulta?: string | null; valor_total_servicio?: number | null;
+  tipos_procedimiento?: string[] | null; observaciones_procedimiento?: string | null;
+  formula_descripcion?: string | null; formula_medicamentos?: MedicationValues[] | null;
+  habilitar_observacion?: boolean | null;
+};
+type LatestModule = { modulo: string; fecha_registro: string; resumen?: string | null };
+export type PetHistoryEntry = {
+  id: string; modulo: string; fecha_registro: string; resumen?: string | null;
+  consulta: ClinicalConsultation | null;
+};
+type CommonProps = { pet: ClinicalPet; veterinarians: ClinicalVeterinarian[]; actor: ClinicalActor;
+  procedureSchemaReady: boolean };
+type ProcedureProps = Pick<CommonProps, "pet" | "actor"> & {
+  recordedAt: string; initial?: Partial<ClinicalConsultation>;
+};
+type FormProps = CommonProps & {
+  recordedAt: string; onCancel: () => void;
+  initialConsultation?: ClinicalConsultation | null; readOnly?: boolean;
+};
+type EntryProps = CommonProps & {
+  consultation: ClinicalConsultation; moduleLabel?: string | null;
+};
+type OverviewProps = CommonProps & {
+  latestConsultation: ClinicalConsultation | null; latestModules?: LatestModule[];
+  historyEntries?: PetHistoryEntry[]; eventSchemaReady: boolean;
+  consultations: ClinicalConsultation[]; historyOpen: boolean;
+  historyPage: number; historyTotal: number; historyFrom: string; historyTo: string;
+};
+type PanelProps = OverviewProps & {
+  historyAvailable: boolean; recordedAt: string;
+  initialModule: "historia" | "consulta-control";
+  initialView: "history" | "new";
+  success: string; error: string;
+};
+function narrativeValue(initial: Partial<ClinicalConsultation>, name: string): string {
+  const value: unknown = (initial as Record<string, unknown>)[name];
+  return typeof value === "string" ? value : "";
+}
 
 const modules = [
   ["historia", "Historial de la mascota"],
@@ -53,7 +125,7 @@ const narrativeSections = [
 
 const systemLabels = Object.fromEntries(systems);
 
-function formatDateTime(value) {
+function formatDateTime(value: string | Date | null | undefined): string {
   if (!value) return "—";
   return new Intl.DateTimeFormat("es-CO", {
     dateStyle: "medium",
@@ -62,11 +134,11 @@ function formatDateTime(value) {
   }).format(new Date(value));
 }
 
-function responsibilityText(name) {
+function responsibilityText(name: string): string {
   return `El propietario no cuenta con los recursos económicos y/o no acepta que se realicen las pruebas paraclínicas necesarias para instaurar una terapia, y/o no acepta hospitalización en caso de que se requiera. Por lo tanto, el Dr. ${name} no se hace responsable del paciente, en virtud de que el propietario y/o usuario del servicio no puede cumplir con las recomendaciones indicadas. De esta manera, el propietario y/o usuario del servicio acepta la responsabilidad del paciente.`;
 }
 
-function SubmitConsultationButton({ disabled }) {
+function SubmitConsultationButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
 
   return (
@@ -77,7 +149,7 @@ function SubmitConsultationButton({ disabled }) {
   );
 }
 
-function ReadonlyField({ label, value }) {
+function ReadonlyField({ label, value }: { label: string; value?: string | number | null }) {
   return (
     <label>
       <span>{label}</span>
@@ -86,7 +158,7 @@ function ReadonlyField({ label, value }) {
   );
 }
 
-function newMedicationRow(id) {
+function newMedicationRow(id: number): MedicationRow {
   return {
     id,
     medicamento: "",
@@ -100,36 +172,36 @@ function newMedicationRow(id) {
   };
 }
 
-function ProcedureBlock({ pet, actor, recordedAt, initial = {} }) {
+function ProcedureBlock({ pet, actor, recordedAt, initial = {} }: ProcedureProps) {
   const [enabled, setEnabled] = useState(initial.procedimientos_habilitados ? "si" : "no");
-  const [selectedTypes, setSelectedTypes] = useState(initial.tipos_procedimiento || []);
-  const [medicationRows, setMedicationRows] = useState(
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(initial.tipos_procedimiento || []);
+  const [medicationRows, setMedicationRows] = useState<MedicationRow[]>(
     Array.isArray(initial.formula_medicamentos) && initial.formula_medicamentos.length
       ? initial.formula_medicamentos.map((row, index) => ({ ...newMedicationRow(index + 1), ...row, id: index + 1 }))
       : [newMedicationRow(1)]
   );
   const homeTreatmentSelected = selectedTypes.includes("Tratamiento farmacológico en casa");
 
-  function toggleType(type, checked) {
+  function toggleType(type: string, checked: boolean): void {
     setSelectedTypes((current) => checked
       ? [...current, type]
       : current.filter((value) => value !== type));
   }
 
-  function updateMedication(id, field, value) {
+  function updateMedication(id: number, field: keyof MedicationValues, value: string): void {
     setMedicationRows((current) => current.map((row) => (
       row.id === id ? { ...row, [field]: value } : row
     )));
   }
 
-  function addMedication() {
+  function addMedication(): void {
     setMedicationRows((current) => [
       ...current,
       newMedicationRow(Math.max(...current.map((row) => row.id), 0) + 1)
     ]);
   }
 
-  function removeMedication(id) {
+  function removeMedication(id: number): void {
     setMedicationRows((current) => current.length > 1
       ? current.filter((row) => row.id !== id)
       : current);
@@ -205,7 +277,7 @@ function ProcedureBlock({ pet, actor, recordedAt, initial = {} }) {
 
             <label className="stackedField">
               <span>Observaciones</span>
-              <textarea name="observaciones_procedimiento" rows="4" defaultValue={initial.observaciones_procedimiento || ""} />
+              <textarea name="observaciones_procedimiento" rows={4} defaultValue={initial.observaciones_procedimiento || ""} />
             </label>
 
             {homeTreatmentSelected ? (
@@ -232,7 +304,7 @@ function ProcedureBlock({ pet, actor, recordedAt, initial = {} }) {
 
                 <label className="stackedField prescriptionDescription">
                   <span>Descripción</span>
-                  <textarea name="formula_descripcion" rows="4" placeholder="Indicaciones generales para el tratamiento en casa" defaultValue={initial.formula_descripcion || ""} />
+                  <textarea name="formula_descripcion" rows={4} placeholder="Indicaciones generales para el tratamiento en casa" defaultValue={initial.formula_descripcion || ""} />
                 </label>
 
                 <input
@@ -374,12 +446,12 @@ function ClinicalForm({
   onCancel,
   initialConsultation = null,
   readOnly = false
-}) {
-  const initial = initialConsultation || {};
+}: FormProps) {
+  const initial: Partial<ClinicalConsultation> = initialConsultation || {};
   const [foodType, setFoodType] = useState(initial.tipo_alimento || "");
   const [stoolType, setStoolType] = useState(initial.heces || "");
   const [observation, setObservation] = useState(initial.habilitar_observacion ? "si" : "no");
-  const [systemStatus, setSystemStatus] = useState(
+  const [systemStatus, setSystemStatus] = useState<Record<string, string>>(
     () => Object.fromEntries(systems.map(([key]) => [key, initial.revision_sistemas?.[key]?.estado || "No evaluado"]))
   );
   const action = useMemo(
@@ -445,14 +517,14 @@ function ClinicalForm({
           </label>
           <label className="fullField">
             <span>Motivo de cita</span>
-            <textarea name="motivo_cita" rows="3" defaultValue={initial.motivo_cita || ""} />
+            <textarea name="motivo_cita" rows={3} defaultValue={initial.motivo_cita || ""} />
           </label>
           <label className="fullField">
             <span>Anamnesis</span>
             <textarea
               name="anamnesis"
               defaultValue={initial.anamnesis || ""}
-              rows="4"
+              rows={4}
               placeholder="¿En qué estado inicial se encuentra la mascota al llegar a la cita?"
             />
           </label>
@@ -474,7 +546,7 @@ function ClinicalForm({
           ) : null}
           <label className="fullField">
             <span>Ración</span>
-            <textarea name="racion" rows="2" defaultValue={initial.racion || ""} placeholder="¿Cómo es la ración que se le da?" />
+            <textarea name="racion" rows={2} defaultValue={initial.racion || ""} placeholder="¿Cómo es la ración que se le da?" />
           </label>
           <label>
             <span>Orina</span>
@@ -535,7 +607,7 @@ function ClinicalForm({
                 {systemStatus[key] === "Anormal" ? (
                   <textarea
                     name={`sistema_${key}_detalle`}
-                    rows="2"
+                    rows={2}
                     defaultValue={initial.revision_sistemas?.[key]?.detalle || ""}
                     placeholder={`Describe la alteración en ${label.toLowerCase()}`}
                   />
@@ -546,7 +618,7 @@ function ClinicalForm({
 
           <label className="stackedField">
             <span>Comentarios y observaciones</span>
-            <textarea name="comentarios_observaciones" rows="4" defaultValue={initial.comentarios_observaciones || ""} />
+            <textarea name="comentarios_observaciones" rows={4} defaultValue={initial.comentarios_observaciones || ""} />
           </label>
         </div>
       </details>
@@ -557,7 +629,7 @@ function ClinicalForm({
           <div className="clinicalBlockContent">
             <label className="stackedField">
               <span>Descripción</span>
-              <textarea name={name} rows="5" defaultValue={initial[name] || ""} />
+              <textarea name={name} rows={5} defaultValue={narrativeValue(initial, name)} />
             </label>
           </div>
         </details>
@@ -577,7 +649,7 @@ function ClinicalForm({
           <div className="clinicalBlockContent">
             <label className="stackedField">
               <span>Descripción</span>
-              <textarea name={name} rows="5" defaultValue={initial[name] || ""} />
+              <textarea name={name} rows={5} defaultValue={initial[name] || ""} />
             </label>
           </div>
         </details>
@@ -611,7 +683,7 @@ function ClinicalForm({
   );
 }
 
-function HistoryValue({ label, value }) {
+function HistoryValue({ label, value }: { label: string; value: unknown }) {
   if (value === null || value === undefined || value === "") return null;
   return (
     <div>
@@ -621,7 +693,7 @@ function HistoryValue({ label, value }) {
   );
 }
 
-function ProcedureHistory({ consultation }) {
+function ProcedureHistory({ consultation }: { consultation: ClinicalConsultation }) {
   const medicationRows = Array.isArray(consultation.formula_medicamentos)
     ? consultation.formula_medicamentos
     : [];
@@ -635,7 +707,7 @@ function ProcedureHistory({ consultation }) {
       : null;
   }
 
-  const serviceValue = consultation.valor_total_servicio === null
+  const serviceValue = typeof consultation.valor_total_servicio !== "number"
     ? null
     : new Intl.NumberFormat("es-CO", {
       style: "currency",
@@ -674,7 +746,7 @@ function ProcedureHistory({ consultation }) {
   );
 }
 
-function ConsultationEntry({ consultation, pet, veterinarians, actor, procedureSchemaReady, moduleLabel = null }) {
+function ConsultationEntry({ consultation, pet, veterinarians, actor, procedureSchemaReady, moduleLabel = null }: EntryProps) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   return (
@@ -709,7 +781,7 @@ function ConsultationEntry({ consultation, pet, veterinarians, actor, procedureS
   );
 }
 
-function ConsultationHistory({ consultations, pet, veterinarians, actor, procedureSchemaReady }) {
+function ConsultationHistory({ consultations, pet, veterinarians, actor, procedureSchemaReady }: CommonProps & { consultations: ClinicalConsultation[] }) {
   if (!consultations.length) {
     return <div className="emptyState clinicalEmpty"><h2>No hay registros en este período</h2><p>Crea una nueva consulta o ajusta el rango de fechas.</p></div>;
   }
@@ -725,12 +797,12 @@ function ConsultationHistory({ consultations, pet, veterinarians, actor, procedu
 
 function PetHistoryOverview({ pet, latestConsultation, latestModules = [], historyEntries = [],
   eventSchemaReady, consultations, veterinarians, actor, procedureSchemaReady,
-  historyOpen, historyPage, historyTotal, historyFrom, historyTo }) {
+  historyOpen, historyPage, historyTotal, historyFrom, historyTo }: OverviewProps) {
   const names = [
     "Consulta y control", "Fórmula y remisión", "Procedimientos", "Vacunación",
     "Desparasitación", "Estética", "Guardería", "Seguimiento", "Consentimientos"
   ];
-  const moduleOverview = names.map((name) => [
+  const moduleOverview: Array<[string, LatestModule | null]> = names.map((name) => [
     name,
     latestModules.find((event) => event.modulo === name) || (
       !eventSchemaReady && name === "Consulta y control" && latestConsultation
@@ -739,7 +811,7 @@ function PetHistoryOverview({ pet, latestConsultation, latestModules = [], histo
     )
   ]);
   const totalPages = Math.max(1, Math.ceil(historyTotal / 50));
-  const historyHref = (page) => {
+  const historyHref = (page: number): string => {
     const q = new URLSearchParams({ historial: "1", pagina: String(page) });
     if (historyFrom) q.set("desde", historyFrom);
     if (historyTo) q.set("hasta", historyTo);
@@ -835,11 +907,11 @@ export default function ConsultationControlPanel({
   initialView,
   success,
   error
-}) {
+}: PanelProps) {
   const [selectedModule, setSelectedModule] = useState(initialModule);
   const [view, setView] = useState(initialView);
 
-  function selectModule(key) {
+  function selectModule(key: string): void {
     if (key === "historia" || key === "consulta-control") {
       setSelectedModule(key);
       if (key === "consulta-control") setView("history");
