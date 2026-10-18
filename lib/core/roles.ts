@@ -21,7 +21,8 @@ export function normalizeCoreRole(input: string | null | undefined): CoreRole | 
 }
 
 export function canCreateRole(actor: CoreRole, target: CoreRole, sameCompany: boolean): boolean {
-  if (actor === CORE_ROLES.SUPER_ADMIN) return true;
+  // Super-Admin es único: nadie, ni el propietario, crea un segundo.
+  if (actor === CORE_ROLES.SUPER_ADMIN) return target !== CORE_ROLES.SUPER_ADMIN;
   if (actor === CORE_ROLES.ADMIN && sameCompany) {
     return target === CORE_ROLES.ADMIN || target === CORE_ROLES.USER;
   }

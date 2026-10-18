@@ -70,3 +70,13 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **Límite de verificación:** el adaptador administrativo `lib/supabase/admin.ts` conserva **un `any` explícito** para tablas/RPC de Supabase no generadas. No afirmar tipado de esquema real hasta C01. Las pruebas unitarias/build no validan RLS ni datos del entorno Supabase.
 - **SQL/operación:** `010_core_access.sql` no ejecutado; sin cambios a producción, credenciales o PULSE.
 - **Pendiente:** generar tipos Database de la instancia Core validada, eliminar el `any` del adaptador y ejecutar pruebas E2E clínicas, aislamiento A/B y regresión de integraciones.
+
+## 2026-10-18 — Acceso global Core SaaS, roles y modelo multiempresa
+- **Estado:** IMPLEMENTADO EN CÓDIGO Y SQL VERSIONADO, sujeto a CI y preflight. **NO** activado en Supabase ni producción.
+- **Objetivo:** un login CORE SAAS, identidad global y membresías por empresa, roles Super-Admin (uno), Super-User, Admin y User, permisos granulares por vertical y aislamiento real.
+- **Código:** `lib/core/roles.ts` (roles, delegación, invariantes), `lib/core/portal-access.ts` (licencias y membresías; PETS legacy limitado), `lib/core/auth.ts` (resolver identidad Core solo con RPC instalada), `app/login`, `app/panel`, `app/portal`, `lib/core/support-policy.ts`, `app/super-admin/soporte`, `proxy.ts` y enlace en Core Admin.
+- **SQL redactado:** `supabase/migrations/011_core_identity_multitenant.sql` depende de 010; `core.accounts`, `core.platform_staff`, `core.memberships.company_role`, `core.membership_permissions`, `core.platform_permission_grants`, `core.support_sessions`; RPC de identidad, licencias, autorización, cuentas, personal, membresías multiempresa, soporte y directorio.
+- **Auditoría diseñada:** registro del creador/actor real, empresa, sujeto, rol/permisos, inicio y cierre de soporte. El modo soporte solo muestra permisos/licencias y bloquea rutas operativas, no reemplaza Auth del usuario.
+- **Compatibilidad preservada:** `public.usuarios.rol` (enum PETS) y `empresa_id` legacy permanecen sin cambios; el acceso a PETS por empresa adicional se bloquea hasta adaptar todos los filtros y RLS. PULSE sigue sin frontend productivo en Core.
+- **Seguridad:** sin licencias inventadas desde frontend; fail-closed cuando falta 011 para nuevas funciones. Sin leer datos de Supabase real ni desplegar SQL; pruebas de aislamiento real/E2E pendientes.
+- **Pendientes:** preflight C01, ensayo de SQL 010/011, API/UI de invitación de usuarios y selector de permisos, adaptación completa de PETS multiempresa, pruebas de soporte y auditoría contra BD real.

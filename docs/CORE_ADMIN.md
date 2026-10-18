@@ -33,3 +33,9 @@ Core Admin controla empresas y producto global. Empresa Admin gestiona únicamen
 
 ## Sistema visual
 Core Admin utiliza los tokens de styles/tokens.css que también rigen PETS. Las verticales pueden usar navegación y lenguaje específicos, pero no paletas CSS aisladas.
+
+## Nuevo contrato de acceso y soporte
+- Super-Admin único administra toda la plataforma; Super-User recibe permisos por delegación expresa; Admin administra únicamente Admin/User de su empresa; User ejecuta funciones de su vertical.
+- El acceso global es `/login` → `/portal` o `/super-admin`; empresas/verticales se filtran por licencias y grants del servidor.
+- `/super-admin/soporte` muestra el alcance efectivo del usuario seleccionado, con motivo, actor real, caducidad 15 min y auditoría. No es un login real del sujeto; no permite editar ni abrir datos clínicos.
+- La UI de alta de Super-Users, membresías múltiples y permisos editables está pendiente de integrar con el SQL versionado en 011 y de validar RLS. Ver `docs/IDENTIDAD_ACCESO_MULTIEMPRESA.md`.

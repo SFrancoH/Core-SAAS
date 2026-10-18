@@ -21,6 +21,7 @@ test("cuatro roles principales; cargos PETS se convierten solo para compatibilid
 
 test("creación: propietario todos, empresa solo admin/user propio, super-user sin privilegios heredados", () => {
   assert.equal(canCreateRole(CORE_ROLES.SUPER_ADMIN,CORE_ROLES.SUPER_USER,false),true);
+  assert.equal(canCreateRole(CORE_ROLES.SUPER_ADMIN,CORE_ROLES.SUPER_ADMIN,false),false);
   assert.equal(canCreateRole(CORE_ROLES.ADMIN,CORE_ROLES.ADMIN,true),true);
   assert.equal(canCreateRole(CORE_ROLES.ADMIN,CORE_ROLES.USER,true),true);
   assert.equal(canCreateRole(CORE_ROLES.ADMIN,CORE_ROLES.USER,false),false);
