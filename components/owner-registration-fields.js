@@ -1,4 +1,4 @@
-import { sedes } from "@/lib/pet-catalogs";
+import { sedes } from "@/lib/verticals/pets/pet-catalogs";
 
 const documentTypes = [
   "Cédula de ciudadania",

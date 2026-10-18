@@ -2,9 +2,9 @@ import Link from "next/link";
 
 import CarnetGenerator from "@/components/carnet-generator";
 import OwnerRegistrationFields from "@/components/owner-registration-fields";
-import { especies, razas, temperamentos, estadosReproductivos, tamanos, estadosMascota } from "@/lib/pet-catalogs";
+import { especies, razas, temperamentos, estadosReproductivos, tamanos, estadosMascota } from "@/lib/verticals/pets/pet-catalogs";
 import DashboardHeader from "@/components/dashboard-header";
-import { requireOperationalProfile } from "@/lib/operational";
+import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createPetRegistration } from "./actions";
 

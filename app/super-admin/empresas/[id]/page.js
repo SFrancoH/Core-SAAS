@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 
 import DashboardHeader from "@/components/dashboard-header";
 import PasswordField from "@/components/password-field";
-import { requireProfile } from "@/lib/auth";
+import { requireProfile } from "@/lib/core/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import {
   createCompanyAdmin,

@@ -1,23 +1,15 @@
 import { NextResponse } from "next/server";
 
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { pickGhlField, normalizeGhlFields } from "@/lib/integrations/ghl-payload.mjs";
 
 export const dynamic = "force-dynamic";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function sources(body) {
-  return [body, body?.data, body?.contact, body?.customData, body?.custom_data, body?.fields].filter(Boolean);
-}
-
+// Parseo único Core: mantiene alias y fuentes ya aceptadas por PETS.
 function pick(body, ...keys) {
-  for (const source of sources(body)) {
-    for (const key of keys) {
-      const value = source?.[key];
-      if (value !== undefined && value !== null && String(value).trim() !== "") return String(value).trim();
-    }
-  }
-  return "";
+  return pickGhlField(body, ...keys);
 }
 
 async function readBody(request) {
@@ -40,7 +32,11 @@ export async function POST(request, { params }) {
     return NextResponse.json({ ok: false, error: "Contenido no válido" }, { status: 400 });
   }
 
-  const registrationId = pick(body, "pets_registro_id", "registro_id");
+  const normalized = normalizeGhlFields(body, { pets_registro_id: ["registro_id"] }, { strict: ["pets_registro_id"] });
+  if (normalized.conflicts.length > 0) {
+    return NextResponse.json({ ok: false, campos_invalidos: normalized.conflicts }, { status: 400 });
+  }
+  const registrationId = normalized.values.pets_registro_id;
   if (!uuidPattern.test(registrationId)) {
     return NextResponse.json({ ok: false, error: "Falta pets_registro_id" }, { status: 400 });
   }

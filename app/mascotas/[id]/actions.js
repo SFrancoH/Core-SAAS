@@ -8,8 +8,8 @@ import {
   medicationFrequencies,
   medications,
   procedureTypes
-} from "@/lib/clinical-catalogs";
-import { requireOperationalProfile } from "@/lib/operational";
+} from "@/lib/verticals/pets/clinical-catalogs";
+import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;

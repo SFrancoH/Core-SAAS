@@ -21,6 +21,7 @@ Next.js 16, React 19, Supabase Auth, PostgreSQL y ExcelJS. El código actual usa
 npm install
 npm run dev
 npm run build
+npm test
 ```
 
 Configurar en `.env.local` o en el servidor, **nunca en Git**:
@@ -31,7 +32,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 ```
 `SUPABASE_SECRET_KEY` es exclusivamente privada y no lleva prefijo `NEXT_PUBLIC_`.
 
-El directorio `supabase/migrations` contiene el esquema base PETS 001–009. Confirmar qué migraciones se ejecutaron realmente antes de aplicar SQL. Las carpetas nuevas documentan límites de dominio; sus README no prueban funciones implementadas.
+El directorio `supabase/migrations` contiene PETS 001–009 y el **diseño aún no aplicado** `010_core_access.sql` (Core: licencias, roles, permisos y membresías). Confirmar qué migraciones se ejecutaron realmente antes de aplicar SQL. Las carpetas nuevas delimitan la aplicación: autenticación compartida en `lib/core` y catálogos y permisos PETS en `lib/verticals/pets`. Los módulos nuevos no se consideran implementados por crear sus carpetas.
 
 ## Primera entrega de Core
 Conservar PETS operativo, inventariar la base de datos actual, construir permisos/licencias centrales y agregar la primera función «Crear proyecto PULSE» siguiendo el contrato Core. No copiar todo PULSE de golpe ni escribir en una base de datos ajena a este proyecto.

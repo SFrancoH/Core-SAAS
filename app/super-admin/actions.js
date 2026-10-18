@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireProfile } from "@/lib/auth";
+import { requireProfile } from "@/lib/core/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function createCompany(formData) {

@@ -2,9 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { requireOperationalProfile } from "@/lib/operational";
+import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { sedes } from "@/lib/pet-catalogs";
+import { sedes } from "@/lib/verticals/pets/pet-catalogs";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i;
 const value = (data, key, max = 500) => String(data.get(key) || "").trim().slice(0, max);

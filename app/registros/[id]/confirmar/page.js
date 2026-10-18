@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import DashboardHeader from "@/components/dashboard-header";
 import RegistrationConfirmation from "@/components/registration-confirmation";
-import { requireOperationalProfile } from "@/lib/operational";
+import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 function buildFormUrl(baseUrl, registration) {

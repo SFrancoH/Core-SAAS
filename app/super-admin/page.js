@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import DashboardHeader from "@/components/dashboard-header";
-import { requireProfile } from "@/lib/auth";
+import { requireProfile } from "@/lib/core/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createCompany } from "./actions";
 

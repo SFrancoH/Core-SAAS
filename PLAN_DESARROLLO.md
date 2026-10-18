@@ -10,7 +10,7 @@ Core aporta empresas, cuentas, membresías, permisos, licencias, integraciones y
 - [x] Código PETS presente en Next.js; `app/`, `components/`, `lib/` y migraciones SQL 001–009.
 - [x] Modelo en repositorio de `public.empresas(id uuid)`, `public.usuarios` ligado a `auth.users`, mascotas, propietarios y consultas.
 - [ ] Verificación del esquema **real** instalado en el Supabase de Core SaaS.
-- [ ] Entitlements, roles/permisos y membresías Core implantados.
+- [~] Autorización Core en código y SQL 010 redactado; **no aplicado a Supabase ni conectado aún a todos los flujos PETS**.
 - [ ] Primera función PULSE implantada en este repositorio.
 - [ ] Módulos compartidos funcionales.
 - [ ] Pruebas E2E y publicación consolidada.
@@ -20,29 +20,29 @@ Core aporta empresas, cuentas, membresías, permisos, licencias, integraciones y
 ### C00 — Documentación y estructura
 - [x] Documentación maestra, modelo de datos, contratos, reglas PETS/PULSE.
 - [x] Carpetas previstas sin alterar código de aplicación.
-- [ ] Ejecutar build/regresión PETS y registrar resultados en bitácora.
+- [~] Tests unitarios de scoping/webhook disponibles. Pendiente build/regresión PETS con dependencias y tests E2E.
 **Criterio:** sin cambios en base de datos ni dependencias; estructura consistente.
 
 ### C01 — Inventario de la base Core
-- [ ] Consultar en solo lectura columnas, UUID, FKs, RLS, políticas, grants, funciones, triggers, migraciones aplicadas y datos.
+- [ ] Ejecutar `supabase/design/PREFLIGHT_CORE.sql` de solo lectura y confirmar columnas, UUID, FKs, RLS, políticas, triggers y migraciones en la BD real.
 - [ ] Definir baseline versionado y copia de seguridad/restauración de prueba.
 - [ ] Registrar discrepancias SQL-versión/DB real sin ejecutar correcciones destructivas.
 **Criterio:** esquema real comprobado y documentado.
 
 ### C02 — Autenticación y contexto empresarial
 - [ ] Reutilizar `auth.users`, `public.usuarios` y `public.empresas`.
-- [ ] Implementar membresía, empresa activa y separación entre rol de plataforma y rol por empresa.
+- [~] Helpers Core y SQL 010 diseñados; falta comprobar memberships y autorizar desde la BD, no se permite cambiar de empresa solo por un ID.
 - [ ] Pruebas de acceso cruzado empresa A/B, cambio de rol y usuario desactivado.
 **Criterio:** una sesión no permite leer/editar datos de otra empresa.
 
 ### C03 — Licencias y permisos
-- [ ] Crear tablas Core de catálogo, permisos, roles, membresías y licencias mediante SQL revisado.
+- [~] SQL versionado `010_core_access.sql` redactado. **No ejecutado, requiere preflight y validación de dependencias.**
 - [ ] Registrar productos y módulos, con PETS como primer producto.
 - [ ] Validación de backend y UX para módulos activos/inactivos.
 **Criterio:** sin entitlement o permiso, API rechaza la operación.
 
 ### C04 — Integraciones estándar
-- [ ] Parser común para GHL (raíz, Custom Data, mezcla y alias).
+- [x] Parser puro común GHL y pruebas de raíz, Custom Data, mezclas, alias y conflictos; endpoint PETS adaptado.
 - [ ] Autenticación de webhook ligada a tenant; validación, auditoría e idempotencia.
 - [ ] Políticas por tipo de evento: envío único o reintento idempotente; tests de contrato.
 **Criterio:** recepción segura y versionada sin acoplamiento a una vertical.
@@ -65,7 +65,7 @@ Core aporta empresas, cuentas, membresías, permisos, licencias, integraciones y
 **Criterio:** módulo compartido sin importar las tablas de cada vertical.
 
 ### C08 — Calidad y expansión
-- [ ] Auditoría, backups verificados, métricas, colas cuando sean necesarias, CI, permisos y E2E.
+- [~] Workflow CI agregado; aún faltan backups verificados, auditoría operativa, permisos E2E y monitoreo.
 - [ ] Definir regulaciones necesarias para clínicas humanas antes de AURA/VISION.
 - [ ] Crear próximas verticales solo con requisitos concretos.
 **Criterio:** publicación comercial verificada.

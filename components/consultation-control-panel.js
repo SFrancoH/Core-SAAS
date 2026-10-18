@@ -10,7 +10,7 @@ import {
   medicationFrequencies,
   medications as medicationCatalog,
   procedureTypes
-} from "@/lib/clinical-catalogs";
+} from "@/lib/verticals/pets/clinical-catalogs";
 
 const modules = [
   ["historia", "Historial de la mascota"],

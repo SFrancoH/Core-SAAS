@@ -1,4 +1,4 @@
-import { sedes } from "@/lib/pet-catalogs";
+import { sedes } from "@/lib/verticals/pets/pet-catalogs";
 import { updateOwnerProfile } from "@/app/propietarios/[id]/actions";
 
 export default function OwnerEditForm({ owner, editing, error, success }) {

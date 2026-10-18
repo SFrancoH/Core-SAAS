@@ -26,3 +26,6 @@ Ruta HTTP → autenticación + organización + permiso + licencia → caso de us
 - No son necesarias nuevas apps, nuevos stacks o nuevos proyectos Supabase para crear una carpeta.
 
 **Estado:** diseño de destino. Ninguna carpeta vacía significa módulo funcional.
+
+## Estado de integración de la base PETS
+Desde la primera organización de código, `lib/core/auth.js` mantiene la lógica compartida de sesiones; `lib/verticals/pets/operational.js` contiene el comportamiento operativo veterinario y sus catálogos. Los imports históricos se mantienen como **adaptadores** para compatibilidad; las pantallas actuales usan preferentemente las nuevas rutas. `lib/core/authorization.js` ofrece la autorización para casos de uso Core futuros y requiere la RPC del SQL 010 antes de usarse. **No afirmar que la licencia ya protege las rutas PETS heredadas**: deben incorporarse gradualmente con pruebas.

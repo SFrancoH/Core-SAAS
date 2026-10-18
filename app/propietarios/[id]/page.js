@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 
 import DashboardHeader from "@/components/dashboard-header";
 import OwnerEditForm from "@/components/owner-edit-form";
-import { mostrarSede } from "@/lib/sede-display";
+import { mostrarSede } from "@/lib/verticals/pets/sede-display";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { requireOperationalProfile } from "@/lib/operational";
+import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 
 export default async function OwnerDetailPage({ params, searchParams }) {
   const urlParams = await searchParams;
