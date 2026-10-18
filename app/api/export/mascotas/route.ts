@@ -1,20 +1,31 @@
-// @ts-nocheck — compatibilidad PETS: tipado estricto de este archivo pendiente.
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { getCurrentProfile } from "@/lib/core/auth";
 import { createExcelFile, excelDate } from "@/lib/excel-export";
 import { fetchAll } from "@/lib/excel-import";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
+type PetExportOwner = { nombre: string; telefono: string | null; whatsapp: string | null };
+type PetExportRow = {
+  empresas?: { nombre: string } | null;
+  nombre: string; numero_carnet?: string | null; raza?: string | null;
+  especie?: string | null; peso_kg?: number | null; fecha_nacimiento?: string | null;
+  sexo?: string | null; temperamento?: string | null; estado_reproductivo?: string | null;
+  numero_partos?: number | null; color?: string | null; fecha_fallecimiento?: string | null;
+  motivo_fallecimiento?: string | null; comentarios_fallecimiento?: string | null;
+  estado?: string | null; fuente?: string | null;
+  propietarios_mascotas?: Array<{ propietarios: PetExportOwner | null }>;
+};
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET(request) {
+export async function GET(request: NextRequest) {
   const profile = await getCurrentProfile();
   if (!profile) return NextResponse.redirect(new URL("/login", request.url));
   const admin = getSupabaseAdmin();
 
-  const pets = await fetchAll((from, to) => {
+  const pets = await fetchAll<PetExportRow>((from, to) => {
     let query = admin.from("mascotas").select(`*, empresas(nombre), propietarios_mascotas(propietarios(nombre, telefono, whatsapp, numero_documento))`);
     if (profile.rol !== "super_admin") query = query.eq("empresa_id", profile.empresa_id);
     return query.order("nombre").range(from, to);
@@ -44,7 +55,7 @@ export async function GET(request) {
   ];
 
   const rows = pets.map((pet) => {
-    const owners = (pet.propietarios_mascotas || []).map((relation) => relation.propietarios).filter(Boolean);
+    const owners = (pet.propietarios_mascotas || []).map((relation) => relation.propietarios).filter((owner): owner is PetExportOwner => Boolean(owner));
     return {
       ...(includeCompany ? { empresa: pet.empresas?.nombre || "" } : {}),
       nombre: pet.nombre,

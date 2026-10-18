@@ -1,9 +1,10 @@
-// @ts-nocheck — compatibilidad PETS pendiente de tipado completo.
 import "server-only";
 
 import ExcelJS from "exceljs";
 
-export async function createExcelFile({ sheetName, columns, rows }) {
+type ExcelExportColumn = { header: string; key: string; width?: number; numFmt?: string };
+type ExcelExportOptions = { sheetName: string; columns: ExcelExportColumn[]; rows: Record<string, unknown>[] };
+export async function createExcelFile({ sheetName, columns, rows }: ExcelExportOptions) {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "PETS";
   workbook.created = new Date();
@@ -30,7 +31,7 @@ export async function createExcelFile({ sheetName, columns, rows }) {
   return workbook.xlsx.writeBuffer();
 }
 
-export function excelDate(value) {
+export function excelDate(value: unknown): Date | null {
   if (!value) return null;
   const date = new Date(`${String(value).slice(0, 10)}T00:00:00Z`);
   return Number.isNaN(date.getTime()) ? null : date;

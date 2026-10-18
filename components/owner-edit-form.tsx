@@ -1,8 +1,17 @@
-// @ts-nocheck — lógica/props PETS aún requieren tipado estricto.
 import { sedes } from "@/lib/verticals/pets/pet-catalogs";
 import { updateOwnerProfile } from "@/app/propietarios/[id]/actions";
 
-export default function OwnerEditForm({ owner, editing, error, success }) {
+type OwnerFormRecord = {
+  id: string;
+  nombre?: string | null; fuente?: string | null; ciudad?: string | null;
+  direccion?: string | null; telefono?: string | null; whatsapp?: string | null;
+  email?: string | null; tipo_documento?: string | null;
+  numero_documento?: string | null; estado?: string | null;
+  notificaciones_whatsapp?: boolean | null; tags?: string[] | null;
+};
+type Props = { owner: OwnerFormRecord; editing?: boolean; error?: boolean; success?: boolean };
+
+export default function OwnerEditForm({ owner, editing, error, success }: Props) {
   const selected = owner.fuente && !sedes.includes(owner.fuente) ? [owner.fuente, ...sedes] : sedes;
   return (
     <section className="recordSection">

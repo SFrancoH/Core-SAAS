@@ -59,3 +59,14 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - Sistema visual: styles/tokens.css contiene paleta, transparencias, radios y tipografía; app/globals.css consume variables en lugar de valores HEX; styles/shell.css organiza administración.
 - Estado de tipado: algunos archivos heredados todavía llevan @ts-nocheck; deben tiparse realmente por fases. No introducir nuevos JS.
 - SQL 010 no aplicado; Supabase y PULSE productivo sin cambios. Pruebas de integración clínica y visuales pendientes.
+
+## 2026-10-18 — Tipado estricto PETS y controles de regresión
+- **Estado:** IMPLEMENTADO EN CÓDIGO de PR #5; pruebas de CI registradas en el PR. La base de datos no ha sido modificada.
+- **Objetivo:** cerrar los `@ts-nocheck` heredados sin alterar URLs, consultas veterinarias, flujos de pago o Supabase.
+- **Alcance de código:** componentes de formularios propietarios/mascotas y confirmación; cookies y sesión Supabase; importación, exportación y lectores Excel; rutas webhooks/estados/descargas; paneles PETS y acciones de crear usuarios, registros y consultas; formulario clínico, procedimientos, medicamentos y línea de tiempo.
+- **Tipos:** parámetros Next.js `params`/`searchParams`, `FormData`, datos de propietarios/mascotas, consultas, veterinarios, medicamentos, eventos, búsquedas, errores `unknown`, lectores Excel y buffers de salida.
+- **Correcciones derivadas del chequeo:** nullabilidad, invariantes de medicamentos, tipos de relaciones, ausencia de cliente Auth, callbacks, fechas, tipos de filas y campos de actualización clínica sin mutar la autoría original.
+- **Política:** `tsconfig.json` `strict` y `allowJs: false`; prueba de arquitectura bloquea JavaScript y directivas `@ts-nocheck`/`@ts-ignore` en código TS.
+- **Límite de verificación:** el adaptador administrativo `lib/supabase/admin.ts` conserva **un `any` explícito** para tablas/RPC de Supabase no generadas. No afirmar tipado de esquema real hasta C01. Las pruebas unitarias/build no validan RLS ni datos del entorno Supabase.
+- **SQL/operación:** `010_core_access.sql` no ejecutado; sin cambios a producción, credenciales o PULSE.
+- **Pendiente:** generar tipos Database de la instancia Core validada, eliminar el `any` del adaptador y ejecutar pruebas E2E clínicas, aislamiento A/B y regresión de integraciones.

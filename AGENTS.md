@@ -4,10 +4,10 @@
 
 ## Norma obligatoria de lenguaje — TypeScript
 - **Todo código nuevo de aplicación, servidor, Core, verticales, módulos, integraciones y pruebas automatizadas se escribe en TypeScript**: `.ts` y `.tsx`. No crear nuevos archivos `.js`, `.jsx` ni `.mjs` para funcionalidades.
-- El proyecto usa `tsconfig.json` con `strict: true`, `allowJs: true`, `checkJs: false` y `noEmit: true`. `allowJs` se mantiene **solo para ejecutar el código heredado PETS**, no es permiso para escribir código nuevo en JavaScript.
+- El proyecto usa `tsconfig.json` con `strict: true`, `allowJs: false` y `noEmit: true`. El código de aplicación es TypeScript.
 - Antes de finalizar un cambio: `npm ci`, `npm test`, `npm run typecheck` y `npm run build`. La CI usa Node.js 22 para ejecutar pruebas TypeScript; si el cambio requiere un runtime distinto, documentarlo.
-- Al modificar código JavaScript heredado de PETS, preservar su comportamiento. Convertir el archivo a TypeScript cuando sea seguro y se disponga de pruebas; no forzar conversiones masivas.
-- Los adapters `.js` existentes son compatibilidad temporal. La lógica real de `lib/core` y `lib/verticals/pets` se desarrolla en TypeScript. Contratos entre módulos deben tener tipos explícitos y validar entradas externas en runtime.
+- Al modificar lógica PETS, preservar el comportamiento y agregar pruebas; todas las rutas, componentes y servicios son TypeScript.
+- No hay adaptadores `.js` dentro del código de aplicación. Los contratos entre módulos llevan tipos explícitos, validaciones de entradas externas en runtime y pruebas.
 - Excepciones: SQL `.sql`, documentación `.md`, JSON y archivos de configuración exigidos por herramientas; no se consideran código de funcionalidad.
 
 ## Lectura antes de modificar código
@@ -47,5 +47,5 @@ Actualizar `PLAN_DESARROLLO.md` y `BITACORA.md` en el mismo PR. Estados: DEFINID
 
 ## Conversión real de PETS a TypeScript
 - Las rutas, acciones, componentes y utilidades de PETS se renombraron a .ts/.tsx conservando URLs y lógica.
-- Algunos archivos heredados requieren todavía tipos explícitos y contienen @ts-nocheck. NO equivalen a tipado estricto completo; retirarlo de manera progresiva con tests. Prohibido introducir @ts-nocheck en funcionalidades nuevas.
+- Los archivos PETS se verifican con `strict: true`, **sin `@ts-nocheck` ni `@ts-ignore`**. La prueba automática bloquea regresiones. Un único límite pendiente es la definición tipada de tablas/RPC de Supabase real (requiere C01); no extender `any` del adaptador administrativo a nuevas funciones.
 - No crear archivos JavaScript dentro de app, components o lib. El núcleo nuevo permanece en TypeScript estricto.

@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -9,11 +8,11 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function companyPath(companyId, query = "") {
+function companyPath(companyId: string, query = ""): string {
   return `/super-admin/empresas/${companyId}${query}`;
 }
 
-export async function createCompanyAdmin(formData) {
+export async function createCompanyAdmin(formData: FormData) {
   const actor = await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const nombre = String(formData.get("nombre") || "").trim();
@@ -64,7 +63,7 @@ export async function createCompanyAdmin(formData) {
   redirect(companyPath(companyId, "?ok=usuario_creado"));
 }
 
-export async function resetCompanyUserPassword(formData) {
+export async function resetCompanyUserPassword(formData: FormData) {
   await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const userId = String(formData.get("usuario_id") || "");
@@ -91,7 +90,7 @@ export async function resetCompanyUserPassword(formData) {
   redirect(companyPath(companyId, "?ok=password"));
 }
 
-export async function setCompanyUserStatus(formData) {
+export async function setCompanyUserStatus(formData: FormData) {
   await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const userId = String(formData.get("usuario_id") || "");
@@ -116,7 +115,7 @@ export async function setCompanyUserStatus(formData) {
   redirect(companyPath(companyId, "?ok=estado"));
 }
 
-export async function saveContactIntegration(formData) {
+export async function saveContactIntegration(formData: FormData) {
   const actor = await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const formUrl = String(formData.get("formulario_url") || "").trim();

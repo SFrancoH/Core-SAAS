@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -35,12 +34,12 @@ const systemKeys = [
   "sistema_reproductivo"
 ];
 
-function text(formData, name, maxLength = 10000) {
+function text(formData: FormData, name: string, maxLength = 10000): string | null {
   const value = String(formData.get(name) || "").trim();
   return value ? value.slice(0, maxLength) : null;
 }
 
-function number(formData, name, integer = false) {
+function number(formData: FormData, name: string, integer = false): number | null {
   const value = String(formData.get(name) || "").trim().replace(",", ".");
   if (!value) return null;
   const parsed = Number(value);
@@ -48,17 +47,29 @@ function number(formData, name, integer = false) {
   return integer ? Math.trunc(parsed) : parsed;
 }
 
-function safeText(value, maxLength = 1000) {
+function safeText(value: unknown, maxLength = 1000): string | null {
   const normalized = String(value || "").trim();
   return normalized ? normalized.slice(0, maxLength) : null;
 }
 
-function parseMedicationRows(value) {
+type MedicationRow = {
+  medicamento: string; medicamento_otro: string | null;
+  dosis_terapeutica: string; via_administracion: string;
+  via_administracion_otra: string | null; frecuencia: string;
+  frecuencia_otra: string | null; cantidad_total: number;
+};
+type ClinicalSystem = { estado: "Normal" | "Anormal"; detalle: string | null };
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+function parseMedicationRows(value: unknown): MedicationRow[] | null {
   try {
-    const parsed = JSON.parse(String(value || "[]"));
+    const parsed: unknown = JSON.parse(String(value || "[]"));
     if (!Array.isArray(parsed) || parsed.length < 1 || parsed.length > 20) return null;
 
-    const rows = parsed.map((item) => {
+    const rows = parsed.map((raw: unknown): MedicationRow | null => {
+      if (!isRecord(raw)) return null;
+      const item = raw;
       const medicamento = safeText(item?.medicamento, 200);
       const medicamentoOtro = safeText(item?.medicamento_otro, 200);
       const dosis = safeText(item?.dosis_terapeutica, 500);
@@ -69,12 +80,12 @@ function parseMedicationRows(value) {
       const cantidad = Number(String(item?.cantidad_total || "").replace(",", "."));
 
       if (
-        !allowedMedications.has(medicamento)
+        !medicamento || !allowedMedications.has(medicamento)
         || (medicamento === "Otro" && !medicamentoOtro)
         || !dosis
-        || !allowedAdministrationRoutes.has(via)
+        || !via || !allowedAdministrationRoutes.has(via)
         || (via === "Otra" && !viaOtra)
-        || !allowedMedicationFrequencies.has(frecuencia)
+        || !frecuencia || !allowedMedicationFrequencies.has(frecuencia)
         || (frecuencia === "Otra" && !frecuenciaOtra)
         || !Number.isFinite(cantidad)
         || cantidad <= 0
@@ -92,22 +103,22 @@ function parseMedicationRows(value) {
       };
     });
 
-    return rows.some((row) => row === null) ? null : rows;
+    return rows.some((row) => row === null) ? null : rows as MedicationRow[];
   } catch {
     return null;
   }
 }
 
-export async function createConsultation(petId, formData) {
+export async function createConsultation(petId: string, formData: FormData) {
   return saveConsultation(petId, null, formData);
 }
 
-export async function updateConsultation(petId, consultationId, formData) {
+export async function updateConsultation(petId: string, consultationId: string, formData: FormData) {
   if (!uuidPattern.test(consultationId || "")) redirect("/mascotas");
   return saveConsultation(petId, consultationId, formData);
 }
 
-async function saveConsultation(petId, consultationId, formData) {
+async function saveConsultation(petId: string, consultationId: string | null, formData: FormData) {
   const actor = await requireOperationalProfile();
   if (!uuidPattern.test(petId)) redirect("/mascotas");
 
@@ -126,7 +137,7 @@ async function saveConsultation(petId, consultationId, formData) {
 
     const serviceType = text(formData, "tipo_servicio", 20);
     const veterinarianId = text(formData, "medico_veterinario_id", 36);
-    if (!serviceTypes.has(serviceType) || !uuidPattern.test(veterinarianId || "")) {
+    if (!serviceTypes.has(serviceType || "") || !uuidPattern.test(veterinarianId || "")) {
       redirect(`/mascotas/${petId}?modulo=consulta-control&vista=nueva&error=datos_requeridos`);
     }
 
@@ -151,7 +162,7 @@ async function saveConsultation(petId, consultationId, formData) {
       .getAll("tipos_procedimiento")
       .map((value) => String(value))
       .filter((value) => allowedProcedureTypes.has(value));
-    if (proceduresEnabled && !procedureAreas.has(procedureArea)) {
+    if (proceduresEnabled && !procedureAreas.has(procedureArea || "")) {
       redirect(`/mascotas/${petId}?modulo=consulta-control&vista=nueva&error=procedimientos`);
     }
 
@@ -163,7 +174,7 @@ async function saveConsultation(petId, consultationId, formData) {
       redirect(`/mascotas/${petId}?modulo=consulta-control&vista=nueva&error=formula`);
     }
 
-    const systems = {};
+    const systems: Record<string, ClinicalSystem> = {};
     systemKeys.forEach((key) => {
       const status = text(formData, `sistema_${key}_estado`, 20);
       // No registrar como normal un sistema que el veterinario no evaluó.
@@ -174,7 +185,7 @@ async function saveConsultation(petId, consultationId, formData) {
       };
     });
 
-    const row = {
+    const record = {
       empresa_id: pet.empresa_id,
       mascota_id: pet.id,
       tipo_servicio: serviceType,
@@ -182,11 +193,11 @@ async function saveConsultation(petId, consultationId, formData) {
       medico_veterinario_id: veterinarian.id,
       medico_veterinario_nombre: veterinarian.nombre,
       anamnesis: text(formData, "anamnesis"),
-      tipo_alimento: foodTypes.has(foodType) ? foodType : null,
+      tipo_alimento: foodTypes.has(foodType || "") ? foodType : null,
       tipo_alimento_otro: foodType === "Otro" ? text(formData, "tipo_alimento_otro", 500) : null,
       racion: text(formData, "racion", 2000),
       orina: text(formData, "orina", 2000),
-      heces: stoolTypes.has(stoolType) ? stoolType : null,
+      heces: stoolTypes.has(stoolType || "") ? stoolType : null,
       heces_otro: stoolType === "Otro" ? text(formData, "heces_otro", 500) : null,
       frecuencia_cardiaca: number(formData, "frecuencia_cardiaca", true),
       frecuencia_respiratoria: number(formData, "frecuencia_respiratoria", true),
@@ -219,12 +230,13 @@ async function saveConsultation(petId, consultationId, formData) {
       medico_registra_nombre: actor.nombre
     };
 
-    if (consultationId) {
-      // La autoría de creación se conserva; updated_at se actualiza mediante trigger de BD.
-      delete row.registrada_por;
-      delete row.medico_registra_nombre;
-      row.ultima_edicion_por = actor.id;
-    }
+    // Al editar, nunca sobrescribir la autoría original.
+    const row = consultationId
+      ? (() => {
+        const { registrada_por: _originalAuthor, medico_registra_nombre: _originalVet, ...editable } = record;
+        return { ...editable, ultima_edicion_por: actor.id };
+      })()
+      : record;
     let { error } = consultationId
       ? await admin.from("consultas_controles").update(row).eq("id", consultationId)
           .eq("empresa_id", pet.empresa_id).eq("mascota_id", pet.id)
@@ -239,16 +251,11 @@ async function saveConsultation(petId, consultationId, formData) {
         redirect(`/mascotas/${petId}?modulo=consulta-control&vista=nueva&error=actualizar_bd`);
       }
 
-      const legacyRow = { ...row };
-      [
-        "procedimientos_habilitados",
-        "area_consulta",
-        "tipos_procedimiento",
-        "valor_total_servicio",
-        "observaciones_procedimiento",
-        "formula_descripcion",
-        "formula_medicamentos"
-      ].forEach((key) => delete legacyRow[key]);
+      const unsupportedFields = new Set([
+        "procedimientos_habilitados", "area_consulta", "tipos_procedimiento",
+        "valor_total_servicio", "observaciones_procedimiento", "formula_descripcion", "formula_medicamentos"
+      ]);
+      const legacyRow = Object.fromEntries(Object.entries(record).filter(([key]) => !unsupportedFields.has(key)));
       ({ error } = await admin.from("consultas_controles").insert(legacyRow));
     }
 
@@ -256,11 +263,12 @@ async function saveConsultation(petId, consultationId, formData) {
 
     revalidatePath(`/mascotas/${petId}`);
     redirect(`/mascotas/${petId}?modulo=consulta-control&ok=${consultationId ? "consulta_actualizada" : "consulta_creada"}`);
-  } catch (error) {
-    if (error?.digest?.startsWith("NEXT_REDIRECT")) throw error;
+  } catch (error: unknown) {
+    const info = isRecord(error) ? error : {};
+    if (typeof info.digest === "string" && info.digest.startsWith("NEXT_REDIRECT")) throw error;
     console.error("No fue posible crear la consulta clínica", {
-      code: error?.code,
-      message: error?.message
+      code: typeof info.code === "string" ? info.code : undefined,
+      message: typeof info.message === "string" ? info.message : undefined
     });
     redirect(`/mascotas/${petId}?modulo=consulta-control&error=guardar`);
   }

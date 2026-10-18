@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -19,10 +18,11 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export async function importPets(formData) {
+export async function importPets(formData: FormData) {
   const actor = await requireProfile(["super_admin"]);
   const companyId = String(formData.get("empresa_id") || "");
   const file = formData.get("archivo");
+  if (!(file instanceof File)) redirect("/mascotas?error=archivo");
   if (!uuidPattern.test(companyId)) redirect("/mascotas?error=empresa");
 
   try {
@@ -31,11 +31,11 @@ export async function importPets(formData) {
     const { data: company } = await admin.from("empresas").select("id").eq("id", companyId).eq("activa", true).maybeSingle();
     if (!company) redirect("/mascotas?error=empresa");
 
-    const existing = await fetchAll((from, to) =>
+    const existing = await fetchAll<{ numero_carnet: string | null }>((from, to) =>
       admin.from("mascotas").select("numero_carnet").eq("empresa_id", companyId).range(from, to)
     );
     const existingCarnets = new Set(existing.map((row) => String(row.numero_carnet || "").trim().toLowerCase()).filter(Boolean));
-    const fileCarnets = new Set();
+    const fileCarnets = new Set<string>();
     const rows = [];
     let duplicateCarnets = 0;
     let skippedExisting = 0;
@@ -99,8 +99,8 @@ export async function importPets(formData) {
     revalidatePath("/mascotas");
     const omitted = skippedExisting + skippedWithoutName;
     redirect(`/mascotas?ok=importado&importados=${rows.length}&omitidos=${omitted}`);
-  } catch (error) {
-    if (error?.digest?.startsWith("NEXT_REDIRECT")) throw error;
+  } catch (error: unknown) {
+    if (error && typeof error === "object" && "digest" in error && typeof error.digest === "string" && error.digest.startsWith("NEXT_REDIRECT")) throw error;
     redirect("/mascotas?error=archivo");
   }
 }

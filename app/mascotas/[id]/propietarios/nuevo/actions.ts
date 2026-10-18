@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -10,15 +9,15 @@ import { sedes } from "@/lib/verticals/pets/pet-catalogs";
 
 const validUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-function read(formData, key, max = 240) {
+function read(formData: FormData, key: string, max = 240): string {
   return String(formData.get(key) || "").trim().slice(0, max);
 }
 
-function fail(petId, code) {
+function fail(petId: string, code: string): never {
   redirect(`/mascotas/${petId}/propietarios/nuevo?error=${encodeURIComponent(code)}`);
 }
 
-export async function addOwnerToPet(petId, formData) {
+export async function addOwnerToPet(petId: string, formData: FormData) {
   const profile = await requireOperationalProfile();
   if (!validUuid.test(petId || "")) redirect("/mascotas");
 

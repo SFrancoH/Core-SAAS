@@ -1,15 +1,14 @@
-// @ts-nocheck — compatibilidad PETS: tipado estricto de este archivo pendiente.
 "use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireProfile } from "@/lib/core/auth";
+import { requireProfile, type CoreProfile } from "@/lib/core/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export async function createVeterinarian(formData) {
+export async function createVeterinarian(formData: FormData) {
   const actor = await requireProfile(["empresa_admin"]);
   const nombre = String(formData.get("nombre") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
@@ -48,7 +47,7 @@ export async function createVeterinarian(formData) {
   redirect("/empresa?ok=usuario_creado");
 }
 
-async function getManagedVeterinarian(actor, userId) {
+async function getManagedVeterinarian(actor: CoreProfile, userId: string) {
   if (!uuidPattern.test(userId)) return null;
   const admin = getSupabaseAdmin();
   const { data } = await admin
@@ -61,7 +60,7 @@ async function getManagedVeterinarian(actor, userId) {
   return data;
 }
 
-export async function resetVeterinarianPassword(formData) {
+export async function resetVeterinarianPassword(formData: FormData) {
   const actor = await requireProfile(["empresa_admin"]);
   const userId = String(formData.get("usuario_id") || "");
   const password = String(formData.get("password") || "");
@@ -77,7 +76,7 @@ export async function resetVeterinarianPassword(formData) {
   redirect("/empresa?ok=password");
 }
 
-export async function setVeterinarianStatus(formData) {
+export async function setVeterinarianStatus(formData: FormData) {
   const actor = await requireProfile(["empresa_admin"]);
   const userId = String(formData.get("usuario_id") || "");
   const activo = String(formData.get("activo")) === "true";

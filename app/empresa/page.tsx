@@ -1,4 +1,4 @@
-// @ts-nocheck — compatibilidad PETS: tipado estricto de este archivo pendiente.
+import { redirect } from "next/navigation";
 import DashboardHeader from "@/components/dashboard-header";
 import PasswordField from "@/components/password-field";
 import { requireProfile } from "@/lib/core/auth";
@@ -9,15 +9,18 @@ import {
   setVeterinarianStatus
 } from "./actions";
 
-const successMessages = {
+const successMessages: Record<string, string> = {
   usuario_creado: "Veterinario creado correctamente.",
   password: "La contraseña fue reemplazada.",
   estado: "El estado del usuario fue actualizado."
 };
 
-export default async function CompanyPage({ searchParams }) {
+type Query = { ok?: string; error?: string };
+type CompanyUser = { id: string; nombre: string; email: string; rol: string; activo: boolean };
+export default async function CompanyPage({ searchParams }: { searchParams: Promise<Query> }) {
   const profile = await requireProfile(["empresa_admin", "veterinario"]);
   const supabase = await createSupabaseServerClient();
+  if (!profile.empresa_id) redirect("/login?error=sin_acceso");
   const params = await searchParams;
 
   const [{ data: company }, { count: petCount }, { count: userCount }, { count: ownerCount }, usersResult] =
@@ -44,7 +47,7 @@ export default async function CompanyPage({ searchParams }) {
         : Promise.resolve({ data: [] })
     ]);
 
-  const users = usersResult.data || [];
+  const users = (usersResult.data || []) as CompanyUser[];
 
   return (
     <main className="dashboardShell">

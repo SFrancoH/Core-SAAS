@@ -1,15 +1,28 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import ConsultationControlPanel from "@/components/consultation-control-panel";
+import ConsultationControlPanel, { type ClinicalConsultation } from "@/components/consultation-control-panel";
 import DashboardHeader from "@/components/dashboard-header";
 import PetEditForm from "@/components/pet-edit-form";
 import { mostrarSede } from "@/lib/verticals/pets/sede-display";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { formatDate, requireOperationalProfile } from "@/lib/verticals/pets/operational";
 
-export default async function PetDetailPage({ params, searchParams }) {
+type PetDetailParams = {
+  historial?: string; pagina?: string; desde?: string; hasta?: string;
+  modulo?: string; vista?: string; ok?: string; error?: string;
+  editar?: string; error_perfil?: string; perfil_actualizado?: string;
+  propietario?: string;
+};
+type OwnerContact = { id: string; nombre: string; telefono?: string | null;
+  whatsapp?: string | null; email?: string | null; numero_documento?: string | null };
+type HistoryEvent = { id: string; modulo: string; consulta_id: string | null;
+  fecha_registro: string; resumen?: string | null };
+type ConsultationRecord = ClinicalConsultation;
+type Veterinarian = { id: string; nombre: string; rol: string; empresa_id: string | null };
+export default async function PetDetailPage({ params, searchParams }: {
+  params: Promise<{ id: string }>; searchParams: Promise<PetDetailParams>
+}) {
   const profile = await requireOperationalProfile();
   const { id } = await params;
   const queryParams = await searchParams;
@@ -29,8 +42,8 @@ export default async function PetDetailPage({ params, searchParams }) {
   const historyOpen = queryParams?.historial === "1";
   const historyPage = Math.max(1, Number.parseInt(queryParams?.pagina || "1", 10) || 1);
   const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-  const historyFrom = datePattern.test(queryParams?.desde || "") ? queryParams.desde : "";
-  const historyTo = datePattern.test(queryParams?.hasta || "") ? queryParams.hasta : "";
+  const historyFrom = datePattern.test(queryParams?.desde || "") ? queryParams.desde ?? "" : "";
+  const historyTo = datePattern.test(queryParams?.hasta || "") ? queryParams.hasta ?? "" : "";
   // Una consulta como máximo para la pestaña de consulta y control.
   const recentConsultationQuery = admin.from("consultas_controles")
     .select("*").eq("empresa_id", pet.empresa_id).eq("mascota_id", pet.id)
@@ -54,17 +67,17 @@ export default async function PetDetailPage({ params, searchParams }) {
           .range(offset, offset + pageLimit - 1)
       : Promise.resolve({ data: [], count: 0, error: null })
   ]);
-  const loadedEvents = eventsResult.data || [];
-  const consultationIds = [...new Set(loadedEvents.map((event) => event.consulta_id).filter(Boolean))];
+  const loadedEvents = (eventsResult.data || []) as HistoryEvent[];
+  const consultationIds = [...new Set(loadedEvents.map((event) => event.consulta_id).filter((id): id is string => id !== null))];
   const relatedResult = consultationIds.length
     ? await admin.from("consultas_controles").select("*").eq("empresa_id", pet.empresa_id)
         .eq("mascota_id", pet.id).in("id", consultationIds)
     : { data: [], error: null };
-  const consultationsById = new Map((relatedResult.data || []).map((item) => [item.id, item]));
+  const consultationsById = new Map<string, ConsultationRecord>(((relatedResult.data || []) as ConsultationRecord[]).map((item) => [item.id, item]));
   const historyEntries = loadedEvents.map((event) => ({
-    ...event, consulta: consultationsById.get(event.consulta_id) || null
+    ...event, consulta: event.consulta_id ? consultationsById.get(event.consulta_id) || null : null
   }));
-  const veterinarians = [...(veterinariansResult.data || [])];
+  const veterinarians = [...(veterinariansResult.data || [])] as Veterinarian[];
   if (profile.rol === "super_admin" && !veterinarians.some((vet) => vet.id === profile.id)) {
     veterinarians.unshift({
       id: profile.id,
@@ -75,7 +88,8 @@ export default async function PetDetailPage({ params, searchParams }) {
   }
   const historyAvailable = !consultationsResult.error;
   const consultations = consultationsResult.data || [];
-  const owners = (pet.propietarios_mascotas || []).map((relation) => relation.propietarios).filter(Boolean);
+  const owners = ((pet.propietarios_mascotas || []) as Array<{ propietarios: OwnerContact | null }>)
+    .map((relation) => relation.propietarios).filter((owner): owner is OwnerContact => owner !== null);
   const details = [
     ["Número de carnet", pet.numero_carnet],
     ["Especie", pet.especie],

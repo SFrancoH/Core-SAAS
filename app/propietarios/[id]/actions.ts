@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 "use server";
 
 import { redirect } from "next/navigation";
@@ -8,9 +7,9 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { sedes } from "@/lib/verticals/pets/pet-catalogs";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i;
-const value = (data, key, max = 500) => String(data.get(key) || "").trim().slice(0, max);
+const value = (data: FormData, key: string, max = 500): string => String(data.get(key) || "").trim().slice(0, max);
 
-export async function updateOwnerProfile(ownerId, formData) {
+export async function updateOwnerProfile(ownerId: string, formData: FormData) {
   const actor = await requireOperationalProfile();
   if (!uuidPattern.test(ownerId)) redirect("/propietarios");
   const admin = getSupabaseAdmin();
@@ -45,8 +44,9 @@ export async function updateOwnerProfile(ownerId, formData) {
     if (error) throw error;
     revalidatePath(`/propietarios/${ownerId}`);
     revalidatePath("/propietarios");
-  } catch (error) {
-    console.error("No se actualizó el propietario", { code: error?.code, message: error?.message });
+  } catch (error: unknown) {
+    const info = error && typeof error === "object" ? error as { code?: string; message?: string } : {};
+    console.error("No se actualizó el propietario", { code: info.code, message: info.message });
     fail();
   }
   redirect(`/propietarios/${ownerId}?perfil_actualizado=1`);

@@ -1,4 +1,3 @@
-// @ts-nocheck — pendiente tipar lógica heredada PETS.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -8,7 +7,11 @@ import { mostrarSede } from "@/lib/verticals/pets/sede-display";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 
-export default async function OwnerDetailPage({ params, searchParams }) {
+type OwnerDetailsProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ editar?: string; error_perfil?: string; perfil_actualizado?: string }>;
+};
+export default async function OwnerDetailPage({ params, searchParams }: OwnerDetailsProps) {
   const urlParams = await searchParams;
   const profile = await requireOperationalProfile();
   const { id } = await params;
@@ -25,7 +28,10 @@ export default async function OwnerDetailPage({ params, searchParams }) {
   }
   if (!owner) notFound();
 
-  const pets = (owner.propietarios_mascotas || []).map((relation) => relation.mascotas).filter(Boolean);
+  type PetAssociation = { id: string; nombre: string; raza?: string | null; especie?: string | null; numero_carnet?: string | null };
+  const pets: PetAssociation[] = (owner.propietarios_mascotas || [])
+    .map((relation: { mascotas: PetAssociation | null }) => relation.mascotas)
+    .filter((pet: PetAssociation | null): pet is PetAssociation => pet !== null);
   const details = [
     ["Ciudad", owner.ciudad], ["Dirección", owner.direccion], ["Teléfono", owner.telefono],
     ["WhatsApp", owner.whatsapp], ["Email", owner.email], ["Tipo de documento", owner.tipo_documento],
