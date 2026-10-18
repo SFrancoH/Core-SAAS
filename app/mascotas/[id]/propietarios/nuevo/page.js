@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import DashboardHeader from "@/components/dashboard-header";
 import OwnerRegistrationFields from "@/components/owner-registration-fields";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { mostrarSede } from "@/lib/sede-display";
-import { requireOperationalProfile } from "@/lib/operational";
+import { mostrarSede } from "@/lib/verticals/pets/sede-display";
+import { requireOperationalProfile } from "@/lib/verticals/pets/operational";
 import { addOwnerToPet } from "./actions";
 
 const errors = {

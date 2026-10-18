@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { requireProfile } from "@/lib/auth";
+import { requireProfile } from "@/lib/core/auth";
 
 export default async function PanelPage() {
   const profile = await requireProfile();

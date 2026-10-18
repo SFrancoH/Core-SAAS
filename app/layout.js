@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "PETS",
+  title: "Core SaaS | PETS",
   description: "Administración segura de empresas, usuarios y mascotas"
 };
 

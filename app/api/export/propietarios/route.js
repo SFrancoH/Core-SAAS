@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getCurrentProfile } from "@/lib/auth";
+import { getCurrentProfile } from "@/lib/core/auth";
 import { createExcelFile } from "@/lib/excel-export";
 import { fetchAll } from "@/lib/excel-import";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";

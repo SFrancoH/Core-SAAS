@@ -8,9 +8,9 @@ import {
   applyCompanyScope,
   requireOperationalProfile,
   sanitizeSearch
-} from "@/lib/operational";
+} from "@/lib/verticals/pets/operational";
 import { importOwners } from "./actions";
-import { mostrarSede } from "@/lib/sede-display";
+import { mostrarSede } from "@/lib/verticals/pets/sede-display";
 
 export const maxDuration = 60;
 

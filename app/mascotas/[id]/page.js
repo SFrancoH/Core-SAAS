@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 import ConsultationControlPanel from "@/components/consultation-control-panel";
 import DashboardHeader from "@/components/dashboard-header";
 import PetEditForm from "@/components/pet-edit-form";
-import { mostrarSede } from "@/lib/sede-display";
+import { mostrarSede } from "@/lib/verticals/pets/sede-display";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { formatDate, requireOperationalProfile } from "@/lib/operational";
+import { formatDate, requireOperationalProfile } from "@/lib/verticals/pets/operational";
 
 export default async function PetDetailPage({ params, searchParams }) {
   const profile = await requireOperationalProfile();

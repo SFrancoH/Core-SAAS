@@ -1,6 +1,6 @@
 import {
   sedes, especies, razas, temperamentos, estadosReproductivos, tamanos, estadosMascota
-} from "@/lib/pet-catalogs";
+} from "@/lib/verticals/pets/pet-catalogs";
 import { updatePetProfile } from "@/app/mascotas/[id]/profile-actions";
 
 function Choice({ label, name, current, values, required = false }) {

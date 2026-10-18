@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import PasswordField from "@/components/password-field";
-import { getCurrentProfile } from "@/lib/auth";
+import { getCurrentProfile } from "@/lib/core/auth";
 import { login } from "./actions";
 
 const messages = {

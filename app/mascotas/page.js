@@ -9,9 +9,9 @@ import {
   formatDate,
   requireOperationalProfile,
   sanitizeSearch
-} from "@/lib/operational";
+} from "@/lib/verticals/pets/operational";
 import { importPets } from "./actions";
-import { mostrarSede } from "@/lib/sede-display";
+import { mostrarSede } from "@/lib/verticals/pets/sede-display";
 
 export const maxDuration = 60;
 

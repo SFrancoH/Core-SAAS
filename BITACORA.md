@@ -32,3 +32,13 @@ PR/commit/deployment:
 Riesgos y siguiente acción:
 ```
 No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en esta bitácora.
+
+## 2026-10-17 — Núcleo de código y separación PETS
+- **Estado:** IMPLEMENTADO EN CÓDIGO de rama; migración DB no aplicada.
+- **Objetivo:** mantener rutas existentes PETS y convertir su autenticación, permisos operativos y catálogos en módulos dentro de Core SaaS.
+- **Cambios:** `lib/core/auth.js`, `lib/core/access.mjs`, `lib/core/permissions.mjs`, `lib/core/authorization.js`; `lib/verticals/pets/*`; adaptadores compatibles en `lib/auth.js`, `lib/operational.js`, catálogos anteriores; parser global `lib/integrations/ghl-payload.mjs`, adoptado en la integración de contactos PETS; pantallas con imports actualizados.
+- **Contratos:** roles históricos de PETS conservados; API de nuevos módulos usa `core_autorizar_operacion` con permiso, empresa y licencia. Si no existe la RPC/entitlement se deniega; no añadir verificaciones de licencia a todas las rutas antiguas antes de instalar/probar SQL.
+- **SQL:** `supabase/migrations/010_core_access.sql` **redactado, no ejecutado**; `supabase/design/PREFLIGHT_CORE.sql` preparado.
+- **Pruebas:** `node --test` de 7 escenarios puros de scopes/parsing reproducidos localmente; todavía falta `npm ci`, `npm run build`, pruebas de DB y E2E sobre el repositorio.
+- **Operación:** ninguna conexión a Supabase, ningún cambio de variables, deployment ni despliegue afirmado.
+- **Pendiente:** ejecutar preflight en Supabase Core, ensayar SQL 010 en entorno de prueba y completar autorización de nuevas rutas; luego PULSE crear proyecto.
