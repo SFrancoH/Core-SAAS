@@ -153,3 +153,11 @@ Leer reglas → identificar vertical/entidad → definir contrato, permisos/lice
 - [ ] C16: retirar dependencia única `public.usuarios.empresa_id` en auth/queries/RPC legacy; estabilizar roles Core multiempresa.
 - [ ] INVENTORY I0: acordar semaforización, unidades, proveedores, stock negativo y requisitos regulatorios; el módulo NO se desarrolla aún.
 - [ ] Activar producción solo tras E2E y verificación de regresiones. El bundle único STAGING NO equivale al cierre C14/C15/C16.
+
+## 2026-10-19 — Entregables para la rama permanente desarrollo
+
+1. **Licencias Core (código listo, BD pendiente):** instalar SQL 014 después del despliegue de 010–013 y probar propietario global, suspensión, vencimiento y auditoría.
+2. **PULSE esquema (DDL listo, BD pendiente):** revisar preflight, ejecutar manualmente SQL 015 sobre Core staging, validar FKs y RLS. No correr sobre la base PULSE actual.
+3. **PULSE operativo (pendiente):** adaptar API, pantallas, transacciones y webhooks desde su repositorio original de forma incremental. No ofrecer la vertical hasta completar pruebas.
+4. **PETS multiempresa (pendiente):** completar C14–C16 de escrituras y RLS legacy. Estructura TypeScript/core existente no significa migración clínica integral.
+5. **Workflow:** único origen `desarrollo`, CI en PR contra `main`, pruebas PowerShell, promoción supervisada y sincronización de la misma rama.

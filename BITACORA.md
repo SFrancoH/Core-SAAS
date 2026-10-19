@@ -124,3 +124,11 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **Frontend/API:** rutas bajo /portal/empresa/[id] para crear sedes y consultar historial clínico filtrado por sedes, además de endpoints Excel que validan actor+empresa+licencia+permiso y filtran `empresa_id`. Flag multiempresa PETS desactivado por defecto, sin reemplazar rutas legacy.
 - **INVENTORY:** `docs/modules/INVENTORY_PLAN.md` documenta el alcance aportado y aclara decisiones de modelo por sede/bodega, lotes, proveedores N:M, FEFO/FIFO, stock físico negativo, caducidad, JIT, transacciones y roadmap I0–I9. NO existen tablas, UI ni stock de Inventario implementados.
 - **Pendiente crítico:** C14–C16 todavía requieren adaptación de pantallas y escrituras antiguas, eliminación de FK a `public.usuarios` cuando corresponda y pruebas reales de aislamiento. No es correcto decir «solo falta ejecutar Supabase» para producción.
+
+## 2026-10-19 · Desarrollo único: licencias Core y DDL inicial PULSE
+
+- **IMPLEMENTADO EN CÓDIGO (rama desarrollo):** pantalla del propietario en `/super-admin/empresas/[id]/licencias`, acción validada en servidor, RPC SQL 014 que audita cambios de entitlement; helper TypeScript para estados PULSE, formato de números y disponibilidad Oficina.
+- **DDL VERSIONADO, BD NO APLICADA:** `014_core_license_admin.sql` y `015_pulse_core_schema.sql`; nueve tablas nuevas bajo `pulse` con UUID/FK compuestas y RLS cerrada. Preflight/postcheck manual.
+- **NO IMPLEMENTADO:** interfaces/endpoints PULSE; reservas transaccionales, integración WhatsApp y migración histórica; PETS legacy aún requiere C14–C16 para escrituras multiempresa.
+- **NO VERIFICADO:** SQL real, JWT RLS, integración con Supabase, E2E; la CI puede validar pruebas estáticas/TypeScript, no sustituye Supabase staging.
+- **Ramas:** `main` estable; `desarrollo` única rama de trabajo futura. Las ramas viejas se retirarán después de verificar que no tienen trabajo no incorporado.
