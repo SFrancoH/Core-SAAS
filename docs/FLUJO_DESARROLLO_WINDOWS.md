@@ -7,7 +7,7 @@
 Desde `PS E:\\SOY SEBASTIAN FRANCO\\Desarrollo\\CORE-SAAS>`, si la carpeta está **vacía y no contiene .git**, ejecutar:
 
 ```powershell
-git clone --branch desarrollo --single-branch https://github.com/SFrancoH/Core-SAAS.git .
+git clone --branch desarrollo https://github.com/SFrancoH/Core-SAAS.git .
 npm ci
 npm test
 npm run typecheck
@@ -20,7 +20,7 @@ Si la carpeta **ya es repositorio Git**, NO ejecutar `git clone .` ni borrar arc
 ```powershell
 git status
 git remote -v
-git fetch origin desarrollo main
+git fetch origin
 git switch --track origin/desarrollo
 git pull --ff-only
 npm ci
@@ -47,7 +47,7 @@ npm run build
 Después de que pasen pruebas locales **y** SQL/JWT/RLS en Supabase Core de pruebas:
 
 1. Revisar la PR abierta `desarrollo → main` (GitHub ejecuta CI).
-2. Fusionar la PR solo si PETS sigue funcionando y no hay accesos cruzados entre empresas.
+2. Fusionar la PR solo si PETS sigue funcionando y no hay accesos cruzados entre empresas. Elegir 'Create a merge commit' (no 'Squash') para poder sincronizar desarrollo con --ff-only.
 3. Sincronizar la rama de trabajo con main sin crear una tercera rama:
 
 ```powershell
@@ -61,7 +61,7 @@ Si `git merge --ff-only` falla porque hubo commits nuevos en ambas ramas, detene
 
 ## Ramas antiguas
 
-Al comienzo del trabajo había once ramas históricas. Las ramas anteriores no son necesarias para el flujo cotidiano y se pueden borrar **tras confirmar que sus PR están integradas y no contienen trabajo exclusivo**. GitHub conserva los commits de los PR fusionados. Ninguna rama se elimina automáticamente en la creación de `desarrollo`.
+La PR #1 a #10 están fusionadas. Nueve ramas antiguas conservan exactamente el SHA de su PR fusionada y pueden borrarse. La rama `feat/core-identity-multitenant-access` avanzó dos commits después de la PR #6: revisarla ANTES de borrarla. Para borrar las ramas antiguas en GitHub debes usar PowerShell con `git push origin --delete NOMBRE_RAMA` o la interfaz web. Ningún commit de este repositorio elimina ramas remotas. Los PR fusionados conservan su historial.
 
 ## Supabase
 
