@@ -8,7 +8,7 @@ permissions:
   contents: write
 jobs:
   cleanup:
-    if: github.event.head_commit.message == 'chore(git): execute one-time historic branch cleanup'
+    if: "${{ github.event.head_commit.message == 'chore(git): execute one-time historic branch cleanup' }}"
     runs-on: ubuntu-latest
     steps:
       - name: Verify merged PRs, preserve extra commits, delete old branches
