@@ -132,3 +132,9 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **NO IMPLEMENTADO:** interfaces/endpoints PULSE; reservas transaccionales, integración WhatsApp y migración histórica; PETS legacy aún requiere C14–C16 para escrituras multiempresa.
 - **NO VERIFICADO:** SQL real, JWT RLS, integración con Supabase, E2E; la CI puede validar pruebas estáticas/TypeScript, no sustituye Supabase staging.
 - **Ramas:** `main` estable; `desarrollo` única rama de trabajo futura. Las ramas viejas se retirarán después de verificar que no tienen trabajo no incorporado.
+ 
+## 2026-10-19 · Hotfix SQL 013 — cadena sin cerrar
+- **Causa verificada**: `if v_code !~ '^[A-Z0-9_-]{2,32}` estaba truncado; debe ser `if v_code !~ '^[A-Z0-9_-]{2,32}$'`.
+- **Corregido en la rama `desarrollo`**: `supabase/migrations/013_core_sedes.sql`, el paquete combinado `supabase/deploy/CORE_UNA_EJECUCION_STAGING.sql` y prueba estática que impide regresar al error 42601.
+- **Despliegue**: 001–012 ejecutados manualmente por el usuario sin errores; 013 falló durante el análisis SQL. Ejecutar solo 013 corregido desde una sesión nueva tras comprobar que no quedaron cambios parciales; **no ejecutar paquete combinado ni repetir 001–012**.
+- **Estado**: no se ha confirmado ejecución exitosa de 013 en Supabase ni validación de RLS con JWT.

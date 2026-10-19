@@ -1421,7 +1421,121 @@ declare v_id uuid; v_code text; v_name text; v_owner boolean;
 begin
  v_code:=upper(btrim(coalesce(p_codigo,'')));
  v_name:=btrim(coalesce(p_nombre,''));
- if v_code !~ '^[A-Z0-9_-]{2,32}
+ if v_code !~ '^[A-Z0-9_-]{2,32} or char_length(v_name) not between 2 and 120
+    or p_actor_id is null or p_empresa_id is null then
+  raise exception 'DATOS_SEDE_INVALIDOS' using errcode='22023';
+ end if;
+ select exists(
+  select 1 from core.platform_staff st join core.accounts a on a.user_id=st.user_id
+  where st.user_id=p_actor_id and st.role='super_admin' and st.active and a.active
+ ) into v_owner;
+ if not exists(select 1 from public.empresas e where e.id=p_empresa_id and e.activa)
+   or (
+    not v_owner and not exists(
+     select 1 from core.memberships m join core.accounts a on a.user_id=m.user_id
+     where m.user_id=p_actor_id and m.empresa_id=p_empresa_id
+       and m.status='active' and m.company_role='admin' and a.active
+       and core.effective_permission(p_actor_id,p_empresa_id,'core.members.manage')
+    )
+   ) then raise exception 'SIN_PERMISO_PARA_CREAR_SEDE' using errcode='42501'; end if;
+ insert into core.sedes(empresa_id,codigo,nombre,created_by)
+ values(p_empresa_id,v_code,v_name,p_actor_id)
+ returning id into v_id;
+ insert into core.audit_events(empresa_id,actor_id,event_type,resource_id,metadata)
+ values(p_empresa_id,p_actor_id,'core.sede.created',v_id::text,
+ jsonb_build_object('code',v_code,'name',v_name));
+ return v_id;
+end;
+$$;
+revoke all on function public.core_crear_sede(uuid,uuid,text,text)
+ from public,anon,authenticated;
+grant execute on function public.core_crear_sede(uuid,uuid,text,text) to service_role;
+
+
+-- El alcance del usuario distingue 'todas las sedes de su empresa'
+-- de permisos restringidos a un subconjunto. Necesario para filtrar
+-- historias clínicas sin permitir que el valor 'Todas' salte los grants.
+create or replace function public.core_contexto_sedes(
+ p_actor_id uuid,p_empresa_id uuid,p_permiso text
+) returns jsonb language sql stable security definer set search_path=''
+as $$
+select case when core.effective_permission(p_actor_id,p_empresa_id,p_permiso)
+then jsonb_build_object(
+ 'todas',(
+  exists (
+   select 1 from core.platform_staff st join core.accounts a on a.user_id=st.user_id
+   where st.user_id=p_actor_id and st.role='super_admin' and st.active and a.active
+  )
+  or exists (
+   select 1 from core.memberships m where m.user_id=p_actor_id
+    and m.empresa_id=p_empresa_id and m.status='active' and m.sede_scope='all'
+  )
+  or exists (
+   select 1 from core.platform_permission_grants gp
+   join core.platform_staff st on st.user_id=gp.staff_user_id and st.active
+   where gp.staff_user_id=p_actor_id and gp.empresa_id=p_empresa_id
+    and gp.permission_code=p_permiso and st.role='super_user'
+  )
+ ),
+ 'sedes',coalesce((
+  select jsonb_agg(jsonb_build_object('id',s.id,'nombre',s.nombre,'codigo',s.codigo)
+      order by s.nombre)
+   from core.sedes s where s.empresa_id=p_empresa_id and s.activa
+    and core.site_allowed(p_actor_id,p_empresa_id,s.id,p_permiso)
+ ),'[]'::jsonb))
+else jsonb_build_object('todas',false,'sedes','[]'::jsonb) end;
+$$;
+revoke all on function public.core_contexto_sedes(uuid,uuid,text)
+ from public,anon,authenticated;
+grant execute on function public.core_contexto_sedes(uuid,uuid,text) to service_role;
+
+-- fin de 013_core_sedes.sql: transacción global
+
+
+-- Auditoría de bundle atómica con el resto de la migración:
+create table if not exists core.migration_bundle_runs(
+ bundle_code text primary key,
+ installed_at timestamptz not null default now(),
+ description text not null
+);
+alter table core.migration_bundle_runs enable row level security;
+revoke all on core.migration_bundle_runs from public,anon,authenticated;
+grant select,insert on core.migration_bundle_runs to service_role;
+
+do $verify$
+declare n_legacy bigint; n_mapped bigint;
+begin
+ if to_regclass('core.sedes') is null
+ or to_regclass('core.membership_sedes') is null
+ or to_regprocedure('public.core_pets_tenant_access(uuid,uuid,text)') is null
+ or to_regprocedure('public.core_contexto_sedes(uuid,uuid,text)') is null
+ or to_regprocedure('public.core_crear_sede(uuid,uuid,text,text)') is null then
+  raise exception 'POSTCHECK_FALLO: RPCs o tablas Core incompletas';
+ end if;
+ select count(*) into n_legacy from public.usuarios where empresa_id is not null;
+ select count(*) into n_mapped from public.usuarios u
+ join core.memberships m on m.user_id=u.id and m.empresa_id=u.empresa_id
+ where u.empresa_id is not null;
+ if n_legacy<>n_mapped then
+  raise exception 'POSTCHECK_MEMBERSHIPS % de %',n_mapped,n_legacy;
+ end if;
+ if exists(select 1 from public.mascotas m join core.sedes s on s.id=m.sede_origen_id
+  where m.empresa_id<>s.empresa_id)
+ or exists(select 1 from public.propietarios p join core.sedes s on s.id=p.sede_origen_id
+  where p.empresa_id<>s.empresa_id) then
+  raise exception 'POSTCHECK_CROSS_TENANT_SEDE';
+ end if;
+ insert into core.migration_bundle_runs(bundle_code,description)
+ values('CORE_010_013','Core identidad, permisos, RLS PETS, sedes y mapeo conservador');
+ raise notice 'CORE ESTRUCTURAL OK. Membresías migradas %/%; sedes creadas %',
+ n_mapped,n_legacy,(select count(*) from core.sedes);
+end;
+$verify$;
+commit;
+-- ATENCIÓN: SQL ejecutado ≠ RLS ni aplicación validada.
+-- CORE_PETS_MULTI_TENANT_READ_ENABLED debe continuar desactivado
+-- hasta que la matriz de pruebas JWT/empresa/sede A/B esté aprobada.
+
  or char_length(v_name) not between 2 and 120
     or p_actor_id is null or p_empresa_id is null then
   raise exception 'DATOS_SEDE_INVALIDOS' using errcode='22023';
