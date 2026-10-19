@@ -19,7 +19,7 @@ test("bundle Supabase integra cuatro migraciones en UNA transacción y deniega C
  assert.doesNotMatch(sql,/^as \$(?!\$)/gm);
  assert.doesNotMatch(sql,/^\$;$/gm);
  assert.doesNotMatch(sql,/create table\s+(?:inventory|inventario)\./i);
- assert.match(sql, /if v_code !~ '\^\[A-Z0-9_-\]\{2,32\}\
+ assert.ok(sql.includes("if v_code !~ '^[A-Z0-9_-]{2,32}$'"));
 });
 test("PETS históricos preservan sede de origen sin inventar sede clínica",()=>{
  const sql=read("supabase/migrations/013_core_sedes.sql");
@@ -30,120 +30,7 @@ test("PETS históricos preservan sede de origen sin inventar sede clínica",()=>
  assert.match(sql,/create or replace function core\.site_allowed/);
  assert.match(sql,/create or replace function public\.core_contexto_sedes/);
  assert.match(sql,/create or replace function public\.core_crear_sede/);
- // Regresión 42601: una comilla faltante en regex hacía que SQL ignorara el
- // resto de la función y emitiera 'unterminated quoted string' en auditoría.
- assert.match(sql, /if v_code !~ '\^\[A-Z0-9_-\]\{2,32\}\
- assert.match(sql,/alter table public\.consultas_controles\s+add column if not exists sede_id/);
- assert.match(sql,/upper\(btrim\(coalesce\(m\.fuente/);
- assert.doesNotMatch(sql,/set sede_id\s*=/);
- assert.match(sql,/core\.audit_events/);
-});
-test("lecturas/exportaciones tenant-scope no aceptan empresa desde body sin autorización",()=>{
- const files=[
- "app/api/core/empresas/[id]/pets/export/mascotas/route.ts",
- "app/api/core/empresas/[id]/pets/export/propietarios/route.ts",
- "app/portal/empresa/[id]/pets/mascotas/[petId]/historial/page.tsx"
- ];
- for(const path of files){
-   const source=read(path);
-   assert.match(source,/requirePetTenant\(/,path);
-   assert.match(source,/\.eq\("empresa_id",/,path);
-   assert.match(source,/ensureTenantRows\(/,path);
- }
- const history=read(files[2]);
- assert.match(history,/resolveSedeScope/);
- assert.match(history,/canSelectSede/);
- assert.match(history,/\.in\("sede_id",scope\.sedes/);
-});
-test("especificación Inventory permanece un documento de diseño, no se crea un sub-SaaS por sede",()=>{
- const md=read("docs/modules/INVENTORY_PLAN.md");
- for(const term of ["FEFO","FIFO","JIT","Cuarentena","Bodegas",
- "PULSE","PETS","altillaje","lote","stock","sede","I0","I9","NO"]) {
-   assert.ok(md.toLowerCase().includes(term.toLowerCase()),term);
- }
- assert.match(md,/no se implementan tablas/i);
-});
-/);
- assert.doesNotMatch(sql, /if v_code !~ '\^\[A-Z0-9_-\]\{2,32\}\s*\n/);
-
- assert.match(sql,/alter table public\.consultas_controles\s+add column if not exists sede_id/);
- assert.match(sql,/upper\(btrim\(coalesce\(m\.fuente/);
- assert.doesNotMatch(sql,/set sede_id\s*=/);
- assert.match(sql,/core\.audit_events/);
-});
-test("lecturas/exportaciones tenant-scope no aceptan empresa desde body sin autorización",()=>{
- const files=[
- "app/api/core/empresas/[id]/pets/export/mascotas/route.ts",
- "app/api/core/empresas/[id]/pets/export/propietarios/route.ts",
- "app/portal/empresa/[id]/pets/mascotas/[petId]/historial/page.tsx"
- ];
- for(const path of files){
-   const source=read(path);
-   assert.match(source,/requirePetTenant\(/,path);
-   assert.match(source,/\.eq\("empresa_id",/,path);
-   assert.match(source,/ensureTenantRows\(/,path);
- }
- const history=read(files[2]);
- assert.match(history,/resolveSedeScope/);
- assert.match(history,/canSelectSede/);
- assert.match(history,/\.in\("sede_id",scope\.sedes/);
-});
-test("especificación Inventory permanece un documento de diseño, no se crea un sub-SaaS por sede",()=>{
- const md=read("docs/modules/INVENTORY_PLAN.md");
- for(const term of ["FEFO","FIFO","JIT","Cuarentena","Bodegas",
- "PULSE","PETS","altillaje","lote","stock","sede","I0","I9","NO"]) {
-   assert.ok(md.toLowerCase().includes(term.toLowerCase()),term);
- }
- assert.match(md,/no se implementan tablas/i);
-});
-/);
-
-});
-test("PETS históricos preservan sede de origen sin inventar sede clínica",()=>{
- const sql=read("supabase/migrations/013_core_sedes.sql");
- assert.match(sql,/create table if not exists core\.sedes/);
- assert.doesNotMatch(sql,/^as \$(?!\$)/gm);
- assert.doesNotMatch(sql,/^\$;$/gm);
- assert.match(sql,/create table if not exists core\.membership_sedes/);
- assert.match(sql,/create or replace function core\.site_allowed/);
- assert.match(sql,/create or replace function public\.core_contexto_sedes/);
- assert.match(sql,/create or replace function public\.core_crear_sede/);
- // Regresión 42601: una comilla faltante en regex hacía que SQL ignorara el
- // resto de la función y emitiera 'unterminated quoted string' en auditoría.
- assert.match(sql, /if v_code !~ '\^\[A-Z0-9_-\]\{2,32\}\
- assert.match(sql,/alter table public\.consultas_controles\s+add column if not exists sede_id/);
- assert.match(sql,/upper\(btrim\(coalesce\(m\.fuente/);
- assert.doesNotMatch(sql,/set sede_id\s*=/);
- assert.match(sql,/core\.audit_events/);
-});
-test("lecturas/exportaciones tenant-scope no aceptan empresa desde body sin autorización",()=>{
- const files=[
- "app/api/core/empresas/[id]/pets/export/mascotas/route.ts",
- "app/api/core/empresas/[id]/pets/export/propietarios/route.ts",
- "app/portal/empresa/[id]/pets/mascotas/[petId]/historial/page.tsx"
- ];
- for(const path of files){
-   const source=read(path);
-   assert.match(source,/requirePetTenant\(/,path);
-   assert.match(source,/\.eq\("empresa_id",/,path);
-   assert.match(source,/ensureTenantRows\(/,path);
- }
- const history=read(files[2]);
- assert.match(history,/resolveSedeScope/);
- assert.match(history,/canSelectSede/);
- assert.match(history,/\.in\("sede_id",scope\.sedes/);
-});
-test("especificación Inventory permanece un documento de diseño, no se crea un sub-SaaS por sede",()=>{
- const md=read("docs/modules/INVENTORY_PLAN.md");
- for(const term of ["FEFO","FIFO","JIT","Cuarentena","Bodegas",
- "PULSE","PETS","altillaje","lote","stock","sede","I0","I9","NO"]) {
-   assert.ok(md.toLowerCase().includes(term.toLowerCase()),term);
- }
- assert.match(md,/no se implementan tablas/i);
-});
-/);
- assert.doesNotMatch(sql, /if v_code !~ '\^\[A-Z0-9_-\]\{2,32\}\s*\n/);
-
+ assert.ok(sql.includes("if v_code !~ '^[A-Z0-9_-]{2,32}$'"));
  assert.match(sql,/alter table public\.consultas_controles\s+add column if not exists sede_id/);
  assert.match(sql,/upper\(btrim\(coalesce\(m\.fuente/);
  assert.doesNotMatch(sql,/set sede_id\s*=/);
