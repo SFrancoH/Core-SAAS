@@ -245,7 +245,14 @@ create function pulse.guardar_estado_pago()
 returns trigger language plpgsql security invoker set search_path = ''
 as $fn$
 begin
-  if tg_op='UPDATE' then
+  if tg_op='INSERT' then
+    -- OLD no existe en INSERT: no evaluarlo ni por cortocircuito.
+    if new.estado='Pagado' then
+      new.pagado_en := clock_timestamp();
+    else
+      new.pagado_en := null;
+    end if;
+  else
     if (old.estado in ('Pagado','Abonado') or old.valor_pagado>0)
       and new.estado='Disponible' then
       raise exception 'NO_SE_PUEDE_LIBERAR_BOLETA_CON_PAGO';
@@ -253,13 +260,15 @@ begin
     if old.estado='Pagado' and new.estado<>'Pagado' then
       raise exception 'PAGO_REQUIERE_REVERSO_AUDITADO';
     end if;
-  end if;
-  if new.estado='Pagado' and (tg_op='INSERT' or old.estado is distinct from 'Pagado') then
-    new.pagado_en := clock_timestamp();
-  elsif new.estado<>'Pagado' then
-    new.pagado_en := null;
-  elsif tg_op='UPDATE' then
-    new.pagado_en := old.pagado_en;
+    if new.estado='Pagado' then
+      if old.estado is distinct from 'Pagado' then
+        new.pagado_en := clock_timestamp();
+      else
+        new.pagado_en := old.pagado_en;
+      end if;
+    else
+      new.pagado_en := null;
+    end if;
   end if;
   new.updated_at := clock_timestamp();
   return new;
