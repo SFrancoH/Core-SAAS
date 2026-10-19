@@ -224,7 +224,7 @@ declare v_id uuid; v_code text; v_name text; v_owner boolean;
 begin
  v_code:=upper(btrim(coalesce(p_codigo,'')));
  v_name:=btrim(coalesce(p_nombre,''));
- if v_code !~ '^[A-Z0-9_-]{2,32}
+ if v_code !~ '^[A-Z0-9_-]{2,32}$'
  or char_length(v_name) not between 2 and 120
     or p_actor_id is null or p_empresa_id is null then
   raise exception 'DATOS_SEDE_INVALIDOS' using errcode='22023';

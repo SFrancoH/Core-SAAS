@@ -19,6 +19,7 @@ test("bundle Supabase integra cuatro migraciones en UNA transacción y deniega C
  assert.doesNotMatch(sql,/^as \$(?!\$)/gm);
  assert.doesNotMatch(sql,/^\$;$/gm);
  assert.doesNotMatch(sql,/create table\s+(?:inventory|inventario)\./i);
+ assert.ok(sql.includes("if v_code !~ '^[A-Z0-9_-]{2,32}$'"));
 });
 test("PETS históricos preservan sede de origen sin inventar sede clínica",()=>{
  const sql=read("supabase/migrations/013_core_sedes.sql");
@@ -29,6 +30,7 @@ test("PETS históricos preservan sede de origen sin inventar sede clínica",()=>
  assert.match(sql,/create or replace function core\.site_allowed/);
  assert.match(sql,/create or replace function public\.core_contexto_sedes/);
  assert.match(sql,/create or replace function public\.core_crear_sede/);
+ assert.ok(sql.includes("if v_code !~ '^[A-Z0-9_-]{2,32}$'"));
  assert.match(sql,/alter table public\.consultas_controles\s+add column if not exists sede_id/);
  assert.match(sql,/upper\(btrim\(coalesce\(m\.fuente/);
  assert.doesNotMatch(sql,/set sede_id\s*=/);
