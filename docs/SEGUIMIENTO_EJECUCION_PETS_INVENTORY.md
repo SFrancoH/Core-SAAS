@@ -12,7 +12,7 @@ PENDIENTE = no iniciado; EN ANÁLISIS = definición incompleta; EN DESARROLLO = 
 |---|---|---|
 | 001–012 | **Ejecutadas manualmente sin errores, según usuario** | Preflight/postcheck, backup y aislamiento real |
 | 013_core_sedes.sql | **Ejecutada manualmente sin errores, según usuario** (tras corrección 42601) | Comprobar tablas, RPC, constraints y RLS empresas/sedes; entorno de DB no especificado |
-| 014_core_license_admin.sql | **Ejecutada manualmente, según usuario (2026-10-19); sin postcheck confirmado** | Comprobar firmas, permisos EXECUTE, lectura de licencias y autorización super_admin en entorno seguro |
+| 014_core_license_admin.sql | **Ejecutada según usuario; postcheck de existencia/firma/grants OK (2026-10-19)** | Pendiente prueba funcional de lectura/escritura de licencias y autorización super_admin en entorno seguro |
 | 015_pulse_core_schema.sql | **No confirmada; independiente de PETS** | No afectar PULSE productivo ni ejecutar por inferencia |
 | INVENTORY y diez formularios nuevos | **No existe SQL implementado ni aplicado** | Diseñar nueva migración y pruebas tras E0/E1 |
 
@@ -73,5 +73,7 @@ PENDIENTE = no iniciado; EN ANÁLISIS = definición incompleta; EN DESARROLLO = 
 | 2026-10-19 | Migración 014 | `supabase/migrations/014_core_license_admin.sql` | Usuario informó «ya ejecuté 014_core_license_admin.sql» sin adjuntar salida SQL ni postcheck | SQL EJECUTADO (REPORTE USUARIO), no validado contra DB | Verificar funciones, grants y pruebas de acceso; no confundir con cierre C14–C16 |
 
 | 2026-10-19 | Postcheck 014: existencia y firmas | SQL de inspección informado por usuario | `public.core_company_entitlements(uuid,uuid)` y `public.core_set_product_entitlement(uuid,uuid,text,text,timestamptz)` presentes | FUNCIONES CONFIRMADAS; permisos EXECUTE y comportamiento por rol no informados | Revisar columna estado/permisos, pruebas servicio autorizado y denegación anon/authenticated |
+
+| 2026-10-19 | Postcheck de 014 | SQL Editor de Supabase: consulta de firmas y EXECUTE | `core_company_entitlements(uuid,uuid)` = OK; `core_set_product_entitlement(uuid,uuid,text,text,timestamptz)` = OK; usuario reportó ambas filas | ESTRUCTURA Y GRANTS BÁSICOS VERIFICADOS (REPORTE USUARIO); NO implica pruebas de permisos por actor | Probar acceso super_admin permitido, actor no autorizado rechazado, licencias sin modificar datos productivos |
 
 **Protocolo obligatorio por entrega:** elegir 1 hito; leer fuente/código/migraciones actuales; registrar alcance y contrato; crear cambios TypeScript/SQL versionados en desarrollo; ejecutar `npm ci`, `npm test`, `npm run typecheck`, `npm run build`; verificar DB staging si corresponde; documentar resultado, fecha, entorno, SHA, PR y pruebas en **este archivo, PLAN_DESARROLLO.md y BITACORA.md**. No tocar main hasta los criterios.
