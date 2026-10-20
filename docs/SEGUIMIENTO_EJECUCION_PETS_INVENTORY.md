@@ -72,4 +72,6 @@ PENDIENTE = no iniciado; EN ANÁLISIS = definición incompleta; EN DESARROLLO = 
 
 | 2026-10-19 | Migración 014 | `supabase/migrations/014_core_license_admin.sql` | Usuario informó «ya ejecuté 014_core_license_admin.sql» sin adjuntar salida SQL ni postcheck | SQL EJECUTADO (REPORTE USUARIO), no validado contra DB | Verificar funciones, grants y pruebas de acceso; no confundir con cierre C14–C16 |
 
+| 2026-10-19 | Postcheck 014: existencia y firmas | SQL de inspección informado por usuario | `public.core_company_entitlements(uuid,uuid)` y `public.core_set_product_entitlement(uuid,uuid,text,text,timestamptz)` presentes | FUNCIONES CONFIRMADAS; permisos EXECUTE y comportamiento por rol no informados | Revisar columna estado/permisos, pruebas servicio autorizado y denegación anon/authenticated |
+
 **Protocolo obligatorio por entrega:** elegir 1 hito; leer fuente/código/migraciones actuales; registrar alcance y contrato; crear cambios TypeScript/SQL versionados en desarrollo; ejecutar `npm ci`, `npm test`, `npm run typecheck`, `npm run build`; verificar DB staging si corresponde; documentar resultado, fecha, entorno, SHA, PR y pruebas en **este archivo, PLAN_DESARROLLO.md y BITACORA.md**. No tocar main hasta los criterios.
