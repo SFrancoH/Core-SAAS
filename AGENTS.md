@@ -84,7 +84,7 @@ Actualizar `PLAN_DESARROLLO.md` y `BITACORA.md` en el mismo PR. Estados: DEFINID
 - Nuevas vistas por tenant, historial multi-sede y exportaciones requieren `CORE_PETS_MULTI_TENANT_READ_ENABLED=true` después de validación, OFF por defecto. Las escrituras clínicas C15 y eliminación de dependencia legacy C16 **aún no están migradas**. No permitir que un mensaje de entrega afirme «solo falta SQL» hasta que esos flujos tengan pruebas E2E.
 
 ## C21 — Reglas aprobadas PETS + INVENTORY
-- Estado por hitos, pruebas y decisiones **DEC-001–007** en \`docs/SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md\`; actualizar seguimiento, PLAN_DESARROLLO.md y BITACORA.md con cada avance. No crear nuevas ramas: desarrollo para trabajar, main estable.
+- Estado por hitos, pruebas y decisiones **DEC-001–007** en `docs/SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md`; actualizar seguimiento, PLAN_DESARROLLO.md y BITACORA.md con cada avance. No crear nuevas ramas: desarrollo para trabajar, main estable.
 - Cinco clasificaciones estándar **iniciales** (Producto, Medicamento, Vacuna, Desparasitante, Insumo), ampliables por Super-Admin global. Diferenciar de tags personalizados por empresa y subcategorías propias de Producto. Nunca cerrar categorías en enum rígido que impida crecer.
 - SKU **único por empresa**, compartido entre sedes. Existencias por sede/bodega/ubicación provienen del ledger, nunca contador independiente editable.
 - Compras y ventas NO actualizan stock automáticamente por ahora; entradas, salidas y ajustes se hacen con movimiento MANUAL autorizado/auditado. Integración futura con venta exige idempotencia y evitar doble descuento.

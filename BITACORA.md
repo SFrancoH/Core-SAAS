@@ -154,6 +154,6 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **DEC-004:** inventario se descuenta MANUALMENTE por movimiento autorizado; registrar compra/venta NO mueve stock en el MVP. Integración futura con ventas podría hacerlo sin doble descuento.
 - **DEC-005/006:** el registro clínico solo referencia el artículo, no vende/consume ni reserva. Permitida selección del artículo incluso con stock cero.
 - **DEC-007:** no crear ningún flujo de ventas, cambio de inventario ni interruptor asociado al texto «sin inventario».
-- **Documentos y estados:** creado \`docs/SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md\` con E0–E11, evidencias y próximos pasos; actualizados plan integrado, INVENTORY_PLAN, PLAN_DESARROLLO, AGENTS y README.
+- **Documentos y estados:** creado `docs/SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md` con E0–E11, evidencias y próximos pasos; actualizados plan integrado, INVENTORY_PLAN, PLAN_DESARROLLO, AGENTS y README.
 - **Pendiente inmediato:** E1 (postcheck 013, revisar estado 014, C14 lecturas, C15 escrituras, C16 dependencia usuario único); E0 residual (unidades/stock inicial, cardinalidad y movimientos manuales). Sin cambios SQL ni PETS/PULSE operacional en esta entrega.
-
+- **C21/E1, comprobación preparada:** añadido `supabase/design/POSTCHECK_CORE_013_SEDES_READONLY.sql` con consultas SELECT de tablas/RPC, esquema, RLS, FKs/legado, sedes/empresa y estado 014. Solo Git: NO se ejecutó en Supabase ni acredita aislamiento JWT.

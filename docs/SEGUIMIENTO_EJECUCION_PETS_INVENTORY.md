@@ -1,6 +1,6 @@
 # SEGUIMIENTO — PETS y módulo INVENTORY (Core SaaS)
 
-**Inicio:** 2026-10-19. **Código:** rama \`desarrollo\` (única de trabajo), rama \`main\` estable.
+**Inicio:** 2026-10-19. **Código:** rama `desarrollo` (única de trabajo), rama `main` estable.
 **Fuentes:** [Plan integrado](PLAN_EJECUCION_PETS_INVENTORY_2026_10.md) · [Inventario I0–I9](modules/INVENTORY_PLAN.md) · [Fuente PETS](especificaciones/ESPECIFICACION_FORMULARIOS_PETS.md) · [Bitácora](../BITACORA.md).
 **Norma:** este archivo registra el ESTADO ACTUAL. El texto cronológico antiguo de la bitácora documenta la situación de su fecha original; una entrada antigua que diga «013 no aplicada» no invalida esta actualización.
 
@@ -39,7 +39,7 @@ PENDIENTE = no iniciado; EN ANÁLISIS = definición incompleta; EN DESARROLLO = 
 | Orden | Fase | Estado actual | Entregable / evidencia de cierre |
 |---|---|---|---|
 | 00 | **E0 / I0 — Cerrar reglas** | EN ANÁLISIS, DEC-001–007 aprobadas | Acordar cardinalidad de clasificación, SKU obligatorio/formato, unidades/conversiones, stock inicial por sede-bodega-lote, movimientos manuales, stock negativo y pendientes clínicos |
-| 01 | **E1 — Core + PETS C14–C16** | PENDIENTE (013 reportada ejecutada) | Postcheck 013/estado 014; permisos/licencias, JWT RLS empresas A/B y sedes A/B, GET/export, Server Actions, login multiempresa y regresión |
+| 01 | **E1 — Core + PETS C14–C16** | EN DESARROLLO (postcheck SQL preparado; no ejecutado) | Postcheck 013/estado 014; permisos/licencias, JWT RLS empresas A/B y sedes A/B, GET/export, Server Actions, login multiempresa y regresión |
 | 02 | **E2 — Contratos y UX** | PENDIENTE | Tipos TS para clasificaciones, tags, SKU, existencias, clínica, licencias; especificaciones de los 10 formularios; pruebas |
 | 03 | **E3 — SQL incremental** | PENDIENTE | Diseño de inventory.* y servicios PETS; migration SQL, FKs compuestas, RLS, preflight/postcheck en staging y respaldo |
 | 04 | **E4 — Catálogo INVENTORY** | PENDIENTE | CRUD empresas, clasificación dinámica Super-Admin, tags distintos, subcategorías Producto, SKU único empresa, imagen, ficha popup, totales por sede |
@@ -50,6 +50,8 @@ PENDIENTE = no iniciado; EN ANÁLISIS = definición incompleta; EN DESARROLLO = 
 | 09 | **E9 — Vinculación clínica con Inventario** | PENDIENTE | Relaciones ID artículo, snapshot histórico, cero consumo/venta/reserva al registrar servicio |
 | 10 | **E10 — Operación avanzada** | PENDIENTE | Semáforos stock/vencimiento, JIT, búsqueda ubicaciones, informes, proveedores y pruebas |
 | 11 | **E11 — Validación y promoción** | PENDIENTE | E2E multiempresa/multisede, concurrencia, restauración, permisos, CI, piloto y autorización explícita main |
+
+**Instrumento E1 de lectura:** `supabase/design/POSTCHECK_CORE_013_SEDES_READONLY.sql` (archivo creado en Git, **no ejecutado**). Ejecutarlo manualmente en Supabase, revisar salida y luego JWT/RLS antes de habilitar flujo multiempresa.
 
 **Próximo trabajo concreto:** E1: verificación del SQL 013 real, estado 014, auditoría C14 GET/export → C15 escrituras/consultas → C16 roles/perfil multiempresa. E2 se puede diseñar en paralelo sin activar endpoints de escritura mientras falten controles de seguridad.
 
@@ -62,4 +64,4 @@ PENDIENTE = no iniciado; EN ANÁLISIS = definición incompleta; EN DESARROLLO = 
 | 2026-10-19 | 001–013 | SQL Editor manual usuario | Confirmación explícita usuario «013 ya quedó ejecutado sin errores»; 001–012 confirmadas en turnos anteriores | SQL EJECUTADO (REPORTADO) | RLS/JWT A-B, postcheck real, entorno, backup, 014 |
 | 2026-10-19 | DEC-001–007 + E0 parcial | Esta matriz / plan Git | Reglas expresas comunicadas por usuario | DOCUMENTADO | E0 residual; registrar SHA CI del cambio en BITACORA |
 
-**Protocolo obligatorio por entrega:** elegir 1 hito; leer fuente/código/migraciones actuales; registrar alcance y contrato; crear cambios TypeScript/SQL versionados en desarrollo; ejecutar \`npm ci\`, \`npm test\`, \`npm run typecheck\`, \`npm run build\`; verificar DB staging si corresponde; documentar resultado, fecha, entorno, SHA, PR y pruebas en **este archivo, PLAN_DESARROLLO.md y BITACORA.md**. No tocar main hasta los criterios.
+**Protocolo obligatorio por entrega:** elegir 1 hito; leer fuente/código/migraciones actuales; registrar alcance y contrato; crear cambios TypeScript/SQL versionados en desarrollo; ejecutar `npm ci`, `npm test`, `npm run typecheck`, `npm run build`; verificar DB staging si corresponde; documentar resultado, fecha, entorno, SHA, PR y pruebas en **este archivo, PLAN_DESARROLLO.md y BITACORA.md**. No tocar main hasta los criterios.
