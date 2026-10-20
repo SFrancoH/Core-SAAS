@@ -144,3 +144,4 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - Se examinó la especificación suministrada de diez formularios y el anexo de Inventario; se contrastó con docs/modules/INVENTORY_PLAN.md, UNI-001, PETS actual y el árbol real de migraciones.
 - Nuevo plan ejecutable: docs/PLAN_EJECUCION_PETS_INVENTORY_2026_10.md. Mantiene las capacidades anteriores de Inventario y agrega taxonomía estándar, subcategorías Producto, tipo de uso, modal, cantidades por sede, Movimiento/Compras/Ventas y catálogo dinámico clínico.
 - Se registraron bloqueadores de negocio; **no se ha ejecutado SQL, creado infraestructura Inventario, activado PETS multiempresa ni afectado PULSE**. Trabajo restringido a documentación en desarrollo.
+- Documento fuente completo preservado para implementación fiel: docs/especificaciones/ESPECIFICACION_FORMULARIOS_PETS.md. Su contenido no equivale a un esquema SQL existente.

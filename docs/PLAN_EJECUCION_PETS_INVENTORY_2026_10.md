@@ -1,6 +1,6 @@
 # Plan de ejecución integrado — PETS (10 formularios) + INVENTORY transversal
 **Versión:** 2026-10-19 · **Estado:** PLAN DEFINIDO, sin implementación de funcionalidades ni SQL nuevo.
-**Fuente nueva:** archivo entregado por el usuario, ESPECIFICACION_FORMULARIOS_PETS (1).md (apartados 1–14, especialmente 13).
+**Fuente nueva versionada:** docs/especificaciones/ESPECIFICACION_FORMULARIOS_PETS.md, copia íntegra de ESPECIFICACION_FORMULARIOS_PETS (1).md entregado por el usuario (apartados 1–14, especialmente 13).
 **Fuentes vigentes del repositorio:** AGENTS.md, docs/UNIFICACION_MULTISEDE.md, docs/modules/INVENTORY_PLAN.md, docs/verticales/PETS.md, docs/MIGRACION_PETS_MULTIEMPRESA.md, PLAN_DESARROLLO.md y migraciones reales 001–015.
 **Estrategia Git:** trabajar solo en desarrollo; main estable; despliegue de SQL manual y validado por el usuario. No alterar la app PULSE productiva.
 
