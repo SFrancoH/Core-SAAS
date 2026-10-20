@@ -5,10 +5,11 @@ import { ensureTenantRows } from "@/lib/verticals/pets/tenant-policy";
 import { createExcelFile } from "@/lib/excel-export";
 import { fetchAll } from "@/lib/excel-import";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { resolveSedeScope } from "@/lib/core/sedes";
 
 type OwnerExportPet = { nombre: string; numero_carnet: string | null };
 type OwnerExportRow = {
-  empresa_id: string; nombre: string;
+  empresa_id: string; nombre: string; sede_origen_id?: string | null;
   ciudad?: string | null; direccion?: string | null;
   telefono?: string | null; whatsapp?: string | null; email?: string | null;
   tipo_documento?: string | null; numero_documento?: string | null;
@@ -24,10 +25,13 @@ export async function GET(_request: NextRequest, {params}: {params:Promise<{id:s
   const {id}=await params;
   const tenant=await requirePetTenant(id,"pets.pet.read");
   const admin = getSupabaseAdmin();
+  const scope = await resolveSedeScope(tenant.actorId, tenant.companyId, "pets.pet.read");
 
   const owners = await fetchAll<OwnerExportRow>((from, to) => {
-    return admin.from("propietarios").select(`*, propietarios_mascotas(mascotas(nombre, numero_carnet))`)
-      .eq("empresa_id",tenant.companyId).order("nombre").range(from,to);
+    let query = admin.from("propietarios").select(`*, propietarios_mascotas(mascotas(nombre, numero_carnet))`)
+      .eq("empresa_id",tenant.companyId);
+    if (!scope.todas) query = query.in("sede_origen_id", scope.sedes.length ? scope.sedes.map(s => s.id) : ["00000000-0000-0000-0000-000000000000"]);
+    return query.order("nombre").range(from,to);
   });
 
   ensureTenantRows(owners,tenant.companyId);

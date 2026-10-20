@@ -52,3 +52,29 @@ test("RLS nueva no amplía permisos mediante política heredada permisiva",()=>{
  assert.match(sql,/revoke all on function public\.core_pets_tenant_access/);
  assert.match(sql,/grant execute on function public\.core_pets_tenant_access\(uuid,uuid,text\) to service_role/);
 });
+
+test("C14: exportaciones antiguas delegan a rutas Core con autorización explícita",()=>{
+ for(const resource of ["mascotas","propietarios"]){
+  const old=readFileSync(`app/api/export/${resource}/route.ts`,"utf8");
+  assert.match(old,/getCurrentProfile\(\)/);
+  assert.match(old,/\/api\/core\/empresas\//);
+  assert.doesNotMatch(old,/\.from\("mascotas"\)|\.from\("propietarios"\)/);
+  const scoped=readFileSync(`app\/api\/core\/empresas\/[id]\/pets\/export\/${resource}\/route.ts`,"utf8");
+  assert.match(scoped,/requirePetTenant\(/);
+  assert.match(scoped,/resolveSedeScope\(/);
+  assert.match(scoped,/\.eq\("empresa_id",tenant\.companyId\)/);
+  assert.match(scoped,/\.in\("sede_origen_id"/);
+ }
+});
+test("C14: listados y detalle limitan las sedes en servidor",()=>{
+ for(const path of [
+ "app/portal/empresa/[id]/pets/mascotas/page.tsx",
+ "app/portal/empresa/[id]/pets/propietarios/page.tsx",
+ "app/portal/empresa/[id]/pets/mascotas/[petId]/page.tsx"
+ ]){
+  const code=readFileSync(path,"utf8");
+  assert.match(code,/requirePetTenant\(/);
+  assert.match(code,/resolveSedeScope\(/);
+  assert.match(code,/\.in\("sede_origen_id"/);
+ }
+});

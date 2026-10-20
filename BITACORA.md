@@ -124,3 +124,36 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **Frontend/API:** rutas bajo /portal/empresa/[id] para crear sedes y consultar historial clínico filtrado por sedes, además de endpoints Excel que validan actor+empresa+licencia+permiso y filtran `empresa_id`. Flag multiempresa PETS desactivado por defecto, sin reemplazar rutas legacy.
 - **INVENTORY:** `docs/modules/INVENTORY_PLAN.md` documenta el alcance aportado y aclara decisiones de modelo por sede/bodega, lotes, proveedores N:M, FEFO/FIFO, stock físico negativo, caducidad, JIT, transacciones y roadmap I0–I9. NO existen tablas, UI ni stock de Inventario implementados.
 - **Pendiente crítico:** C14–C16 todavía requieren adaptación de pantallas y escrituras antiguas, eliminación de FK a `public.usuarios` cuando corresponda y pruebas reales de aislamiento. No es correcto decir «solo falta ejecutar Supabase» para producción.
+
+## 2026-10-19 · Desarrollo único: licencias Core y DDL inicial PULSE
+
+- **IMPLEMENTADO EN CÓDIGO (rama desarrollo):** pantalla del propietario en `/super-admin/empresas/[id]/licencias`, acción validada en servidor, RPC SQL 014 que audita cambios de entitlement; helper TypeScript para estados PULSE, formato de números y disponibilidad Oficina.
+- **DDL VERSIONADO, BD NO APLICADA:** `014_core_license_admin.sql` y `015_pulse_core_schema.sql`; nueve tablas nuevas bajo `pulse` con UUID/FK compuestas y RLS cerrada. Preflight/postcheck manual.
+- **NO IMPLEMENTADO:** interfaces/endpoints PULSE; reservas transaccionales, integración WhatsApp y migración histórica; PETS legacy aún requiere C14–C16 para escrituras multiempresa.
+- **NO VERIFICADO:** SQL real, JWT RLS, integración con Supabase, E2E; la CI puede validar pruebas estáticas/TypeScript, no sustituye Supabase staging.
+- **Ramas:** `main` estable; `desarrollo` única rama de trabajo futura. Las ramas viejas se retirarán después de verificar que no tienen trabajo no incorporado.
+ 
+## 2026-10-19 · Hotfix SQL 013 — cadena sin cerrar
+- **Causa verificada**: `if v_code !~ '^[A-Z0-9_-]{2,32}` estaba truncado; debe ser `if v_code !~ '^[A-Z0-9_-]{2,32}$'`.
+- **Corregido en la rama `desarrollo`**: `supabase/migrations/013_core_sedes.sql`, el paquete combinado `supabase/deploy/CORE_UNA_EJECUCION_STAGING.sql` y prueba estática que impide regresar al error 42601.
+- **Despliegue**: 001–012 ejecutados manualmente por el usuario sin errores; 013 falló durante el análisis SQL. Ejecutar solo 013 corregido desde una sesión nueva tras comprobar que no quedaron cambios parciales; **no ejecutar paquete combinado ni repetir 001–012**.
+- **Estado**: no se ha confirmado ejecución exitosa de 013 en Supabase ni validación de RLS con JWT.
+
+
+## 2026-10-19 — Plan PETS formularios + INVENTORY
+- Se examinó la especificación suministrada de diez formularios y el anexo de Inventario; se contrastó con docs/modules/INVENTORY_PLAN.md, UNI-001, PETS actual y el árbol real de migraciones.
+- Nuevo plan ejecutable: docs/PLAN_EJECUCION_PETS_INVENTORY_2026_10.md. Mantiene las capacidades anteriores de Inventario y agrega taxonomía estándar, subcategorías Producto, tipo de uso, modal, cantidades por sede, Movimiento/Compras/Ventas y catálogo dinámico clínico.
+- Se registraron bloqueadores de negocio; **no se ha ejecutado SQL, creado infraestructura Inventario, activado PETS multiempresa ni afectado PULSE**. Trabajo restringido a documentación en desarrollo.
+- Documento fuente completo preservado para implementación fiel: docs/especificaciones/ESPECIFICACION_FORMULARIOS_PETS.md. Su contenido no equivale a un esquema SQL existente.
+
+## 2026-10-19 — C21: decisiones y línea base de ejecución
+- **Estado SQL comunicado por el usuario:** 001–012 y **013 corregida ejecutadas manualmente sin errores** en Supabase; no se confirmó proyecto/entorno ni postcheck/JWT-RLS. Estado: SQL EJECUTADO (REPORTADO), NO VALIDADO EN STAGING. 014/015 sin confirmación de ejecución.
+- **DEC-001:** Producto, Medicamento, Vacuna, Desparasitante, Insumo son clasificaciones iniciales del sistema; Super-Admin global podrá crear otras para otras verticales. Tags libres y subcategorías propias son distintos.
+- **DEC-002:** SKU-0012 Dogshow único por empresa: sede A 25, sede B 45; total 70. No duplicar artículo entre sedes.
+- **DEC-003:** existencias por sede consolidadas desde bodegas/ubicaciones y ledger, sin segundo contador.
+- **DEC-004:** inventario se descuenta MANUALMENTE por movimiento autorizado; registrar compra/venta NO mueve stock en el MVP. Integración futura con ventas podría hacerlo sin doble descuento.
+- **DEC-005/006:** el registro clínico solo referencia el artículo, no vende/consume ni reserva. Permitida selección del artículo incluso con stock cero.
+- **DEC-007:** no crear ningún flujo de ventas, cambio de inventario ni interruptor asociado al texto «sin inventario».
+- **Documentos y estados:** creado `docs/SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md` con E0–E11, evidencias y próximos pasos; actualizados plan integrado, INVENTORY_PLAN, PLAN_DESARROLLO, AGENTS y README.
+- **Pendiente inmediato:** E1 (postcheck 013, revisar estado 014, C14 lecturas, C15 escrituras, C16 dependencia usuario único); E0 residual (unidades/stock inicial, cardinalidad y movimientos manuales). Sin cambios SQL ni PETS/PULSE operacional en esta entrega.
+- **C21/E1, comprobación preparada:** añadido `supabase/design/POSTCHECK_CORE_013_SEDES_READONLY.sql` con consultas SELECT de tablas/RPC, esquema, RLS, FKs/legado, sedes/empresa y estado 014. Solo Git: NO se ejecutó en Supabase ni acredita aislamiento JWT.

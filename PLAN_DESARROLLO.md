@@ -153,3 +153,38 @@ Leer reglas → identificar vertical/entidad → definir contrato, permisos/lice
 - [ ] C16: retirar dependencia única `public.usuarios.empresa_id` en auth/queries/RPC legacy; estabilizar roles Core multiempresa.
 - [ ] INVENTORY I0: acordar semaforización, unidades, proveedores, stock negativo y requisitos regulatorios; el módulo NO se desarrolla aún.
 - [ ] Activar producción solo tras E2E y verificación de regresiones. El bundle único STAGING NO equivale al cierre C14/C15/C16.
+
+## 2026-10-19 — Entregables para la rama permanente desarrollo
+
+1. **Licencias Core (código listo, BD pendiente):** instalar SQL 014 después del despliegue de 010–013 y probar propietario global, suspensión, vencimiento y auditoría.
+2. **PULSE esquema (DDL listo, BD pendiente):** revisar preflight, ejecutar manualmente SQL 015 sobre Core staging, validar FKs y RLS. No correr sobre la base PULSE actual.
+3. **PULSE operativo (pendiente):** adaptar API, pantallas, transacciones y webhooks desde su repositorio original de forma incremental. No ofrecer la vertical hasta completar pruebas.
+4. **PETS multiempresa (pendiente):** completar C14–C16 de escrituras y RLS legacy. Estructura TypeScript/core existente no significa migración clínica integral.
+5. **Workflow:** único origen `desarrollo`, CI en PR contra `main`, pruebas PowerShell, promoción supervisada y sincronización de la misma rama.
+
+
+## C20 — PETS: 10 formularios + ampliación INVENTORY (2026-10-19)
+- [x] Analizar nueva especificación de 10 formularios/26 páginas referidas y requisitos expresos de Inventario §13; confrontar con INVENTORY_PLAN original I0–I9.
+- [x] Plan de ejecución: docs/PLAN_EJECUCION_PETS_INVENTORY_2026_10.md; documentar complementos sin borrar FEFO/FIFO, bodegas, lotes, JIT ni permisos.
+- [ ] E0: validar decisiones de taxonomía estándar, SKU, unidad, saldo inicial, eventos de consumo y condiciones «sin inventario».
+- [ ] E1: confirmar 013 aplicado en Supabase Core staging y 014 cuando corresponda; cerrar C14–C16 PETS (writes multiempresa y multisede); E2E reales.
+- [ ] E2/E3: contratos TS y esquema versionado inventory.* y servicios PETS nuevos; SQL NO aplicado automáticamente.
+- [ ] E4/E5/E6: catálogo + modal + cantidades por sede; stock/ledger transaccional; vistas Movimiento/Compras/Ventas.
+- [ ] E7/E8: componentes comunes y 10 variantes PETS fieles a la fuente con historial y adjuntos seguros.
+- [ ] E9/E10/E11: integración sin descuento implícito; FEFO/FIFO/JIT, validación E2E, piloto y aprobación a main.
+**Estado:** plan/documentación; no se han creado tablas, formularios ni descuentos de stock.
+
+## C21 — Inicio controlado PETS + INVENTORY (2026-10-19)
+
+**Fuente vigente de estado:** [docs/SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md](docs/SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md). Consultar también plan E0–E11. Histórico de este archivo anterior a C21 queda como evidencia cronológica, NO como estado actual.
+
+- [x] DEC-001–007 aprobadas/documentadas: clasificaciones globales ampliables desde Super-Admin, separadas de tags; SKU único por empresa y compartido por sedes; stock derivado, movimiento manual, selección clínica incluso stock cero sin venta/descuento, «sin inventario» sin automatismos.
+- [x] **SQL 013 ejecutada manualmente sin errores según el usuario**; 001–012 igualmente reportadas ejecutadas.
+- [~] Postcheck de 013 **redactado, pendiente de ejecutar manualmente**: `supabase/design/POSTCHECK_CORE_013_SEDES_READONLY.sql`; JWT/RLS empresas A/B y sedes A/B pendientes, revisar backups/estado 014. 014/015 NO confirmadas.
+- [ ] E1 / C14: refactorizar GET/export antiguos PETS bajo empresa elegida y membresía.
+- [ ] E1 / C15: refactorizar Server Actions/APIs de escritura PETS, sede y autoría.
+- [ ] E1 / C16: eliminar dependencia de empresa única en perfil y consultas sin alterar datos históricos.
+- [ ] E0 residual / E2: decidir cardinalidad, unidades, alta stock por ubicación y tipos/permisos de movimientos manuales; después diseñar contratos y SQL.
+- [ ] E3–E11: INVENTORY y diez formularios; nunca activar descuento automático en el MVP.
+**Alcance de esta entrega:** actualización de planes/bitácora, sin SQL ejecutado aquí, sin frontend de Inventario, sin cambios a producción ni a main.
+

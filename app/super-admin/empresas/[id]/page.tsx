@@ -75,6 +75,15 @@ export default async function CompanyDetailPage({ params, searchParams }: Compan
           <article className="statCard"><span>Propietarios</span><strong>{ownerCount || 0}</strong></article>
         </div>
 
+        <section className="managementSection">
+          <div>
+            <p className="eyebrow">Accesos por producto</p>
+            <h2>Permisos y licencias Core</h2>
+            <p className="description">Activa o suspende PETS, PULSE y los demás productos para esta empresa, sin modificar permisos de usuario.</p>
+            <Link href={"/super-admin/empresas/"+company.id+"/licencias"}>Administrar licencias →</Link>
+          </div>
+        </section>
+
         <section className="managementSection integrationSection">
           <div>
             <p className="eyebrow">Confirmación de propietarios</p>
