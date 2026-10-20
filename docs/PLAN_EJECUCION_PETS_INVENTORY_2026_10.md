@@ -1,5 +1,6 @@
 # Plan de ejecución integrado — PETS (10 formularios) + INVENTORY transversal
-**Versión:** 2026-10-19 · **Estado:** PLAN DEFINIDO, sin implementación de funcionalidades ni SQL nuevo.
+**Versión:** 2026-10-19, DEC-001–007 · **Estado:** E0 parcialmente resuelto, sin implementación funcional ni SQL nuevo de INVENTORY.
+**Tablero de seguimiento:** [SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md](SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md) — fuente actual de estados, prioridades y evidencia.
 **Fuente nueva versionada:** docs/especificaciones/ESPECIFICACION_FORMULARIOS_PETS.md, copia íntegra de ESPECIFICACION_FORMULARIOS_PETS (1).md entregado por el usuario (apartados 1–14, especialmente 13).
 **Fuentes vigentes del repositorio:** AGENTS.md, docs/UNIFICACION_MULTISEDE.md, docs/modules/INVENTORY_PLAN.md, docs/verticales/PETS.md, docs/MIGRACION_PETS_MULTIEMPRESA.md, PLAN_DESARROLLO.md y migraciones reales 001–015.
 **Estrategia Git:** trabajar solo en desarrollo; main estable; despliegue de SQL manual y validado por el usuario. No alterar la app PULSE productiva.
@@ -14,7 +15,7 @@
 
 ## 2. Estado comprobado en el repositorio; bloqueos reales
 
-- Existen 001–015 versionados; el usuario informó 001–012 ejecutados; 013 se corrigió en main y desarrollo, pero **no consta confirmación de ejecución exitosa de 013**. Tampoco se ha confirmado aplicación de 014 (licencias) ni 015 (estructura PULSE).
+- Existen 001–015 versionados; **el usuario confirmó ejecución manual sin errores de 001–012 y de 013 corregida en Supabase (2026-10-19)**. Es un reporte de ejecución, NO postcheck independiente/JWT RLS/entorno verificado. **014 y 015 no constan ejecutadas**; no repetir migraciones anteriores ni el bundle.
 - Core dispone de modelos, RPC, permisos, membresías y sedes en SQL/versionado, pero falta certificar seguridad y datos reales con staging.
 - PETS dispone de Consulta y control, procedimientos, fórmula y un historial unificado. Su componente actual usa un catálogo fijo de medicamentos y guarda fórmula como JSON; **no existe todavía integración viva con INVENTORY**.
 - Algunas etiquetas de módulos como Vacunación, Desparasitación, Estética o Guardería ya aparecen en navegación, lo que NO demuestra formularios específicos terminados. Los diez formularios de la nueva especificación requieren implementación y pruebas independientes.
@@ -27,11 +28,11 @@
 
 La ficha de artículo pertenece a una EMPRESA (UUID estable). La cantidad física NO pertenece a la ficha maestra sino a sus ubicaciones por sede. Campos visible/solicitados: categoría o etiqueta estándar, subcategoría si Producto, nombre, SKU texto, descripción, cantidades por sede, tipo de uso e imagen_url opcional.
 
-**Cinco etiquetas estándar inmutables del sistema:** Producto; Medicamento; Vacuna; Desparasitante; Insumo. Son distintas de los **tags libres** ya previstos en INVENTORY_PLAN. Las subcategorías personalizadas solo aplican a Producto (ejemplos: Collares, Concentrado, Juguetes), son por empresa y se pueden crear sin despliegue. No inventar taxonomía para las otras cuatro etiquetas.
+**Cinco CLASIFICACIONES estándar iniciales:** Producto; Medicamento; Vacuna; Desparasitante; Insumo, de código estable. **El Super-Admin global podrá crear otras** para nuevos negocios: tabla de clasificaciones extensible, no ENUM SQL fijo. Son diferentes de los **tags libres** y de las **subcategorías personalizadas de Producto** (Collares, Concentrado, Juguetes), cuyo ámbito es la empresa. Nuevas clasificaciones no generan selectores PETS automáticamente.
 
 **Tipo de uso: exactamente cuatro valores**, independiente de etiqueta/tags/subcategoría: Interno; Comercial; Interno/Comercial; Comercial/Sitio-web. El filtro de la futura tienda web queda pendiente porque «solo lo interno» contradice el aparente uso Comercial/Sitio-web. No construir tienda en esta entrega.
 
-**Conflictos que se documentan y no se resuelven a escondidas:** nueva fuente no define unicidad u obligatoriedad de SKU, pero INVENTORY_PLAN proponía SKU único por empresa; validar esa regla antes del DDL. También queda pendiente si un artículo admite una o múltiples etiquetas estándar; recomendación técnica: UNA etiqueta principal + tags libres, solo si se aprueba. No imponer esto como hecho de la fuente.
+**SKU: unicidad APROBADA por empresa** `(empresa_id, sku_normalizado)`, mismo artículo/SKU para todas las sedes: SKU-0012 alimento Dogshow en sede A 25 y B 45, total 70; NO repetir ficha por sede. SKU texto; otras empresas pueden reutilizar SKU. **Solo pendientes:** si SKU es obligatorio y formato, y si un artículo puede tener una o varias clasificaciones estándar (recomendación una principal y tags libres, sin aprobación aún).
 
 El plan anterior añade como capacidades futuras: proveedor, costo, código de barras, unidades, lote, vencimiento y políticas. NO atribuirlos al formulario de alta del anexo: ubicar estos metadatos en paneles avanzados **tras decisión**, sin imponer requisitos no definidos a la ficha básica.
 
@@ -48,13 +49,13 @@ La ficha exhibe la distribución consolidada por sedes autorizadas y la imagen U
 - Movimiento: Fecha, Tipo de movimiento y Responsable; identidad real de usuario autenticado capturada en servidor al ocurrir el evento, inmutable al consultar después. El catálogo exacto de tipos aún requiere aprobación (INVENTORY_PLAN sugería Entrada/Salida/Transferencia/Ajuste/Merma/Devolución).
 - Compras: Fecha, Cantidad, Proveedor, Precio total. El proyecto ya contempla proveedores N:M y costo histórico. La vista mínima NO exige todavía compras contables, IVA ni órdenes a proveedor automáticas.
 - Ventas: Fecha, Cantidad, Propietario PETS (relación por ID real, no string), Precio total. Debe definirse una interfaz/adaptador entre INVENTORY y PETS; evitar acoplar toda la tabla genérica de ventas a propietarios para futuras verticales. La relación PETS debe validar misma empresa.
-- La fuente nueva no define si Compra, Venta o servicio clínico generan movimientos; no asociar automáticamente registro a descuento de stock sin contrato aprobado. Propuesta de modelo mínimo: registros y líneas comerciales identificables, referencias transversales a módulo origen y movimientos opcionales enlazados para reconciliar sin doble conteo.
+- **DEC-004 APROBADA: descontar/ajustar inventario es MANUAL por ahora.** Registrar Compras/Ventas o formulario clínico NO produce entradas/salidas automáticas. Movimientos manuales son transacciones explícitas con actor, empresa, sede y ledger. En integración comercial FUTURA podrán automatizarse descuentos por venta, con idempotencia y conciliación que evite duplicar una salida manual ya registrada.
 
 ### 3.4. Reglas previas de stock que SE CONSERVAN
 
 Movimiento inmutable/compensación; transacciones SQL atómicas; idempotencia; concurrencia con locks; stock físico y disponible diferenciados; FEFO por caducidad para lotes aptos y FIFO de capas de recepción para artículos sin caducidad; cuarentena ≠ merma; bloqueos por vencimiento; transferencia balanceada A→B; semáforos independientes para cantidad y fecha; reorden JIT sobre consumo real y plazo de proveedor, sin autocompra.
 
-Política de stock negativo sigue abierta: el diseño previo RECOMIENDA no permitir saldo físico negativo y considerar pedidos pendientes separados. No activar automáticamente salidas por el hecho de guardar una dosis o registrar un servicio.
+Política de stock negativo físico sigue abierta: la recomendación previa es bloquear saldos físicos negativos. **PETS sí permite SELECCIONAR cualquier artículo con STOCK CERO**: no es consumo ni venta. Una salida MANUAL de stock requiere disponibilidad y permisos; selección clínica solo guarda referencia y NO afecta inventario.
 
 ### 3.5. Licencia, seguridad y contrato transversal
 
@@ -66,7 +67,7 @@ Crear DIEZ variantes independientes y fieles a estructura visible, reutilizando 
 
 **Propuesta de persistencia (NO SQL existente):** cabecera de servicio clínico con UUID, empresa_id, mascota_id, sede_id, tipo, actor, profesional/responsable aplicable, fecha del servidor, estado controlado y versión de esquema; detalle clínico tipado por variante (columnas cuando sean estables / payload estructurado versionado para campos exclusivos); líneas de artículos relacionadas por artículo_id y etiqueta, con dosis, unidad, vía, frecuencia y cantidad SOLO cuando la captura lo exige; documentos clínicos privados por referencia. Debe contemplar relación opcional a consulta/control sin fundir sus significados y proyección al historial unificado; no sobrescribir consultas previas.
 
-Mantener **dato clínico prescrito/planeado** separado de **cantidad física dispensada o consumida**. Una indicación de dosis o cantidad no demuestra aplicación, venta ni salida de inventario. Registrar la relación al artículo desde el primer MVP sin movimiento; activar consumo solo con evento, estado, unidad, sede y política confirmados. Preservar IDs/snapshot legible de artículos en históricos para renombramientos y bajas.
+Mantener **dato clínico prescrito/planeado** separado de **cantidad física dispensada o consumida**. **DEC-005/006:** guardar artículo incluso con saldo cero no registra salida, venta, reserva ni consumo. Registrar ID/snapshot clínico estable; **consumo automático se posterga fuera del MVP**, no es E9. **DEC-007:** «sin inventario» no habilita un interruptor/proceso comercial y los radios Insumos Sí/No no descuentan stock.
 
 | Variante exacta | Singularidades obligatorias de la fuente | Inventario / pendientes |
 |---|---|---|
@@ -92,7 +93,7 @@ El plan I0–I9 del INVENTORY_PLAN sigue siendo el marco de stock. Se introducen
 | Hito | Entregable de código/documentación | Dependencia / condición de cierre |
 |---|---|---|
 | E0 — Alinear alcance | Matriz de inventario original vs. anexo §13, diez fichas de campos, tabla de decisiones abiertas, mapa de compatibilidad clínica y entorno staging | Aprobar prioridades; cero SQL; preservar catálogos y reglas originales |
-| E1 — Cerrar Core/PETS | Preflight real, confirmar 013, revisar 014; SQL 010–013 y RLS efectivas; C14–C16 de PETS (lecturas/escrituras por membresía+empresa+sede, sin Norte/Sur rígidos) | Pruebas reales A/B empresas, A/B sedes, JWT, roles, caducidad licencia, regresión consultas/propietarios |
+| E1 — Cerrar Core/PETS | **013 ejecutada sin errores según usuario**, verificar postcheck/entorno, estado 014 y C14–C16 PETS (lecturas/escrituras multiempresa y sedes reales) | Pruebas RLS JWT A/B empresas/sedes, roles, revocación, permisos, regresión consultas/propietarios |
 | E2 — Contratos y UX | Tipos TS y especificaciones por cada formulario; modelo artículo vs. tag vs. subcategoría; prototipos modal/catálogo; permisos INVENTORY | Decisiones críticas de clasificación/SKU/unidad y ubicación definidas; formularios sin campos inventados |
 | E3 — I1/I2: SQL staging | Migraciones nuevas independientes para inventory.* y estructuras de servicios PETS; preflight/postcheck, catálogo Core, FKs compuestas, RLS, historial no destructivo | SQL manual en staging, restauración backup, pruebas tenant/empresa/sede y referencias |
 | E4 — I3: Catálogo utilizable | Pantallas listado, alta/edición, subcategorías Producto, cinco etiquetas estándar, cuatro tipos de uso, imagen URL, ficha modal y cantidades por sede en lectura; proveedores/tags/bodegas alineados | Alta en empresa A invisible para B; ficha única multi-sede; auditoría; sin saldo ficticio |
@@ -100,7 +101,7 @@ El plan I0–I9 del INVENTORY_PLAN sigue siendo el marco de stock. Se introducen
 | E6 — Vistas comerciales | Movimiento/Compras/Ventas con campos del §13, acceso por artículo; actor histórico automático; vínculos PETS a propietario por ID y empresa | Las vistas tienen datos reales, no simulados; compras/ventas no se presentan como POS contable |
 | E7 — F0: Comunes clínicos | Framework de campos, precarga mascota, profesional autorizado, sede operativa, adjuntos seguros, selectores Inventario por etiqueta, listas NO definidas marcadas pendientes | Sin acceso cruzado; opciones solo empresa propia; edición de catálogo preserva vínculos históricos |
 | E8 — F1: 10 formularios | Construir individualmente conforme tabla §4, con persistencia por mascota/empresa/sede y publicación en historial | Cada campo visible, orden y acción; tests por variante, permisos y edición; ningún campo oculto inventado |
-| E9 — F2/I8: Integración controlada | Registros PETS vinculados a artículos; primero lectura y trazabilidad, luego efecto sobre stock SOLO para eventos/estados y unidades aprobados; adapter idempotente | No consumo al guardar prescripción; nunca doble salida; devolución/anulación y sede exacta probadas |
+| E9 — F2/I8: Integración sin stock automático | PETS registra vinculación por ID al artículo real, también en saldo cero; **no genera movimiento, venta, reserva ni descuento**. Integración comercial futura fuera del MVP | Clínicas con cero stock guardan; movimientos solo manuales en Inventario; sin doble descuentos |
 | E10 — I6/I7: Operación avanzada | Semáforos de stock y vencimiento, JIT, ubicaciones, filtros y reportes consolidados, N:M proveedores y búsquedas indexadas | FEFO/FIFO, límites y sin datos; filtrado por permisos, red de bodega y no doble conteo |
 | E11 — I9: QA/publicación | E2E PETS e INVENTORY, copias/restore, observabilidad, cargas de prueba y plan de reversión; piloto de una empresa | CI y DB staging aprobadas; activación gradual tras aprobación explícita; main solo tras pruebas |
 
@@ -124,17 +125,18 @@ Cada commit funcional actualiza BITACORA/PLAN, ejecuta npm test/typecheck/build,
 
 ## 6. Bloqueadores que necesitan definición humana (no inventar)
 
-**Bloqueadores para construir el motor stock y contratos:**
-B1. ¿Una o varias etiquetas estándar por artículo? Recomendada: una principal + tags libres; decisión pendiente.
-B2. ¿SKU obligatorio y único por empresa según plan previo? ¿Formato? Decisión pendiente.
-B3. ¿Qué unidad base y conversiones se admiten (frasco, ml, tableta, dosis, caja)? No equiparar dosis terapéutica y cantidad física.
-B4. ¿Saldo inicial por sede se imputa a qué bodega/posición, lote y fecha de apertura? No alterar saldos libremente.
-B5. ¿Qué evento concreto crea una salida en PETS: aplicación confirmada, despacho, facturación, registro de servicio o ninguna? ¿Cómo se revierte?
-B6. ¿Qué significa «sin inventario» y qué efecto exacto tiene «Insumos Sí/No»?
-B7. ¿Se bloquea seleccionar artículos con disponible cero? ¿Qué ocurre ante caducidad/cuarentena?
-B8. ¿Qué tipos de movimiento son válidos en MVP y cómo se generan Compra/Venta? ¿Quién puede aprobar ajustes?
-B9. ¿Bodega principal por sede o empresa; lotes obligatorios por tipo de artículo; stock negativo permitido? Conservar pendientes del plan original.
-B10. Filtro exacto de futura página comercial; NO implementar tienda todavía.
+**Decisiones aprobadas:** DEC-001–007: cinco clasificaciones estándar extensibles por Super-Admin sin mezclar tags, SKU único empresa/compartido entre sedes, cantidad derivada del ledger, descuento manual, selección clínica sin movimiento incluso stock cero y ausencia de flujo «sin inventario». Ver seguimiento.
+
+**ÚNICAS decisiones pendientes de ingeniería/negocio:**
+- B1. Cardinalidad de clasificaciones por artículo, permisos de extensiones; **los cinco tipos iniciales y capacidad de ampliación ya están aprobados**.
+- B2. Obligatoriedad/formato SKU; **unicidad por empresa ya aprobada**.
+- B3. Unidades de medida y conversiones (frasco, caja, ml, dosis), lotes/caducidad por clasificación.
+- B4. Distribución de stock inicial por sede/bodega/ubicación/lote mediante movimientos de apertura; sin doble contador.
+- B5. Tipos de movimientos MANUALES y sus permisos de ajustes/mermas, stock negativo, principal bodega por sede o empresa.
+- B6. Botones y catálogos de formularios no visibles, columnas ocultas, unidad junto a dosis y regla de registro de próximos servicios.
+- B7. Integración de venta/descuento AUTOMÁTICO y filtro tienda **solo a futuro**, con idempotencia/doble descuento resueltos.
+
+**No hay pendiente de «sin inventario» para el MVP.** Los radios «Insumos Sí/No» se conservan solo como información clínica según la fuente, nunca como evento de stock.
 
 **No bloquean la estructura básica si se dejan explícitamente sin definir:** selectores de médicos/responsables/servicio sin opciones confirmadas; unidad junto a dosis, vía, frecuencia y ASA; columnas ocultas por scroll; diálogo de botones +; campos de próxima vacuna; salida condicional de guardería; límites de adjuntos fuera del 0/3 visible; reglas de precios/totales/obligatoriedad no definidas. No sustituir los pendientes por supuestos. Donde los catálogos reales de PETS ya existan, reutilizarlos con autorización sin declarar que son los del PDF.
 
@@ -152,6 +154,6 @@ B10. Filtro exacto de futura página comercial; NO implementar tienda todavía.
 
 ## 8. Criterio de inicio y resultado esperado
 
-**Primer trabajo siguiente: E0 y E1, no crear de inmediato tablas de Inventario.** Confirmar aplicación real de 013, completar preflight Core/Sedes, comprobar 014 y terminar C14–C16 de PETS; en paralelo consolidar B1–B9 sin impedir la elaboración de contratos de UI.
+**Primer trabajo siguiente: E1 + cierre residual E0.** 013 ya fue ejecutada sin errores SEGÚN EL USUARIO; verificar postcheck de 013, estado de 014 y pruebas JWT/RLS, y comenzar C14–C16. En paralelo definir cardinalidad, unidades, cantidades iniciales y movimientos manuales. No crear tablas Inventario antes de estos contratos.
 
 **MVP integrado demostrable:** una empresa con dos sedes mantiene UNA ficha de artículo, su distribución real por sede, vistas de movimientos/compras/ventas con datos y responsable histórico; PETS guarda diez variantes clínicas y selecciona los mismos artículos por etiqueta, preservando expediente clínico y sin descuentos implícitos. Luego operaciones stock, FEFO/FIFO y reorden se habilitan solo tras autorización y pruebas.

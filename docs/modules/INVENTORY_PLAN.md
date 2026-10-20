@@ -213,3 +213,18 @@ Esta especificación **NO crea una bodega ni descuenta inventario**. Será la fu
 **Invariantes:** catálogo uno por empresa; ningún formulario guarda un catálogo de medicamentos/vacunas/insumos alternativo; movimientos auditados con actor de sesión y ledger; propietario en venta PETS por ID; no descuento de stock por registro clínico sin definición operativa; cantidades de la ficha por sede se concilian con movimientos, nunca doble saldo. No inferir opciones de listas ni campos ocultos desde los PDF.
 
 **Conflictos abiertos:** cardinalidad de etiqueta estándar, política definitiva de SKU y unidad, registro de saldo inicial por sede y ubicación, automatismo Compra/Venta/consumo clínico, mensaje «sin inventario», disponibilidad, filtro futuro de tienda. Remitir las decisiones a I0 antes de activar flujos que alteren existencias. La inclusión de esta sección es DOCUMENTACIÓN, no implementación ni SQL aplicado.
+
+## 15. ACUERDOS APROBADOS 2026-10-19 (prevalecen sobre propuestas previas)
+
+Ver el [tablero DEC-001–007](../SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md). Se mantienen íntegros I0–I9 sobre sedes, bodegas, lotes, FEFO/FIFO, auditoría, JIT, proveedores y filtros; esta sección concreta las reglas nuevas.
+
+1. **Clasificaciones**: cinco categorías estándar iniciales (Producto, Medicamento, Vacuna, Desparasitante, Insumo). El Super-Admin Core podrá ampliar el catálogo global para nuevas verticales; NO son tags personalizados ni subcategorías de Producto. Diseñar catálogo de registros/códigos estables, no enum fijo. El modelo histórico llamado \`inventory.etiquetas\` correspondía a **tags libres**: preservar esa separación al crear tablas.
+2. **SKU único empresa**: un único artículo / SKU compartido por sedes, con saldo desglosado por bodega/ubicación. SKU-0012 alimento Dogshow, A 25, B 45, empresa 70. No indexar SKU por sede.
+3. **Cantidades auténticas**: solo existencias físicas y ledger; la tabla de ficha «cantidad por sede» es una suma calculada, no otro valor editable. Aperturas/ajustes se realizan por movimientos manuales auditados.
+4. **Compras/Ventas**: vistas comerciales, pero por ahora registrar una compra o venta NO actualiza automáticamente existencias. La entrada/salida es un movimiento MANUAL explícito. Descuento automático con ventas será fase futura, previniendo doble descuento.
+5. **PETS**: guardar una vacuna, desparasitante, medicamento o insumo seleccionado NO vende, consume, reserva ni descuenta. El selector **sí permite stock 0**; la salida física manual sigue validando stock/lote/sede.
+6. **«Sin inventario»**: no crear toggle, ventas ni automatismos por esa frase; no hay todavía un flujo de venta integrado. El radio visible «Insumos Sí/No» no modifica existencias.
+7. **Pendientes**: cardinalidad de clasificación estándar por artículo, obligatoriedad/normalización SKU, unidades y conversiones, bodega destino/stock inicial, catálogo de movimientos manuales y autorizaciones, permisos futuros para nuevas clasificaciones. Mantener decisiones de política física FEFO/FIFO, cuarentena y stock negativo bajo I0.
+
+**Estado:** reglas documentadas; **no** existen tablas, frontend o movimientos de Inventario aplicados.
+

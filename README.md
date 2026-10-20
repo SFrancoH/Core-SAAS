@@ -105,3 +105,11 @@ La migración combinada Core 010–013 para **staging sin Core previo** está en
 ## Rama única de desarrollo (octubre 2026)
 
 Los nuevos cambios de licencias y el DDL de PULSE se prueban primero en la rama `desarrollo`. `main` permanece estable. Ver [flujo PowerShell](docs/FLUJO_DESARROLLO_WINDOWS.md), [licencias Core](docs/CORE_LICENCIAS_ADMIN.md) y [SQL PULSE](docs/verticales/PULSE_MIGRACION_CORE.md). **SQL 014/015 todavía no aplicado**; no usar el código de PULSE original contra el esquema Core sin adaptar sus IDs y contratos.
+
+### Plan vivo PETS + INVENTORY
+- [Matriz DEC-001–007, fases E0–E11 y avance](docs/SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md)
+- [Plan integrado PETS + Inventario](docs/PLAN_EJECUCION_PETS_INVENTORY_2026_10.md)
+- [Especificación de los diez formularios](docs/especificaciones/ESPECIFICACION_FORMULARIOS_PETS.md)
+
+Registrar evidencia real de código, SQL y RLS, no solo marcar casillas por CI.
+

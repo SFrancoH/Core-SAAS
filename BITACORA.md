@@ -145,3 +145,15 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - Nuevo plan ejecutable: docs/PLAN_EJECUCION_PETS_INVENTORY_2026_10.md. Mantiene las capacidades anteriores de Inventario y agrega taxonomía estándar, subcategorías Producto, tipo de uso, modal, cantidades por sede, Movimiento/Compras/Ventas y catálogo dinámico clínico.
 - Se registraron bloqueadores de negocio; **no se ha ejecutado SQL, creado infraestructura Inventario, activado PETS multiempresa ni afectado PULSE**. Trabajo restringido a documentación en desarrollo.
 - Documento fuente completo preservado para implementación fiel: docs/especificaciones/ESPECIFICACION_FORMULARIOS_PETS.md. Su contenido no equivale a un esquema SQL existente.
+
+## 2026-10-19 — C21: decisiones y línea base de ejecución
+- **Estado SQL comunicado por el usuario:** 001–012 y **013 corregida ejecutadas manualmente sin errores** en Supabase; no se confirmó proyecto/entorno ni postcheck/JWT-RLS. Estado: SQL EJECUTADO (REPORTADO), NO VALIDADO EN STAGING. 014/015 sin confirmación de ejecución.
+- **DEC-001:** Producto, Medicamento, Vacuna, Desparasitante, Insumo son clasificaciones iniciales del sistema; Super-Admin global podrá crear otras para otras verticales. Tags libres y subcategorías propias son distintos.
+- **DEC-002:** SKU-0012 Dogshow único por empresa: sede A 25, sede B 45; total 70. No duplicar artículo entre sedes.
+- **DEC-003:** existencias por sede consolidadas desde bodegas/ubicaciones y ledger, sin segundo contador.
+- **DEC-004:** inventario se descuenta MANUALMENTE por movimiento autorizado; registrar compra/venta NO mueve stock en el MVP. Integración futura con ventas podría hacerlo sin doble descuento.
+- **DEC-005/006:** el registro clínico solo referencia el artículo, no vende/consume ni reserva. Permitida selección del artículo incluso con stock cero.
+- **DEC-007:** no crear ningún flujo de ventas, cambio de inventario ni interruptor asociado al texto «sin inventario».
+- **Documentos y estados:** creado \`docs/SEGUIMIENTO_EJECUCION_PETS_INVENTORY.md\` con E0–E11, evidencias y próximos pasos; actualizados plan integrado, INVENTORY_PLAN, PLAN_DESARROLLO, AGENTS y README.
+- **Pendiente inmediato:** E1 (postcheck 013, revisar estado 014, C14 lecturas, C15 escrituras, C16 dependencia usuario único); E0 residual (unidades/stock inicial, cardinalidad y movimientos manuales). Sin cambios SQL ni PETS/PULSE operacional en esta entrega.
+
