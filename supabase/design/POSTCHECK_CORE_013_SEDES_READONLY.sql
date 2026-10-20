@@ -32,7 +32,7 @@ order by tablename;
 
 -- 4. FKs de empresa/sede: 013 instala algunas como NOT VALID por protección histórica.
 -- NOT VALID no significa que la migración fallara; se validan aparte tras revisar legados.
-select n.nspname as esquema,c.relname as tabla,ct.conname as constraint,
+select n.nspname as esquema,c.relname as tabla,ct.conname as nombre_constraint,
        ct.contype as tipo,ct.convalidated as validada
 from pg_constraint ct
 join pg_class c on c.oid=ct.conrelid
@@ -41,7 +41,7 @@ where (n.nspname='core' and c.relname in ('sedes','membership_sedes','sede_legac
    or (n.nspname='public' and ct.conname in
     ('mascotas_sede_origen_misma_empresa','propietarios_sede_origen_misma_empresa',
      'consultas_sede_misma_empresa','eventos_sede_misma_empresa'))
-order by esquema,tabla,constraint;
+order by esquema,tabla,nombre_constraint;
 
 -- 5. Resumen no sensible del catálogo. Cero sedes puede ser válido en empresa nueva.
 select empresa_id,count(*)::integer as sedes_total,
