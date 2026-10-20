@@ -40,7 +40,7 @@ export default async function TenantOwnersPage({params,searchParams}:{
       <button type="submit">Buscar</button>
     </form>
     {owners.length?<div className="userList">{owners.map(o=><article key={o.id} className="userRow">
-      <div className="userIdentity"><strong>{o.nombre}</strong>
+      <div className="userIdentity"><Link href={root+"/propietarios/"+o.id}><strong>{o.nombre}</strong></Link>
         <small>{o.telefono??"—"} · {o.ciudad??"—"} · {o.email??"—"} · Sede: {o.sede_origen_id ? (sedeNames.get(o.sede_origen_id)??"Sede no disponible") : "Histórica sin sede"}</small>
       </div>
     </article>)}</div>:<div className="emptyState">No hay propietarios que coincidan.</div>}
