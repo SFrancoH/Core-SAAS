@@ -161,3 +161,15 @@ Leer reglas → identificar vertical/entidad → definir contrato, permisos/lice
 3. **PULSE operativo (pendiente):** adaptar API, pantallas, transacciones y webhooks desde su repositorio original de forma incremental. No ofrecer la vertical hasta completar pruebas.
 4. **PETS multiempresa (pendiente):** completar C14–C16 de escrituras y RLS legacy. Estructura TypeScript/core existente no significa migración clínica integral.
 5. **Workflow:** único origen `desarrollo`, CI en PR contra `main`, pruebas PowerShell, promoción supervisada y sincronización de la misma rama.
+
+
+## C20 — PETS: 10 formularios + ampliación INVENTORY (2026-10-19)
+- [x] Analizar nueva especificación de 10 formularios/26 páginas referidas y requisitos expresos de Inventario §13; confrontar con INVENTORY_PLAN original I0–I9.
+- [x] Plan de ejecución: docs/PLAN_EJECUCION_PETS_INVENTORY_2026_10.md; documentar complementos sin borrar FEFO/FIFO, bodegas, lotes, JIT ni permisos.
+- [ ] E0: validar decisiones de taxonomía estándar, SKU, unidad, saldo inicial, eventos de consumo y condiciones «sin inventario».
+- [ ] E1: confirmar 013 aplicado en Supabase Core staging y 014 cuando corresponda; cerrar C14–C16 PETS (writes multiempresa y multisede); E2E reales.
+- [ ] E2/E3: contratos TS y esquema versionado inventory.* y servicios PETS nuevos; SQL NO aplicado automáticamente.
+- [ ] E4/E5/E6: catálogo + modal + cantidades por sede; stock/ledger transaccional; vistas Movimiento/Compras/Ventas.
+- [ ] E7/E8: componentes comunes y 10 variantes PETS fieles a la fuente con historial y adjuntos seguros.
+- [ ] E9/E10/E11: integración sin descuento implícito; FEFO/FIFO/JIT, validación E2E, piloto y aprobación a main.
+**Estado:** plan/documentación; no se han creado tablas, formularios ni descuentos de stock.

@@ -202,3 +202,14 @@ Todos exigen membership, `core.entitlements` al módulo `INVENTORY`, empresa del
 ## 13. Estado real y seguridad del despliegue
 
 Esta especificación **NO crea una bodega ni descuenta inventario**. Será la fuente normativa del futuro módulo `lib/modules/inventory`, sus rutas Next.js, contratos TypeScript y esquema `inventory` (propuesto). Ningún SQL de Inventario se incluye en el paquete de migración PETS/Core de esta fase, porque aún hay decisiones de negocio abiertas. Registrar nuevas decisiones en este .md antes de implementarlas.
+
+
+## 14. Complemento PETS formularios y catálogo estándar (2026-10-19)
+
+**Fuente incorporada:** ESPECIFICACION_FORMULARIOS_PETS (1).md del usuario, sobre todo §13. **Plan de conciliación y ejecución:** docs/PLAN_EJECUCION_PETS_INVENTORY_2026_10.md.
+
+**No sustituye I0–I9:** añade cinco etiquetas estándar exactas (Producto, Medicamento, Vacuna, Desparasitante, Insumo) distintas de tags personalizados; subcategorías configurables de Producto; tipos de uso exactos (Interno, Comercial, Interno/Comercial, Comercial/Sitio-web); imagen_url opcional, ficha modal y cantidades agregadas por sede; vistas Movimiento/Compras/Ventas y referencias estables desde diez formularios PETS.
+
+**Invariantes:** catálogo uno por empresa; ningún formulario guarda un catálogo de medicamentos/vacunas/insumos alternativo; movimientos auditados con actor de sesión y ledger; propietario en venta PETS por ID; no descuento de stock por registro clínico sin definición operativa; cantidades de la ficha por sede se concilian con movimientos, nunca doble saldo. No inferir opciones de listas ni campos ocultos desde los PDF.
+
+**Conflictos abiertos:** cardinalidad de etiqueta estándar, política definitiva de SKU y unidad, registro de saldo inicial por sede y ubicación, automatismo Compra/Venta/consumo clínico, mensaje «sin inventario», disponibilidad, filtro futuro de tienda. Remitir las decisiones a I0 antes de activar flujos que alteren existencias. La inclusión de esta sección es DOCUMENTACIÓN, no implementación ni SQL aplicado.

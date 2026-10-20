@@ -138,3 +138,9 @@ No incluir secretos, URLs privadas, datos clínicos o personales ni tokens en es
 - **Corregido en la rama `desarrollo`**: `supabase/migrations/013_core_sedes.sql`, el paquete combinado `supabase/deploy/CORE_UNA_EJECUCION_STAGING.sql` y prueba estática que impide regresar al error 42601.
 - **Despliegue**: 001–012 ejecutados manualmente por el usuario sin errores; 013 falló durante el análisis SQL. Ejecutar solo 013 corregido desde una sesión nueva tras comprobar que no quedaron cambios parciales; **no ejecutar paquete combinado ni repetir 001–012**.
 - **Estado**: no se ha confirmado ejecución exitosa de 013 en Supabase ni validación de RLS con JWT.
+
+
+## 2026-10-19 — Plan PETS formularios + INVENTORY
+- Se examinó la especificación suministrada de diez formularios y el anexo de Inventario; se contrastó con docs/modules/INVENTORY_PLAN.md, UNI-001, PETS actual y el árbol real de migraciones.
+- Nuevo plan ejecutable: docs/PLAN_EJECUCION_PETS_INVENTORY_2026_10.md. Mantiene las capacidades anteriores de Inventario y agrega taxonomía estándar, subcategorías Producto, tipo de uso, modal, cantidades por sede, Movimiento/Compras/Ventas y catálogo dinámico clínico.
+- Se registraron bloqueadores de negocio; **no se ha ejecutado SQL, creado infraestructura Inventario, activado PETS multiempresa ni afectado PULSE**. Trabajo restringido a documentación en desarrollo.
